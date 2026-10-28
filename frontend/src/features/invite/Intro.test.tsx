@@ -6,10 +6,10 @@ import { intro } from './fixtures'
 import { Intro } from './Intro'
 import { makeT } from './strings'
 
-function renderIntro(data = intro()) {
+function renderIntro(data = intro(), lockSkip = false) {
   return render(
     <InviteContext.Provider value={{ lang: 'ar', t: makeT('ar'), maxWidth: 760, demo: false, hasIntro: true }}>
-      <Intro data={data} />
+      <Intro data={data} lockSkip={lockSkip} />
     </InviteContext.Provider>,
   )
 }
@@ -156,5 +156,69 @@ describe('Intro', () => {
     expect(root.classList.contains('is-awaiting-play')).toBe(false)
     expect(root.classList.contains('is-open')).toBe(false)
     document.removeEventListener('lb:intro-play', played)
+  })
+})
+
+describe('Intro — the guest cannot skip the video', () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+    document.body.style.overflow = ''
+    HTMLMediaElement.prototype.play = vi.fn().mockResolvedValue(undefined)
+    HTMLMediaElement.prototype.pause = vi.fn()
+    HTMLMediaElement.prototype.load = vi.fn()
+  })
+  afterEach(() => vi.useRealTimers())
+
+  const rendered = () => renderIntro(intro({ video: '/v.mp4' }), true)
+
+  it('neither a tap nor the enter button opens it while the video plays, and the button is hidden', () => {
+    const { container } = rendered()
+    const root = container.querySelector('.lb-intro')!
+    expect(root.classList.contains('is-skip-locked')).toBe(true)
+    fireEvent.click(container.querySelector('[data-intro-open]')!)
+    fireEvent.click(root)
+    expect(root.classList.contains('is-open')).toBe(false)
+  })
+
+  it('opens by itself when the video ends', () => {
+    const { container } = rendered()
+    const root = container.querySelector('.lb-intro')!
+    fireEvent.ended(container.querySelector('video')!)
+    expect(root.classList.contains('is-open')).toBe(true)
+  })
+
+  it('opens at the configured seconds even though skipping is locked', () => {
+    const { container } = renderIntro(intro({ video: '/v.mp4', seconds: 3 }), true)
+    act(() => {
+      vi.advanceTimersByTime(3100)
+    })
+    expect(container.querySelector('.lb-intro')!.classList.contains('is-open')).toBe(true)
+  })
+
+  it('lets the guest in when the video fails, so nobody is stuck', () => {
+    const { container } = rendered()
+    const root = container.querySelector('.lb-intro')!
+    fireEvent.error(container.querySelector('video')!)
+    expect(root.classList.contains('is-skip-locked')).toBe(false)
+    fireEvent.click(root)
+    expect(root.classList.contains('is-open')).toBe(true)
+  })
+
+  it('unlocks after a failsafe if the video never finishes', () => {
+    const { container } = rendered()
+    const root = container.querySelector('.lb-intro')!
+    act(() => {
+      vi.advanceTimersByTime(16000)
+    })
+    expect(root.classList.contains('is-skip-locked')).toBe(false)
+  })
+
+  it('does not lock the editor preview or a no-video intro', () => {
+    const editor = renderIntro(intro({ video: '/v.mp4' }), false)
+    fireEvent.click(editor.container.querySelector('.lb-intro')!)
+    expect(editor.container.querySelector('.lb-intro')!.classList.contains('is-open')).toBe(true)
+    editor.unmount()
+    const plain = renderIntro(intro(), true)
+    expect(plain.container.querySelector('.lb-intro')!.classList.contains('is-skip-locked')).toBe(false)
   })
 })

@@ -323,7 +323,18 @@ SECTION_CODE_FIELD = field(
     help_text="الصق الكود كله هنا زي ما هو: <style> وHTML و<script>. "
               "الستايل بيتحصر على القسم ده وحده، والكود بيطلع في مربع "
               "واحد محبوس جوّه حدود القسم وبيتسحب بالماوس كقطعة واحدة. "
-              "جوّه <script> المتغيّر root هو عنصر القسم نفسه.")
+              "جوّه <script> المتغيّر root هو عنصر القسم نفسه، والمتغيّر "
+              "eventDate هو موعد الدعوة (Date) — للعدّاد اكتب "
+              "eventDate || new Date(2026, 11, 31) بدل تاريخ ثابت.")
+
+# موعد الكود — بيظهر في كل قسم (إلا اللي عنده ‎countdown_date‎ بتاعه): القالب مالوش تاريخ
+# مناسبة، فمن غير الحقل ده مفيش طريقة تظبط عدّاد مكتوب بالكود وانت بتصمّم.
+SECTION_CODE_DATE_FIELD = field(
+    "countdown_date", "موعد للكود (eventDate)", "datetime", "",
+    group="كود متقدّم", translate=False,
+    help_text="سيبه فاضي عشان ياخد تاريخ المناسبة من تبويب البيانات. "
+              "في الكود استخدم المتغيّر eventDate (Date): "
+              "const target = eventDate || new Date(2026, 11, 31, 20, 0);")
 
 # الخانتين القديمتين. اتلمّوا في خانة واحدة، والقيم المحفوظة بتتنقل لها
 # تلقائياً في ``normalize_document`` — فضلوا متسجّلين عشان التطبيع يشوف
@@ -718,6 +729,8 @@ def register(
     # عنده مفتاح ‎html‎) معرّف حقوله بنفسه بمعنى مختلف — الـHTML هناك
     # **هو** القسم — فبنسيبه زي ما هو.
     block_props.append(copy.deepcopy(SECTION_CODE_FIELD))
+    if not any(f.get("key") == "countdown_date" for f in block_props):
+        block_props.append(copy.deepcopy(SECTION_CODE_DATE_FIELD))
     if not any(f.get("key") == "html" for f in block_props):
         for spec in SECTION_LEGACY_CODE_FIELDS:
             block_props.append(copy.deepcopy(spec))
@@ -1256,7 +1269,7 @@ register(
 
         field("countdown_date", "موعد العدّاد المستورد", "datetime", "",
               group="إعدادات العداد", translate=False,
-              help_text="يظهر هذا الحقل للأقسام التي تحتوي على Countdown؛ اتركه فارغاً لاستخدام موعد القالب الأصلي."),
+              help_text="للأقسام التي تحتوي على Countdown، ولكود القسم (المتغيّر eventDate)؛ اتركه فارغاً لاستخدام موعد القالب الأصلي أو تاريخ المناسبة."),
         field("countdown_dir", "اتجاه خانات العدّاد", "select", "",
               group="إعدادات العداد", translate=False,
               options=COUNTDOWN_DIR_CHOICES,

@@ -45,7 +45,7 @@ interface MusicHandle {
  * المستمعين native مش React عن قصد: الترتيب (التقاط/فقاعة، ‎stopPropagation‎
  * على الزرار) هو اللي بيحدد مين يفتح الدعوة.
  */
-export function Intro({ data }: { data: IntroData }) {
+export function Intro({ data, lockSkip = false }: { data: IntroData; lockSkip?: boolean }) {
   const { t } = useInvite()
   const root = useRef<HTMLDivElement>(null)
   const video = useRef<HTMLVideoElement>(null)
@@ -59,6 +59,9 @@ export function Intro({ data }: { data: IntroData }) {
   const [awaiting, setAwaiting] = useState(manual)
   const [blocked, setBlocked] = useState(false)
   const [gone, setGone] = useState(false)
+  // الضيف مايقدرش يتخطّى فيديو الافتتاحية: لا زرار ولا لمسة بتفتح الدعوة قبل ما الفيديو يخلص
+  // (أو العدّاد يخلّص). المحرر مابيقفلش (‎lockSkip‎ = false) عشان المصمّم يعاين براحته.
+  const [skipLocked, setSkipLocked] = useState(lockSkip && Boolean(data.video))
 
   useEffect(() => {
     const intro = root.current
@@ -68,6 +71,22 @@ export function Intro({ data }: { data: IntroData }) {
     let isOpen = false
     let isAwaiting = manual
     const vid = video.current
+    let locked = lockSkip && Boolean(vid)
+    // لو الفيديو ماقدرش يشتغل (رفض المتصفح، خطأ تحميل، أو مابدأش) الضيف مايتحبسش جوّه الافتتاحية
+    const unlock = () => {
+      if (!locked) return
+      locked = false
+      setSkipLocked(false)
+    }
+    // شبكة أمان: الفيديو وقف في النص أو ماخلصش — بعد مدّته + مهلة الضيف يقدر يدخل بنفسه
+    let failsafe: number | undefined
+    const armFailsafe = () => {
+      if (!locked) return
+      window.clearTimeout(failsafe)
+      const duration = vid && Number.isFinite(vid.duration) ? vid.duration : 0
+      failsafe = window.setTimeout(unlock, ((duration || 7) + 8) * 1000)
+    }
+    cleanup.push(() => window.clearTimeout(failsafe))
     const prevOverflow = document.body.style.overflow
     document.body.style.overflow = 'hidden'
 
@@ -163,9 +182,14 @@ export function Intro({ data }: { data: IntroData }) {
               vid.muted = true
               announcePlay()
               const again = vid.play()
-              if (again && again.catch) again.catch(() => setBlocked(true))
+              if (again && again.catch)
+                again.catch(() => {
+                  setBlocked(true)
+                  unlock()
+                })
             })
           }
+          armFailsafe()
           startAuto() // العدّاد يبدأ من دلوقتي
         }
         const onPlay = (e: Event) => {
@@ -180,7 +204,10 @@ export function Intro({ data }: { data: IntroData }) {
           const tryPlay = vid.play()
           if (tryPlay && tryPlay.catch) {
             // iOS في وضع توفير الطاقة بيرفض التشغيل — الغلاف بيفضل ظاهر
-            tryPlay.catch(() => setBlocked(true))
+            tryPlay.catch(() => {
+              setBlocked(true)
+              unlock()
+            })
           }
         }
       }
@@ -189,12 +216,24 @@ export function Intro({ data }: { data: IntroData }) {
       }
       vid.addEventListener('ended', onEnded)
       cleanup.push(() => vid.removeEventListener('ended', onEnded))
+      if (locked) {
+        vid.addEventListener('error', unlock)
+        cleanup.push(() => vid.removeEventListener('error', unlock))
+        // المنتظر ضغطة تشغيل مايتحسبش عليه وقت (بيبدأ من الضغطة)
+        const onMeta = () => {
+          if (!isAwaiting) armFailsafe()
+        }
+        vid.addEventListener('loadedmetadata', onMeta, { once: true })
+        cleanup.push(() => vid.removeEventListener('loadedmetadata', onMeta))
+        if (!manual) armFailsafe()
+      }
     }
 
     const btn = openBtn.current
     if (btn) {
       const onBtn = (e: Event) => {
         e.stopPropagation()
+        if (locked) return
         doOpen()
       }
       btn.addEventListener('click', onBtn)
@@ -223,11 +262,12 @@ export function Intro({ data }: { data: IntroData }) {
         startManual?.()
         return
       }
+      if (locked) return
       doOpen()
     }
     intro.addEventListener('click', onTouch)
     cleanup.push(() => intro.removeEventListener('click', onTouch))
-    intro.style.cursor = 'pointer'
+    intro.style.cursor = locked ? 'default' : 'pointer'
 
     return () => {
       cleanup.forEach((fn) => fn())
@@ -247,6 +287,7 @@ export function Intro({ data }: { data: IntroData }) {
   if (open) cls.push('is-open')
   if (awaiting) cls.push('is-awaiting-play')
   if (blocked) cls.push('is-video-blocked')
+  if (skipLocked) cls.push('is-skip-locked')
   const items = data.itemStyles
   // أول ما play() يتنادى المتصفح بيشيل الغلاف قبل ما أول فريم يترسم، فبتظهر
   // ومضة بلون الصفحة. الغلاف نفسه كخلفية للفيديو بيسد الفجوة دي.

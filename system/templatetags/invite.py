@@ -429,9 +429,14 @@ def wrap_js(value, events=None, names=None):
         # ‎typeof name‎ من غير ما يرمي لو الدالة مش متعرّفة
         fns = "{" + ",".join(f'"{n}":typeof {n}==="function"?{n}:null' for n in names) + "}"
         bind = "\n" + _HANDLER_BIND_JS % (fns, json.dumps(list(events)))
+    # ‎eventDate‎: موعد الدعوة (أو موعد القسم لو اتحدّد) كـ‎Date‎ جاهز، ‎null‎ لو مفيش —
+    # بيجي من ‎data-event-date‎ على وسم السكربت (‎_section_code.html‎). كود العدّاد يكتب
+    # ‎eventDate || new Date(...)‎ بدل تاريخ مكتوب جوّه الكود، فالتاريخ يتعدّل من المحرر.
     return mark_safe(
         "(function(){var s=document.currentScript;"
         "var root=s&&s.closest?s.closest('[data-block],.lb-intro'):null;"
+        "var eventDate=(function(){var v=s&&s.getAttribute?s.getAttribute('data-event-date'):'';"
+        "var d=v?new Date(v):null;return d&&!isNaN(d.getTime())?d:null;})();"
         "try{" + body + bind + "}catch(e){"
         "console.error('[farha] كود القسم وقع:',e);}})();"
     )

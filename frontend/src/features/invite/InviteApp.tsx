@@ -208,7 +208,7 @@ function Viewer({ initial }: { initial: RenderPayload }) {
     <InviteContext.Provider value={ctx}>
       {kind === 'template' && <BackToSite siteUrl={payload.siteUrl} />}
       {payload.hasAlt && <LangToggle altLang={altLang} onSwitch={switchLang} busy={busy} />}
-      {payload.intro && <Intro data={payload.intro} />}
+      {payload.intro && <Intro data={payload.intro} lockSkip />}
       <div {...rootAttrs} className={stageClass}>
         {payload.blocks.map((block) => (
           <BlockView key={block.id} block={block} />

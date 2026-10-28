@@ -2347,6 +2347,37 @@ class VideoCodeOverlayTests(TestCase):
 
 
 # ==========================================================================
+class CodeEventDateTests(TestCase):
+    """كود القسم بيقرا موعد الدعوة كمتغيّر ‎eventDate‎ (عدّاد مكتوب بالكود)."""
+
+    JS = "<div>x</div><script>const target = eventDate || new Date(2026, 11, 31);</script>"
+
+    def _html(self, **props):
+        block = B.make_block("text")
+        block["id"] = "cd-1"
+        block["props"]["code"] = self.JS
+        block["props"].update(props)
+        doc = B.normalize_document({"blocks": [block]})
+        return str(render_document(doc, editable=False)["html"])
+
+    def test_the_script_defines_event_date_from_its_own_attribute(self):
+        html = self._html()
+        self.assertIn("var eventDate=", html)
+        self.assertIn("data-event-date=", html)
+
+    def test_a_date_picked_on_the_section_wins(self):
+        html = self._html(countdown_date="2031-05-06T19:30")
+        self.assertIn('data-event-date="2031-05-06T19:30"', html)
+
+    def test_every_section_offers_the_date_field(self):
+        keys = {f["key"] for f in B.BLOCK_REGISTRY["text"]["props"]}
+        self.assertIn("countdown_date", keys)
+        # القسم اللي عنده حقل بنفس الاسم مايتكررش
+        names = [f["key"] for f in B.BLOCK_REGISTRY["countdown"]["props"]]
+        self.assertEqual(names.count("countdown_date"), 1)
+
+
+# ==========================================================================
 class CustomSectionTextTests(TestCase):
     """نصوص القسم المستورد — استخراجها من الكود واستبدالها فيه."""
 

@@ -1319,11 +1319,11 @@ def render_document(
         # موعد العدّاد: بيجي من تاريخ المناسبة، إلا لو القسم محدّد موعده
         # بنفسه. القالب مالوش تاريخ مناسبة أصلاً، فمن غير الحقل ده
         # مكانش فيه أي طريقة تظبط العدّاد وانت بتصمّم قالب.
+        # أي قسم ممكن يحدّد موعده (حقل «موعد للكود») — كود القسم بيقراه كمتغيّر ‎eventDate‎
         block_countdown_iso = countdown_iso
-        if block["type"] == "countdown":
-            picked = str(resolved_props.get("countdown_date") or "").strip()
-            if re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}", picked):
-                block_countdown_iso = picked
+        picked = str(resolved_props.get("countdown_date") or "").strip()
+        if re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}", picked):
+            block_countdown_iso = picked
 
         ctx = {
             "block": block,

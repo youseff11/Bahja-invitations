@@ -62,11 +62,13 @@ export function InspectorPanel({ schema }: { schema: EditorSchema }) {
 
   // قسم «كود مخصص»: بنعرض بس اللي ليه لازمة — الكود مفتوح وجاهز، العدّاد لو فيه عدّاد، والمواضع بتتسحب بالماوس. الألوان من العنصر المحدَّد.
   const custom = block.type === 'custom_html'
+  const usesEventDate = typeof block.props.code === 'string' && /\beventDate\b/.test(block.props.code)
   const groupsOf = (...keys: string[]) => spec.props.filter((f) => keys.includes(f.key)).map((f) => f.group || '')
   // «عناصر فوق القسم» (نص/صورة/زرار) مابتظهرش في لوحة أي قسم: بتتضاف من شريط المعاينة وبتتحدّد وتتسحب وتتحذف من المعاينة
   const hide = [
     ...groupsOf('text_overlays'),
-    ...(custom && !hasCountdown(typeof block.props.html === 'string' ? block.props.html : '')
+    // موعد العدّاد بيظهر لو فيه عدّاد مستورد، أو كود القسم بيقرا ‎eventDate‎ (عدّاد مكتوب بالكود)
+    ...(custom && !hasCountdown(typeof block.props.html === 'string' ? block.props.html : '') && !usesEventDate
       ? groupsOf('countdown_date', 'countdown_dir')
       : []),
   ]

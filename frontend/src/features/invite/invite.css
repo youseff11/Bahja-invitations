@@ -1440,6 +1440,8 @@ a.lb-social:hover { transform: translateY(-2px); opacity: .85; }
   color: var(--intro-item-color, var(--intro-color, #fff));
   transition: none;
 }
+/* فيديو الافتتاحية مايتخطّاش: زرار الدخول مخفي لحد ما الفيديو يخلص (الدعوة بتتفتح لوحدها) */
+.lb-intro.is-skip-locked [data-intro-open] { visibility: hidden; pointer-events: none; }
 [data-intro-item] {
   color: var(--intro-item-color, inherit);
   font-family: var(--intro-item-font, inherit);

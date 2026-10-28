@@ -61,6 +61,9 @@ export function runSectionScripts(scope: ParentNode = document) {
     if (!old.parentNode || ran.has(old)) return
     const fresh = document.createElement('script')
     fresh.setAttribute('data-lb-section-script', '1')
+    // موعد الدعوة للكود: ‎wrap_js‎ بيقراه من ‎document.currentScript‎ ويعرّفه كمتغيّر ‎eventDate‎
+    const eventDate = old.getAttribute('data-event-date')
+    if (eventDate) fresh.setAttribute('data-event-date', eventDate)
     fresh.textContent = old.textContent
     ran.add(fresh)
     old.parentNode.replaceChild(fresh, old)
