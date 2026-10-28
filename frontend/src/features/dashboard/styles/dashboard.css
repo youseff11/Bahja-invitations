@@ -816,9 +816,13 @@
 .dash-root .grid--4 {
   grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
 }
-/* كروت القوالب: بحد أقصى ٤ في الصف (الحد الأدنى للعمود = ربع العرض بعد خصم ٣ فجوات ١٨px) */
+/* كروت القوالب بمقاسات zeekraa.com: ٢٩٠px بصورة مربعة وفجوة ٤٠px، بحد أقصى ٤ في الصف */
 .dash-root .grid--gallery {
-  grid-template-columns: repeat(auto-fill, minmax(max(210px, calc((100% - 54px) / 4)), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(290px, 100%), 290px));
+  gap: 40px;
+  justify-content: center;
+  max-width: 1280px;
+  margin-inline: auto;
 }
 .dash-root .card {
   background: var(--surface);
@@ -836,7 +840,8 @@
 .dash-root .tpl-card {
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: var(--radius);
+  border-radius: 20px;
+  padding: 10px;
   overflow: hidden;
   box-shadow: var(--shadow);
   display: flex;
@@ -853,7 +858,8 @@
 }
 .dash-root .tpl-cover {
   position: relative;
-  aspect-ratio: 3/4;
+  aspect-ratio: 1/1;
+  border-radius: 12px;
   background: linear-gradient(150deg, var(--accent-soft), var(--surface-2));
   display: grid;
   place-items: center;
@@ -876,7 +882,7 @@
   opacity: 1;
 }
 .dash-root .tpl-body {
-  padding: 15px 16px 18px;
+  padding: 18px 14px 14px;
   display: flex;
   flex-direction: column;
   gap: 6px;

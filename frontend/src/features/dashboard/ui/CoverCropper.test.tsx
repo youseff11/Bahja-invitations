@@ -37,16 +37,16 @@ function loadImage(width: number, height: number) {
 }
 
 describe('CoverCropper', () => {
-  it('exports a 3:4 crop covering the whole image at zoom 1', async () => {
+  it('exports a square crop covering the whole image at zoom 1', async () => {
     const onDone = vi.fn()
     render(<CoverCropper file={new File(['x'], 'bg.jpg', { type: 'image/jpeg' })} onCancel={vi.fn()} onDone={onDone} />)
-    loadImage(2000, 1000) // أفقية: القص بياخد النص الأوسط بعرض ٧٥٠ (٣:٤ من ارتفاع ١٠٠٠)
+    loadImage(2000, 1000) // أفقية: القص بياخد النص الأوسط بعرض ١٠٠٠ (مربع من ارتفاع ١٠٠٠)
     fireEvent.click(await screen.findByRole('button', { name: 'قص وحفظ' }))
 
     await waitFor(() => expect(onDone).toHaveBeenCalledTimes(1))
     const [sx, sy, sw, sh, dx, dy, dw, dh] = drawImage.mock.calls[0].slice(1)
-    expect([sx, sy, sw, sh]).toEqual([625, 0, 750, 1000])
-    expect([dx, dy, dw, dh]).toEqual([0, 0, 750, 1000])
+    expect([sx, sy, sw, sh]).toEqual([500, 0, 1000, 1000])
+    expect([dx, dy, dw, dh]).toEqual([0, 0, 1000, 1000])
     expect(onDone.mock.calls[0][0]).toMatchObject({ name: 'bg-cover.jpg', type: 'image/jpeg' })
   })
 
@@ -61,7 +61,7 @@ describe('CoverCropper', () => {
     await waitFor(() => expect(drawImage).toHaveBeenCalled())
     const [sx, , sw] = drawImage.mock.calls[0].slice(1)
     expect(Math.abs(sx)).toBe(0) // وقف عند حافة الصورة
-    expect(sw).toBe(750)
+    expect(sw).toBe(1000)
 
     fireEvent.keyDown(document, { key: 'Escape' })
     expect(onCancel).toHaveBeenCalled()

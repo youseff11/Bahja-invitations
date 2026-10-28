@@ -276,9 +276,12 @@ html[lang="en"][data-theme="dark"] .hero-art {
 .grid { display: grid; gap: 18px; }
 .grid--3 { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
 .grid--4 { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }
-/* معرض القوالب: نفس الـ auto-fill بس بحد أقصى ٤ في الصف على الشاشات الكبيرة
-   (الحد الأدنى للعمود = ربع العرض بعد خصم ٣ فجوات ١٨px). */
-.grid--gallery { grid-template-columns: repeat(auto-fill, minmax(max(210px, calc((100% - 54px) / 4)), 1fr)); }
+/* معرض القوالب بمقاسات zeekraa.com: كارت ٢٩٠px بصورة مربعة ١:١ وفجوة ٤٠px،
+   وعرض ١٢٨٠px كحد أقصى = ٤ كروت في الصف بالظبط على الشاشات الكبيرة. */
+.grid--gallery {
+  grid-template-columns: repeat(auto-fill, minmax(min(290px, 100%), 290px));
+  gap: 40px; justify-content: center; max-width: 1280px; margin-inline: auto;
+}
 
 .card {
   background: var(--surface); border: 1px solid var(--line);
@@ -288,16 +291,16 @@ html[lang="en"][data-theme="dark"] .hero-art {
 
 .tpl-card {
   background: var(--surface); border: 1px solid var(--line);
-  border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow);
+  border-radius: 20px; padding: 10px; overflow: hidden; box-shadow: var(--shadow);
   display: flex; flex-direction: column; transition: transform .22s, border-color .22s;
 }
 .tpl-card:hover { transform: translateY(-4px); border-color: var(--accent); }
 .tpl-cover {
-  aspect-ratio: 3/4; background: linear-gradient(150deg, var(--accent-soft), var(--surface-2));
+  aspect-ratio: 1/1; border-radius: 12px; background: linear-gradient(150deg, var(--accent-soft), var(--surface-2));
   display: grid; place-items: center; color: var(--accent);
   font-family: var(--font-display); font-size: 30px; background-size: cover; background-position: center;
 }
-.tpl-body { padding: 15px 16px 18px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.tpl-body { padding: 18px 14px 14px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
 .tpl-body h3 { margin: 0; font-size: 17px; }
 .tpl-meta { font-size: 12px; color: var(--muted); letter-spacing: normal; }
 html[lang="en"] .tpl-meta { letter-spacing: .1em; }

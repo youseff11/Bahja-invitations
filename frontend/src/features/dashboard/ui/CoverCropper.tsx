@@ -3,12 +3,12 @@ import type { KeyboardEvent, PointerEvent } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
-/** نسبة غلاف القالب (عرض:ارتفاع) — نفس ‎.tpl-cover { aspect-ratio: 3/4 }‎. */
-const COVER_ASPECT = 3 / 4
+/** نسبة غلاف القالب (عرض:ارتفاع) — نفس ‎.tpl-cover { aspect-ratio: 1/1 }‎. */
+const COVER_ASPECT = 1
 /** المقاس المثالي للصورة (بالبكسل) عشان الغلاف يبان كامل وواضح حتى على الشاشات الكبيرة. */
-const COVER_IDEAL = { width: 900, height: 1200 }
+const COVER_IDEAL = { width: 1200, height: 1200 }
 
-const FRAME_W = 270
+const FRAME_W = 300
 const FRAME_H = FRAME_W / COVER_ASPECT
 const MAX_ZOOM = 4
 const MAX_OUT_W = 1200
@@ -36,7 +36,7 @@ function clampOffset(offset: Point, natW: number, natH: number, zoom: number): P
   }
 }
 
-/** قص صورة الغلاف بنسبة ثابتة ٣:٤ — اسحب الصورة وكبّرها لحد ما الجزء المطلوب يبان جوه الإطار. */
+/** قص صورة الغلاف بنسبة ثابتة ١:١ — اسحب الصورة وكبّرها لحد ما الجزء المطلوب يبان جوه الإطار. */
 export function CoverCropper({ file, onCancel, onDone }: Props) {
   const { t } = useTranslation()
   const [src, setSrc] = useState('')
