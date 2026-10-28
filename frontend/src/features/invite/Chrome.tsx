@@ -35,6 +35,24 @@ export function LangToggle({
   )
 }
 
+/**
+ * زرار «عودة للموقع» — بيظهر في معاينة القالب بس، فوق الافتتاحية كمان عشان الزائر
+ * اللي فتح المعاينة من تبويب جديد يلاقي طريق الرجوع من أول شاشة.
+ */
+export function BackToSite({ siteUrl }: { siteUrl: string }) {
+  const { t } = useInvite()
+  // الرابط المطلق جاي من السيرفر؛ لو فاضي نرجع للجذر
+  const home = `${siteUrl.replace(/#.*$/, '') || '/'}#templates`
+  return (
+    <a className="lb-back" data-back-to-site href={home}>
+      <span aria-hidden="true" className="lb-back-arrow">
+        →
+      </span>
+      {t('back.toSite')}
+    </a>
+  )
+}
+
 /** شريط «عجبك القالب؟» — بيظهر في معاينة القالب بس. */
 export function PreviewCtaBar({ cta }: { cta: PreviewCta }) {
   const { t } = useInvite()

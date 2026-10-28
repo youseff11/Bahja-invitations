@@ -50,6 +50,9 @@
     "pause": "Pause auto-scroll",
     "play": "Play auto-scroll"
   },
+  "back": {
+    "toSite": "Back to site"
+  },
   "lang": {
     "toEn": "View in English",
     "toAr": "اعرض بالعربية"

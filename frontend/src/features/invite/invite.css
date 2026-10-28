@@ -1854,6 +1854,33 @@ a.lb-social:hover { transform: translateY(-2px); opacity: .85; }
   .lb-lang { inset-block-start: 12px; inset-inline-start: 12px; block-size: 38px; }
 }
 
+/* ------------------------------------------------ عودة للموقع (معاينة القالب) */
+/* نفس مكان زرار اللغة (فوق الافتتاحية كمان)؛ لو زرار اللغة موجود بنزيحه بجنبه.
+   السهم بيتقلب مع اتجاه الصفحة: «→» في العربي بيشاور ناحية الرجوع. */
+.lb-back {
+  position: fixed; z-index: 95;
+  inset-block-start: 16px; inset-inline-start: 16px;
+  block-size: 42px; padding-inline: 16px;
+  display: inline-flex; align-items: center; gap: 8px;
+  border: 1px solid var(--border); border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 86%, transparent);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  color: var(--text);
+  font: 600 13px/1 var(--font-body, inherit);
+  text-decoration: none; white-space: nowrap;
+  box-shadow: 0 8px 22px -12px rgba(0, 0, 0, .45);
+  transition: transform .18s ease, background .18s ease;
+}
+.lb-back:hover { transform: translateY(-1px); background: var(--accent-10); }
+.lb-back:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+[dir="ltr"] .lb-back-arrow { transform: scaleX(-1); }
+.lb-doc:has(.lb-lang) .lb-back { inset-inline-start: 70px; }
+@media (max-width: 480px) {
+  .lb-back { inset-block-start: 12px; inset-inline-start: 12px; block-size: 38px; padding-inline: 13px; }
+  .lb-doc:has(.lb-lang) .lb-back { inset-inline-start: 62px; }
+}
+@media print { .lb-back { display: none !important; } }
+
 /* المحرر: أوقف Hover القالب الذي يحرّك العنصر بعد تغيير موضعه،
    لكن اترك إطار التحديد .is-selected و .lb-el-picked كما هو. */
 .lb-doc--editing .lb:hover:not(.is-selected),

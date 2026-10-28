@@ -48,6 +48,16 @@ describe('InviteApp', () => {
     await waitFor(() => expect(watched.has(document.querySelector('section#video-1')!)).toBe(true))
   })
 
+  it('shows a back-to-site link in the template preview only', () => {
+    const { unmount } = render(
+      <InviteApp boot={{ mode: 'view', ...payload({ kind: 'template', siteUrl: 'https://site.test/', blocks: [hero('ليلى')] }) }} />,
+    )
+    expect(screen.getByRole('link', { name: /عودة للموقع/ })).toHaveAttribute('href', 'https://site.test/#templates')
+    unmount()
+    render(<InviteApp boot={{ mode: 'view', ...payload({ blocks: [hero('ليلى')] }) }} />)
+    expect(screen.queryByRole('link', { name: /عودة للموقع/ })).toBeNull()
+  })
+
   it('skips unknown block types instead of crashing', () => {
     render(<InviteApp boot={{ mode: 'view', ...payload({ blocks: [block('from-the-future'), hero('ليلى')] }) }} />)
     expect(document.querySelectorAll('[data-block]').length).toBe(1)

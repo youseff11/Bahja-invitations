@@ -17,10 +17,11 @@ export function usePublicHome() {
   })
 }
 
-export function useGallery(category?: string) {
+export function useGallery(category?: string, enabled = true) {
   return useQuery({
     queryKey: publicKeys.gallery(category),
     queryFn: () => api<GalleryData>('/public/templates/', { query: { category } }),
+    enabled,
   })
 }
 

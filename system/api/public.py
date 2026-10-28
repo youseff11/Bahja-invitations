@@ -101,6 +101,12 @@ def _faq_payload(faq: FAQ) -> dict:
 
 
 # ---------------------------------------------------------------- القراءة
+def _gallery_categories(labels: dict) -> list[dict]:
+    # «بدون» مش تصنيف يتفلتر بيه في المعرض العام
+    return [{"value": value, "label": label}
+            for value, label in labels.items() if value != NO_CATEGORY]
+
+
 @api_view("GET")
 def home(request):
     """كل اللي الرئيسية محتاجاه في طلب واحد: القوالب والباقات والأسئلة والإعدادات."""
@@ -112,6 +118,7 @@ def home(request):
     return {
         "site": site_payload(request),
         "templates": [_gallery_card(t, labels) for t in templates],
+        "categories": _gallery_categories(labels),
         "plans": [_plan_payload(p, addons) for p in plans],
         "faqs": [_faq_payload(f) for f in FAQ.objects.filter(is_active=True)],
     }
@@ -127,10 +134,7 @@ def template_gallery(request):
     labels = dict(category_choices())
     return {
         "results": [_gallery_card(t, labels) for t in qs],
-        # «بدون» مش تصنيف يتفلتر بيه في المعرض العام
-        "categories": [{"value": value, "label": label}
-                       for value, label in labels.items()
-                       if value != NO_CATEGORY],
+        "categories": _gallery_categories(labels),
         "category": category,
     }
 

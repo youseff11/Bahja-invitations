@@ -49,6 +49,7 @@ export interface PublicFaq {
 export interface HomeData {
   site: SiteInfo
   templates: PublicTemplate[]
+  categories: { value: string; label: string }[]
   plans: PublicPlan[]
   faqs: PublicFaq[]
 }

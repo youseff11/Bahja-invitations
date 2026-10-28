@@ -1,7 +1,9 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 
 import { ApiError } from '@/api/client'
+import { useGallery } from '../hooks'
 import { firstChar, pick, truncateChars, useLang } from '../text'
 import type { PublicTemplate } from '../types'
 
@@ -90,11 +92,17 @@ export function GalleryTemplateCard({ template }: { template: PublicTemplate }) 
 
 interface Props {
   templates: PublicTemplate[] | undefined
+  categories: { value: string; label: string }[] | undefined
   error: unknown
 }
 
-export function TemplatesSection({ templates, error }: Props) {
+export function TemplatesSection({ templates, categories, error }: Props) {
   const { t } = useTranslation()
+  const [category, setCategory] = useState('')
+  // الرئيسية بتجيب أول ١٢ قالب بس؛ لما التصنيف يتحدد بنجيب كل قوالبه من المعرض
+  const filtered = useGallery(category, !!category)
+  const shown = category ? filtered.data?.results : templates
+  const failure = category ? filtered.error : error
   return (
     <section className="section" id="templates">
       <div className="wrap">
@@ -103,12 +111,35 @@ export function TemplatesSection({ templates, error }: Props) {
           <h2>{t('public.templates.title')}</h2>
           <p>{t('public.templates.sub')}</p>
         </div>
+        {!!categories?.length && (
+          <div className="toolbar toolbar--center" role="group" aria-label={t('public.templates.categories')}>
+            <button
+              type="button"
+              className={'btn btn--sm ' + (category ? 'btn--ghost' : 'btn--gold')}
+              aria-pressed={!category}
+              onClick={() => setCategory('')}
+            >
+              {t('public.gallery.all')}
+            </button>
+            {categories.map(({ value, label }) => (
+              <button
+                key={value}
+                type="button"
+                className={'btn btn--sm ' + (category === value ? 'btn--gold' : 'btn--ghost')}
+                aria-pressed={category === value}
+                onClick={() => setCategory(value)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
         <div className="grid grid--4 grid--gallery">
-          {templates?.map((template) => <HomeTemplateCard key={template.id} template={template} />)}
-          {templates?.length === 0 && <p className="empty">{t('public.templates.empty')}</p>}
-          {!!error && (
+          {shown?.map((template) => <HomeTemplateCard key={template.id} template={template} />)}
+          {shown?.length === 0 && <p className="empty">{t('public.templates.empty')}</p>}
+          {!!failure && (
             <p className="empty" role="alert">
-              {error instanceof ApiError && error.message ? error.message : t('public.loadError')}
+              {failure instanceof ApiError && failure.message ? failure.message : t('public.loadError')}
             </p>
           )}
         </div>

@@ -38,7 +38,7 @@ class HomeApiTests(PublicApiTestCase):
 
         data = self.client.get("/api/v1/public/home/").json()
 
-        self.assertEqual(set(data), {"site", "templates", "plans", "faqs"})
+        self.assertEqual(set(data), {"site", "templates", "categories", "plans", "faqs"})
         self.assertIn("ordersEnabled", data["site"])
         card = data["templates"][0]
         self.assertEqual((card["name"], card["nameEn"]), ("ذهبي", "Golden"))
