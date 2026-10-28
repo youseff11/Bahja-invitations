@@ -352,6 +352,11 @@
     "upload": "Upload video",
     "added": "Added “{{name}}” to the library.",
     "reviewData": "Check the data — a field is missing.",
+    "editName": "Click to edit the name",
+    "renamed": "Renamed to “{{name}}”.",
+    "watch": "Watch",
+    "play": "Play “{{name}}”",
+    "close": "Close",
     "moveToIntros": "Move to intros",
     "confirmMove": "Move “{{name}}” to the intro library? It will disappear from the video library and stay in intros only.",
     "moved": "Moved “{{name}}” to the intro library."

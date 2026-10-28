@@ -19,7 +19,7 @@ from ..models import Asset, IntroVideo
 from .dashboard_common import fmt_dt, staff_api
 from .dashboard_library import VIDEO_EXTENSIONS, _clip_row, _get_or_404, _require_type
 from .editor_assets import _unwrap
-from .http import ApiError
+from .http import ApiError, json_body
 
 
 def _owner_label(asset) -> str:
@@ -63,6 +63,21 @@ def videos(request):
     return {"results": [_video_row(asset) for asset in _videos()]}
 
 
+@staff_api("PATCH")
+def video_detail(request, pk):
+    """تعديل اسم الفيديو (الاسم الأصلي اللي بيظهر في المكتبة والمحرر)."""
+    asset = _get_or_404(Asset, pk)
+    if asset.kind != "video" or asset.is_intro:
+        raise ApiError(404, "not_found", "الفيديو غير موجود في المكتبة.")
+    name = str(json_body(request).get("name") or "").strip()
+    if not name:
+        raise ApiError(400, "validation_error", "اكتب اسماً للفيديو.",
+                       fields={"name": "اكتب اسماً للفيديو."})
+    asset.original_name = name[:200]
+    asset.save(update_fields=["original_name", "updated_at"])
+    return _video_row(asset)
+
+
 def _copy_file(field, source) -> None:
     """نسخة مستقلة من الملف — عشان حذف الأصل (مع دعوته) ماينسفش الافتتاحية."""
     with source.open("rb") as handle:
@@ -95,5 +110,6 @@ def video_to_intro(request, pk):
 
 urlpatterns = [
     path("dashboard/videos/", videos, name="api_dashboard_videos"),
+    path("dashboard/videos/<int:pk>/", video_detail, name="api_dashboard_video"),
     path("dashboard/videos/<int:pk>/to-intro/", video_to_intro, name="api_dashboard_video_to_intro"),
 ]

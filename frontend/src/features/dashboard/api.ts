@@ -230,10 +230,13 @@ export function useVideos() {
   const create = useInvalidatingMutation((body: FormData) =>
     api<VideoRow>('/dashboard/videos/', { method: 'POST', body }),
   )
+  const rename = useInvalidatingMutation(({ id, name }: { id: number; name: string }) =>
+    api<VideoRow>(`/dashboard/videos/${id}/`, { method: 'PATCH', body: { name } }),
+  )
   const toIntro = useInvalidatingMutation((id: number) =>
     api<ClipRow>(`/dashboard/videos/${id}/to-intro/`, { method: 'POST' }),
   )
-  return { list, create, toIntro }
+  return { list, create, rename, toIntro }
 }
 
 /** مسح المقطوعات المكررة: ‎dryRun=true‎ بيرجّع الخطة من غير تغيير، وبعده التنفيذ الفعلي. */

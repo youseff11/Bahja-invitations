@@ -57,6 +57,7 @@ def _endpoints(ids):
         ("POST", f"{BASE}/intros/{ids['clip']}/toggle/"),
         ("GET", f"{BASE}/videos/"),
         ("POST", f"{BASE}/videos/"),
+        ("PATCH", f"{BASE}/videos/{ids['video']}/"),
         ("POST", f"{BASE}/videos/{ids['video']}/to-intro/"),
         ("GET", f"{BASE}/plans/"),
         ("PATCH", f"{BASE}/plans/{ids['plan']}/"),
@@ -690,6 +691,17 @@ class VideoLibraryTests(DashboardApiCase):
         # ومينفعش ينتقل مرتين
         self.assertEqual(self.post(f"{BASE}/videos/{self.video.pk}/to-intro/").status_code, 404)
         self.assertEqual(IntroVideo.objects.filter(name="clip").count(), 1)
+
+    def test_rename(self):
+        response = self.send("PATCH", f"{BASE}/videos/{self.video.pk}/", {"name": "  افتتاحية الحنة  "})
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["name"], "افتتاحية الحنة")
+        self.video.refresh_from_db()
+        self.assertEqual(self.video.original_name, "افتتاحية الحنة")
+
+    def test_rename_rejects_blank(self):
+        response = self.send("PATCH", f"{BASE}/videos/{self.video.pk}/", {"name": "   "})
+        self.assertIn("name", response.json()["error"]["fields"])
 
     def test_upload_goes_to_the_general_library(self):
         upload = SimpleUploadedFile("new.mp4", b"0" * 128, content_type="video/mp4")

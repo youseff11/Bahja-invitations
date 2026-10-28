@@ -1734,3 +1734,70 @@ html[lang='en'] .dash-root .tpl-meta {
 @media (prefers-reduced-motion: reduce) {
   .dash-root .empty[aria-busy="true"] { animation-duration: 0s; }
 }
+
+/* ---------------------------------------------------------- مكتبة الفيديوهات */
+.dash-root .video-thumb {
+  position: relative;
+  display: block;
+  width: 96px;
+  aspect-ratio: 9 / 14;
+  max-height: 150px;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #111;
+  cursor: pointer;
+}
+.dash-root .video-thumb video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+.dash-root .video-thumb-play {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: 22px;
+  background: rgba(0, 0, 0, 0.28);
+  transition: background 0.18s ease;
+}
+.dash-root .video-thumb:hover .video-thumb-play,
+.dash-root .video-thumb:focus-visible .video-thumb-play {
+  background: rgba(0, 0, 0, 0.5);
+}
+.dash-dialog.video-dialog {
+  width: min(460px, 100%);
+  max-height: calc(100vh - 36px);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+}
+.video-dialog-player {
+  display: block;
+  width: 100%;
+  min-height: 0;
+  max-height: calc(100vh - 150px);
+  border-radius: 10px;
+  background: #000;
+}
+.video-dialog-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.video-dialog-foot strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 14px;
+}
+@media (max-width: 920px) {
+  .dash-root .video-thumb {
+    width: 120px;
+  }
+}
