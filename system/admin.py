@@ -35,6 +35,7 @@ class TemplateCategoryAdmin(admin.ModelAdmin):
     list_editable = ("sort_order",)
     search_fields = ("name", "value")
     fields = ("name", "value", "sort_order")
+    ordering = ("sort_order", "id")
 
     def get_readonly_fields(self, request, obj=None):
         # القالب بيخزّن المعرّف نفسه؛ تغييره بعد الإنشاء كان هيسيّب القوالب من غير فئة

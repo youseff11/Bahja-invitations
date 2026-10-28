@@ -108,6 +108,7 @@ def home(request):
                  .defer(*_TEMPLATE_HEAVY_FIELDS)[:HOME_TEMPLATES])
     plans = list(Plan.objects.filter(is_active=True))
     addons = list(PlanAddon.objects.filter(is_active=True).prefetch_related("plans"))
+    labels = dict(category_choices())
     return {
         "site": site_payload(request),
         "templates": [_gallery_card(t, labels) for t in templates],

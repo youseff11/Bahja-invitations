@@ -33,7 +33,7 @@
   flex: none;
   text-decoration: none;
   height: 30px;
-  aspect-ratio: 7.5 / 1;
+  aspect-ratio: 7 / 1;
   margin-inline-start: 10px;
   background-image: var(--site-logo-light, url('/site-logo/light.png'));
   background-size: contain;

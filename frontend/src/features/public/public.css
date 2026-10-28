@@ -72,7 +72,7 @@
    (فاتحة أو غامقة) بدل الاتنين، والاسم فاضل موجود كنص لقارئات الشاشة. */
 .brand {
   display: block; flex: none; text-decoration: none;
-  height: 30px; aspect-ratio: 7.5 / 1;   /* نسبة اللوجو المقصوص (عريض)؛ لوجو بنسبة تانية بيتعرض contain جواها */
+  height: 30px; aspect-ratio: 7 / 1;   /* نسبة اللوجو المقصوص (عريض)؛ لوجو بنسبة تانية بيتعرض contain جواها */
   margin-inline-start: 10px;
   background-image: var(--site-logo-light, url("/site-logo/light.png"));
   background-size: contain; background-position: center; background-repeat: no-repeat;
