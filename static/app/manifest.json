@@ -259,7 +259,7 @@
     ]
   },
   "src/editor-frame-main.tsx": {
-    "file": "assets/editorFrame-BtAuFvnF.js",
+    "file": "assets/editorFrame-BOUCsn3J.js",
     "name": "editorFrame",
     "src": "src/editor-frame-main.tsx",
     "isEntry": true,
@@ -275,7 +275,7 @@
       "src/features/invite/runtime/imported.ts"
     ],
     "css": [
-      "assets/editorFrame-DXgDzCtb.css"
+      "assets/editorFrame-C9U7AcYc.css"
     ]
   },
   "src/features/dashboard/pages/AnalyticsPage.tsx": {

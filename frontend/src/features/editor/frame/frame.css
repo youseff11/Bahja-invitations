@@ -1,5 +1,22 @@
 /* إضافات إطار المعاينة فقط (مش بتتحمّل في صفحة الضيف). */
 
+/* حركات الظهور عند السكرول في الأقسام المستوردة (‎.rv‎ + ‎.in‎ من سكربت القسم): في المحرر العناصر تفضل ظاهرة ثابتة.
+   ‎!important‎ عشان ستايل القسم بيتكتب بـ‎#id‎ وبيكسب على أي محدّد عادي. */
+.lb-doc--editing .lb-custom .rv,
+.lb-doc--editing .lb-extra-html .rv {
+  opacity: 1 !important;
+  transform: none !important;
+  filter: none !important;
+  transition: none !important;
+  animation: none !important;
+}
+
+/* وانتقالات التفعيل بالسكرول (برنامج الحفل بيلوّن البند الحالي، العدّاد بيتك) — مفيش انتقال في المحرر */
+.lb-doc--editing .lb-custom *,
+.lb-doc--editing .lb-extra-html * {
+  transition: none !important;
+}
+
 /* القسم المخفي لازم يفضل باهت حتى لو ليه حركة ظهور: ‎.lb-anim.is-in‎ بترجّع الـopacity لـ1 */
 .lb-doc--editing .lb--hidden.lb-anim.is-in {
   opacity: 0.32;
