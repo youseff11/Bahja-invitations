@@ -1,0 +1,2 @@
+{% load invite %}
+{% for overlay in props.text_overlays %}{% include "blocks/_overlay_item.html" with overlay=overlay index=forloop.counter0 wrap_class="lb-section-text" is_video=False %}{% endfor %}

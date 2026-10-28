@@ -1,0 +1,34 @@
+{# Meta Pixel — بيتحط في <head> صفحات الموقع وصفحة الدعوة العامة. #}
+{# مش بيشتغل في لوحة التحكم ولا جوه المحرر عشان مايلخبطش الإحصائيات. #}
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1510217587797836');
+fbq('track', 'PageView');
+</script>
+{% if not no_contact %}
+<script>
+/* حدث Contact: بيتسجّل لما الزائر يدوس على أي رابط واتساب أو اتصال في
+   صفحات الموقع. مش شغال في صفحات الدعوات (no_contact) لأن روابط الواتساب
+   هناك بتاعة مشاركة الدعوة مش تواصل معانا. */
+document.addEventListener('click', function (e) {
+  var a = e.target.closest && e.target.closest('a[href]');
+  if (!a || typeof fbq !== 'function') return;
+  var h = a.getAttribute('href') || '';
+  var ch = /wa\.me|api\.whatsapp\.com|^whatsapp:/i.test(h) ? 'whatsapp'
+         : /^tel:/i.test(h) ? 'phone' : /^mailto:/i.test(h) ? 'email' : '';
+  if (ch) fbq('track', 'Contact', {content_name: ch});
+}, true);
+</script>
+{% endif %}
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1510217587797836&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->

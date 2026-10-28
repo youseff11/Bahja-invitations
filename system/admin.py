@@ -1,0 +1,228 @@
+from django.contrib import admin
+from django.utils.html import format_html
+
+from .models import (
+        Asset, CustomFont, Customer, FavoriteBlock, Guest, Invitation, IntroVideo, MusicTrack, Order,
+    HomeHero, OrderAddon, Plan, PlanAddon, RSVPResponse, SiteSetting, Template, TemplateCategory, FAQ,
+    NO_CATEGORY,
+)
+
+
+@admin.register(Customer)
+class CustomerAdmin(admin.ModelAdmin):
+    list_display = ("name", "phone", "email", "created_at")
+    search_fields = ("name", "phone", "email")
+
+
+@admin.register(Plan)
+class PlanAdmin(admin.ModelAdmin):
+    list_display = ("name", "name_en", "price", "is_featured", "is_active", "sort_order")
+    list_editable = ("is_featured", "is_active", "sort_order")
+    prepopulated_fields = {"slug": ("name",)}
+    fieldsets = (
+        (None, {"fields": ("name", "slug", "price", "old_price", "accent",
+                           "tagline", "description", "bullets")}),
+        ("English", {"fields": ("name_en", "tagline_en", "description_en", "bullets_en"),
+                     "description": "اتركها فارغة ليعود الموقع للنص العربي تلقائياً."}),
+        ("المزايا والحدود", {"fields": ("features", "max_guests", "max_images")}),
+        ("العرض", {"fields": ("is_featured", "is_active", "sort_order")}),
+    )
+
+
+@admin.register(TemplateCategory)
+class TemplateCategoryAdmin(admin.ModelAdmin):
+    list_display = ("name", "value", "templates_count", "sort_order")
+    list_editable = ("sort_order",)
+    search_fields = ("name", "value")
+    fields = ("name", "value", "sort_order")
+
+    def get_readonly_fields(self, request, obj=None):
+        # القالب بيخزّن المعرّف نفسه؛ تغييره بعد الإنشاء كان هيسيّب القوالب من غير فئة
+        return ("value",) if obj else ()
+
+    @admin.display(description="عدد القوالب")
+    def templates_count(self, obj):
+        return Template.objects.filter(category=obj.value).count()
+
+    def get_deleted_objects(self, objs, request):
+        to_delete, counts, perms_needed, protected = super().get_deleted_objects(objs, request)
+        for obj in objs:
+            used = Template.objects.filter(category=obj.value).count()
+            if obj.value == NO_CATEGORY:
+                protected.append(f"«{obj.name}» فئة أساسية (قوالب من غير تصنيف) ومابتتحذفش.")
+            elif used:
+                protected.append(f"الفئة «{obj.name}» مستخدمة في {used} قالب — غيّر تصنيف القوالب دي الأول.")
+        return to_delete, counts, perms_needed, protected
+
+
+@admin.register(Template)
+class TemplateAdmin(admin.ModelAdmin):
+    list_display = ("name", "name_en", "category", "collection", "source", "is_active", "usage_count")
+    list_filter = ("category", "source", "is_active")
+    search_fields = ("name", "name_en", "slug")
+    readonly_fields = ("usage_count", "editor_link", "payload_note")
+    # حقول المستند والـruntime قد تحتوي ملايين الأحرف؛ تعديلها يتم من المحرر
+    # المخصص، وليس من textarea داخل Django Admin.
+    fields = (
+        "name", "name_en", "slug", "category", "collection",
+        "description", "description_en", "cover_image", "cover_url",
+        "source", "source_file", "is_active", "sort_order", "usage_count",
+        "editor_link", "payload_note",
+    )
+
+    def get_queryset(self, request):
+        # لا نسحب JSON الضخم إلى صفحة الإدارة أصلاً؛ هذا يقلل زمن فتح التعديل
+        # واستهلاك الذاكرة على الاستضافات محدودة الموارد.
+        return super().get_queryset(request).defer(
+            "document", "preview_render", "runtime_scripts",
+            "runtime_root_attrs", "required_features",
+        )
+
+    @admin.display(description="فتح المحرر المخصص")
+    def editor_link(self, obj):
+        return format_html(
+            '<a href="/dashboard/templates/{}/editor/" target="_blank">فتح محرر القالب</a>',
+            obj.pk,
+        )
+
+    @admin.display(description="بيانات القالب")
+    def payload_note(self, obj):
+        return format_html(
+            '<div style="max-width:720px;padding:10px 14px;background:#f5f1e8;'
+            'border-radius:8px;line-height:1.8">'
+            'المستند وملفات JavaScript الخاصة بالقالب محفوظة كما هي، وتم إخفاؤها من نموذج الإدارة لتجنب تحميل ملايين الأحرف. '
+            'استخدم «فتح محرر القالب» لتعديل الأقسام والمحتوى.</div>'
+        )
+
+
+@admin.register(Invitation)
+class InvitationAdmin(admin.ModelAdmin):
+    list_display = ("title", "customer", "plan", "status", "public_views", "link")
+    list_filter = ("status", "plan", "template")
+    search_fields = ("title", "slug", "customer__name", "name_one", "name_two")
+    raw_id_fields = ("customer",)
+
+    @admin.display(description="الرابط")
+    def link(self, obj):
+        return format_html('<a href="{}" target="_blank">فتح</a>', obj.get_absolute_url())
+
+
+@admin.register(Guest)
+class GuestAdmin(admin.ModelAdmin):
+    list_display = ("pass_code", "name", "invitation", "source",
+                    "entries_used", "entries_allowed", "checked_in")
+    list_filter = ("checked_in", "source")
+    search_fields = ("name", "phone", "pass_code")
+    readonly_fields = ("token", "pass_code")
+
+
+@admin.register(RSVPResponse)
+class RSVPAdmin(admin.ModelAdmin):
+    list_display = ("name", "invitation", "status", "companions", "created_at")
+    list_filter = ("status",)
+    search_fields = ("name", "phone")
+
+
+class OrderAddonInline(admin.TabularInline):
+    """إضافات الطلب بأسعارها وقت الشراء — للاطّلاع، مش للتعديل."""
+    model = OrderAddon
+    extra = 0
+    readonly_fields = ("addon", "name", "price")
+    can_delete = False
+
+
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ("id", "customer", "plan", "total_price", "status",
+                    "event_date", "created_at")
+    list_filter = ("status",)
+    inlines = [OrderAddonInline]
+
+
+@admin.register(PlanAddon)
+class PlanAddonAdmin(admin.ModelAdmin):
+    list_display = ("name", "code", "price", "is_active", "sort_order")
+    list_editable = ("price", "is_active", "sort_order")
+    list_filter = ("is_active",)
+    search_fields = ("name", "code")
+    filter_horizontal = ("plans",)
+
+
+@admin.register(FAQ)
+class FAQAdmin(admin.ModelAdmin):
+    list_display = ("question_ar", "is_active", "order")
+    list_editable = ("is_active", "order")
+    list_filter = ("is_active",)
+    search_fields = ("question_ar", "answer_ar", "question_en", "answer_en")
+
+
+@admin.register(SiteSetting)
+class SiteSettingAdmin(admin.ModelAdmin):
+    list_display = ("__str__", "preview_cta_enabled", "whatsapp_number", "instagram_url")
+
+    def has_add_permission(self, request):
+        # سجل واحد بس — الزرار «إضافة» بيلخبط
+        return not SiteSetting.objects.exists()
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(HomeHero)
+class HomeHeroAdmin(admin.ModelAdmin):
+    """هيرو الرئيسية: خلفيات (دارك/لايت × عربي/إنجليزي) + الكلام. فاضي = الافتراضي المترجم."""
+
+    fieldsets = (
+        ("الخلفيات (بتتضغط وتتحوّل WebP تلقائياً)", {"fields": ("bg_light_ar", "bg_light_en", "bg_dark_ar", "bg_dark_en")}),
+        ("النصوص — عربي", {"fields": ("top_ar", "main_ar", "sub_ar", "cta_ar", "plans_ar")}),
+        ("النصوص — إنجليزي", {"fields": ("top_en", "main_en", "sub_en", "cta_en", "plans_en")}),
+        ("خانات الثقة — عربي", {"fields": (
+            "trust1_value_ar", "trust1_label_ar", "trust2_value_ar", "trust2_label_ar", "trust3_value_ar", "trust3_label_ar")}),
+        ("خانات الثقة — إنجليزي", {"fields": (
+            "trust1_value_en", "trust1_label_en", "trust2_value_en", "trust2_label_en", "trust3_value_en", "trust3_label_en")}),
+    )
+
+    def has_add_permission(self, request):
+        return not HomeHero.objects.exists()
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(Asset)
+class AssetAdmin(admin.ModelAdmin):
+    list_display = ("original_name", "kind", "invitation", "created_at")
+    list_filter = ("kind",)
+
+
+@admin.register(MusicTrack)
+class MusicTrackAdmin(admin.ModelAdmin):
+    list_display = ("name", "is_active", "order", "created_at")
+    list_editable = ("is_active", "order")
+    search_fields = ("name", "note")
+
+
+
+
+@admin.register(CustomFont)
+class CustomFontAdmin(admin.ModelAdmin):
+    list_display = ("name", "family", "weight", "style", "is_active", "order", "created_at")
+    list_editable = ("is_active", "order")
+    list_filter = ("is_active", "style", "weight")
+    search_fields = ("name", "name_en", "family")
+
+
+@admin.register(FavoriteBlock)
+class FavoriteBlockAdmin(admin.ModelAdmin):
+    list_display = ("name", "block_type", "created_by", "updated_at")
+    list_filter = ("block_type",)
+    search_fields = ("name", "block_type")
+    readonly_fields = ("created_by", "block_type")
+
+
+@admin.register(IntroVideo)
+class IntroVideoAdmin(admin.ModelAdmin):
+
+    list_display = ("name", "seconds", "is_active", "order", "created_at")
+    list_editable = ("is_active", "order")
+    search_fields = ("name", "note")
