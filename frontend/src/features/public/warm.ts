@@ -17,6 +17,30 @@ function warm(url: string) {
   const img = new Image()
   img.decoding = 'async'
   img.src = url
+  // decode() بيجهّز الصورة للرسم؛ من غيره أول ظهور بعد التبديل بيتأخر لحد الفك
+  img.decode?.().catch(() => {})
+}
+
+type HeroUrls = { lightAr?: string; lightEn?: string; darkAr?: string; darkEn?: string }
+
+// صور الهيرو المرفوعة من لوحة التحكم (/media/…) بتغلب الافتراضية في CSS، فلازم
+// تتسخّن هي — تسخين الافتراضية لوحده بيسيب أول تبديل مظهر على صورة لسه بتنزل.
+let customHero: HeroUrls | null = null
+
+/** HeroSection بيسجّل الروابط اللي هتتعرض فعلاً (بنفس تشفير الـCSS). */
+export function registerHeroImages(urls: HeroUrls | null) {
+  customHero = urls
+  warmOtherVariants()
+}
+
+function heroUrl(lang: 'ar' | 'en', theme: 'light' | 'dark'): string {
+  const c = customHero
+  if (c) {
+    const url =
+      theme === 'light' ? (lang === 'en' ? c.lightEn || c.lightAr : c.lightAr) : lang === 'en' ? c.darkEn || c.darkAr : c.darkAr
+    if (url) return url
+  }
+  return HERO[lang][theme]
 }
 
 /** النسخة التانية من المظهر (للّوجو والهيرو) والنسخة التانية من اللغة (للهيرو). */
@@ -25,11 +49,13 @@ export function warmOtherVariants() {
   const theme = root.getAttribute('data-theme') === 'dark' ? 'dark' : 'light'
   const lang = root.lang === 'en' ? 'en' : 'ar'
   const otherTheme = theme === 'dark' ? 'light' : 'dark'
-  warm(BRAND[otherTheme])
+  // اللوجو ممكن يكون مرفوع من اللوحة — الـCSS بيقراه من ‎--site-logo-*‎
+  const logoVar = getComputedStyle(root).getPropertyValue(`--site-logo-${otherTheme}`).match(/url\(["']?([^"')]+)/)
+  warm(logoVar ? logoVar[1] : BRAND[otherTheme])
   // الهيرو في الرئيسية بس
   if (document.querySelector('.hero-art')) {
-    warm(HERO[lang][otherTheme])
-    warm(HERO[lang === 'ar' ? 'en' : 'ar'][theme])
+    warm(heroUrl(lang, otherTheme))
+    warm(heroUrl(lang === 'ar' ? 'en' : 'ar', theme))
   }
 }
 
