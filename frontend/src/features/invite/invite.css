@@ -116,17 +116,44 @@
   position: relative;
   max-width: var(--max-width);
   margin-inline: auto;
-  background-color: var(--bg);
-  background-image: var(--doc-bg-veil, none), var(--doc-bg, none);
+  /* اللون من ‎body‎ (نفس ‎--bg‎)، والوول بيبر الثابت في طبقة ‎.lb-doc::before‎ تحت — لو
+     المسرح لوّن نفسه كان هيغطّي الطبقة دي. الوول بيبر العادي (مش ثابت) بيفضل هنا. */
+  background-color: transparent;
+  background-image: var(--doc-bg-scroll-img, var(--doc-bg-veil, none), var(--doc-bg, none));
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  background-attachment: var(--doc-bg-attach, scroll);
   box-shadow: var(--shadow);
   min-height: 100vh;
   isolation: isolate;
 }
 .lb-stage--full { max-width: none; box-shadow: none; }
+
+/* وول بيبر الدعوة الثابت (تثبيت الخلفية عند التمرير): طبقة ‎position: fixed‎ ورا المسرح
+   بعرض عمود الدعوة. ماينفعش على ‎.lb-stage‎ نفسه بـ‎background-attachment: fixed‎:
+   المسرح ‎container-type: inline-size‎ (عشان وحدات ‎cqw‎ بتاعة المواضع) و‎layout containment‎
+   بتخلّي الخلفية «الثابتة» تتحرك مع الصفحة — على كل المتصفحات، أندرويد وكمبيوتر
+   وآيفون. الطبقة هنا تابعة للـ‎body‎ مش للمسرح فمفيش حاوية بتحبسها.
+   ‎100lvh‎ = ارتفاع الشاشة وشريط المتصفح مستخبي، فالصورة ماتتمطّش وهو بيظهر ويختفي. */
+.lb-doc::before {
+  content: "";
+  position: fixed;
+  z-index: -1;
+  top: 0;
+  left: 50%;
+  width: min(var(--max-width, 720px), 100%);
+  height: 100vh;
+  height: 100lvh;
+  transform: translateX(-50%);
+  pointer-events: none;
+  background-image: var(--doc-bg-fixed-img, none);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.lb-doc:has(.lb-stage--full)::before { width: 100%; }
+.lb-doc[data-ready="0"]::before { visibility: hidden; }
+@media print { .lb-doc::before { display: none; } }
 
 /* ---------------------------------------------------------- نقشات */
 .lb-pattern::before {
@@ -237,25 +264,6 @@
      يبطل تاني. بعد ما الحركة تخلص الـtransform بيبقى ‎none‎ فبنشيله. */
   .lb--bg-fixed.lb-anim.is-in { will-change: auto; }
 
-  .lb-stage {
-    background-image: var(--doc-bg-scroll-img, var(--doc-bg-veil, none), var(--doc-bg, none));
-    background-attachment: scroll;
-  }
-  .lb-stage::after {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 100vh;
-    height: 100lvh;
-    z-index: -1;
-    pointer-events: none;
-    background-image: var(--doc-bg-fixed-img, none);
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-  }
 }
 /* CSS القالب المستورد قد يضع background على .lb-custom أو عناصره،
    لذلك نعيد لون القسم المختار إلى الغلاف الداخلي بأولوية واضحة. */
