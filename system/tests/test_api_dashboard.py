@@ -14,6 +14,7 @@ from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
+from PIL import Image
 
 from system import blocks as blocks_engine
 from system.models import (
@@ -39,6 +40,8 @@ def _endpoints(ids):
         ("POST", f"{BASE}/templates/import/"),
         ("DELETE", f"{BASE}/templates/{ids['template']}/"),
         ("POST", f"{BASE}/templates/{ids['template']}/toggle/"),
+        ("POST", f"{BASE}/templates/{ids['template']}/cover/"),
+        ("DELETE", f"{BASE}/templates/{ids['template']}/cover/"),
         ("GET", f"{BASE}/fonts/"),
         ("POST", f"{BASE}/fonts/"),
         ("DELETE", f"{BASE}/fonts/{ids['font']}/"),
@@ -169,6 +172,7 @@ class GuardTests(DashboardApiCase):
             ("POST", f"{BASE}/invitations/999999/duplicate/"),
             ("DELETE", f"{BASE}/templates/999999/"),
             ("POST", f"{BASE}/templates/999999/toggle/"),
+            ("DELETE", f"{BASE}/templates/999999/cover/"),
             ("DELETE", f"{BASE}/fonts/999999/"),
             ("POST", f"{BASE}/music/999999/toggle/"),
             ("DELETE", f"{BASE}/intros/999999/"),
@@ -353,6 +357,52 @@ class TemplateTests(DashboardApiCase):
         self.template.refresh_from_db()
         self.assertFalse(self.template.is_active)
         self.assertTrue(self.post(f"{BASE}/templates/{self.template.pk}/toggle/").json()["isActive"])
+
+    def _png(self, name="bg.png"):
+        buffer = io.BytesIO()
+        Image.new("RGB", (4, 4), "#802040").save(buffer, "PNG")
+        return SimpleUploadedFile(name, buffer.getvalue(), content_type="image/png")
+
+    def test_cover_add_change_remove(self):
+        url = f"{BASE}/templates/{self.template.pk}/cover/"
+        self.assertIsNone(self.get(f"{BASE}/templates/").json()["results"][0]["cover"])
+
+        response = self.upload(url, {}, {"coverImage": self._png()})
+        self.assertEqual(response.status_code, 200, response.content)
+        self.template.refresh_from_db()
+        first = self.template.cover_image.name
+        self.assertTrue(first)
+        self.assertEqual(response.json()["cover"], self.template.cover_src)
+        self.assertEqual(self.get(f"{BASE}/templates/").json()["results"][0]["cover"],
+                         self.template.cover_src)
+
+        response = self.upload(url, {}, {"coverImage": self._png("other.png")})
+        self.assertEqual(response.status_code, 200, response.content)
+        self.template.refresh_from_db()
+        self.assertNotEqual(self.template.cover_image.name, first)
+        self.assertFalse(self.template.cover_image.storage.exists(first))   # القديمة اتمسحت
+
+        response = self.send("DELETE", url)
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNone(response.json()["cover"])
+        self.template.refresh_from_db()
+        self.assertFalse(self.template.cover_image)
+        self.assertEqual(self.template.cover_src, "")
+
+    def test_cover_remove_also_clears_cover_url(self):
+        Template.objects.filter(pk=self.template.pk).update(cover_url="https://example.com/c.jpg")
+        self.send("DELETE", f"{BASE}/templates/{self.template.pk}/cover/")
+        self.assertIsNone(self.get(f"{BASE}/templates/").json()["results"][0]["cover"])
+
+    def test_cover_validation(self):
+        url = f"{BASE}/templates/{self.template.pk}/cover/"
+        self.assertIn("coverImage", self.upload(url, {}).json()["error"]["fields"])
+        junk = SimpleUploadedFile("c.png", b"not an image", content_type="image/png")
+        self.assertIn("coverImage", self.upload(url, {}, {"coverImage": junk}).json()["error"]["fields"])
+        big = SimpleUploadedFile("c.png", b"0" * (8 * 1024 * 1024 + 1), content_type="image/png")
+        self.assertError(self.upload(url, {}, {"coverImage": big}), 400, "file_too_large")
+        self.template.refresh_from_db()
+        self.assertFalse(self.template.cover_image)
 
     def test_delete_used_template_is_refused(self):
         response = self.send("DELETE", f"{BASE}/templates/{self.template.pk}/")

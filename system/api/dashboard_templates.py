@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import logging
 
+from django import forms
 from django.db.models import Count
 from django.http import Http404
 from django.urls import path, reverse
@@ -94,6 +95,37 @@ def template_toggle(request, pk):
     return {"id": tpl.pk, "name": tpl.name, "isActive": tpl.is_active}
 
 
+class _CoverForm(forms.Form):
+    cover_image = forms.ImageField(label="صورة الغلاف", error_messages={
+        "required": "اختر صورة الخلفية.",
+    })
+
+
+@staff_api("POST", "DELETE")
+def template_cover(request, pk):
+    """إضافة/تغيير (‎POST‎) أو حذف (‎DELETE‎) خلفية كارت القالب (صورة الغلاف)."""
+    tpl = _get_or_404(pk)
+    if request.method == "DELETE":
+        if tpl.cover_image:
+            tpl.cover_image.delete(save=False)
+        tpl.cover_url = ""
+        tpl.save(update_fields=["cover_image", "cover_url", "updated_at"])
+        return {"id": tpl.pk, "name": tpl.name, "cover": None}
+
+    upload = request.FILES.get("coverImage")
+    check_upload(upload, label="صورة الغلاف")
+    form = _CoverForm({}, {"cover_image": upload})
+    if not form.is_valid():
+        raise_invalid(form)
+    if tpl.cover_image:
+        tpl.cover_image.delete(save=False)
+    tpl.cover_image = form.cleaned_data["cover_image"]
+    # الصورة المرفوعة بتتقدّم على الرابط في ‎cover_src‎؛ نفضّيه عشان مايرجعش لو اتحذفت
+    tpl.cover_url = ""
+    tpl.save(update_fields=["cover_image", "cover_url", "updated_at"])
+    return {"id": tpl.pk, "name": tpl.name, "cover": tpl.cover_src or None}
+
+
 def _create_template(request) -> dict:
     """قالب فارغ — بعده فريق العمل بيروح للمحرر."""
     check_upload(request.FILES.get("coverImage"), label="صورة الغلاف")
@@ -166,4 +198,6 @@ urlpatterns = [
     path("dashboard/templates/<int:pk>/", template_detail, name="api_dashboard_template"),
     path("dashboard/templates/<int:pk>/toggle/", template_toggle,
          name="api_dashboard_template_toggle"),
+    path("dashboard/templates/<int:pk>/cover/", template_cover,
+         name="api_dashboard_template_cover"),
 ]

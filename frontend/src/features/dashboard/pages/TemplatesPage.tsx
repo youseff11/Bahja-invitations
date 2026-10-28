@@ -1,10 +1,17 @@
 import { useEffect, useId, useRef, useState } from 'react'
-import type { FormEvent } from 'react'
+import type { ChangeEvent, FormEvent } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { appPath } from '@/lib/appPath'
 
-import { useDeleteTemplate, useImportTemplate, useTemplatesList, useToggleTemplate } from '../api'
+import {
+  useDeleteTemplate,
+  useImportTemplate,
+  useRemoveTemplateCover,
+  useSetTemplateCover,
+  useTemplatesList,
+  useToggleTemplate,
+} from '../api'
 import type { TemplateRow } from '../types'
 import { useConfirm } from '../ui/ConfirmDialog'
 import { useLabels } from '../ui/labels'
@@ -19,8 +26,11 @@ function TemplateActionMenu({ template }: { template: TemplateRow }) {
   const confirm = useConfirm()
   const toggle = useToggleTemplate()
   const remove = useDeleteTemplate()
+  const setCover = useSetTemplateCover()
+  const removeCover = useRemoveTemplateCover()
   const [open, setOpen] = useState(false)
   const root = useRef<HTMLDivElement>(null)
+  const coverInput = useRef<HTMLInputElement>(null)
   const panelId = useId()
 
   useEffect(() => {
@@ -52,6 +62,29 @@ function TemplateActionMenu({ template }: { template: TemplateRow }) {
     setOpen(false)
   }
 
+  function onCoverPicked(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0]
+    event.target.value = '' // نفس الملف يتختار تاني لو فشل الرفع
+    if (!file) return
+    setCover.mutate(
+      { id: template.id, file },
+      {
+        onSuccess: () => toast.success(t('dashboard.templates.coverSaved', { name: template.name })),
+        onError: toast.fail,
+      },
+    )
+  }
+
+  async function onRemoveCover() {
+    setOpen(false)
+    const message = t('dashboard.templates.confirmRemoveCover', { name: template.name })
+    if (!(await confirm({ message, danger: true, confirmLabel: t('dashboard.common.delete') }))) return
+    removeCover.mutate(template.id, {
+      onSuccess: () => toast.success(t('dashboard.templates.coverRemoved', { name: template.name })),
+      onError: toast.fail,
+    })
+  }
+
   async function onDelete() {
     setOpen(false)
     const message = t('dashboard.templates.confirmDelete', { name: template.name })
@@ -74,6 +107,14 @@ function TemplateActionMenu({ template }: { template: TemplateRow }) {
       >
         ⋯ <span>{t('dashboard.templates.actions')}</span>
       </button>
+      <input
+        ref={coverInput}
+        type="file"
+        accept="image/*"
+        hidden
+        aria-label={t('dashboard.templates.addCover')}
+        onChange={onCoverPicked}
+      />
       <div
         className="tpl-action-panel"
         id={panelId}
@@ -92,6 +133,22 @@ function TemplateActionMenu({ template }: { template: TemplateRow }) {
         <a href={template.previewUrl} target="_blank" rel="noopener" role="menuitem">
           {t('dashboard.templates.preview')}
         </a>
+        <button
+          type="button"
+          role="menuitem"
+          disabled={setCover.isPending}
+          onClick={() => {
+            setOpen(false)
+            coverInput.current?.click()
+          }}
+        >
+          {template.cover ? t('dashboard.templates.changeCover') : t('dashboard.templates.addCover')}
+        </button>
+        {template.cover && (
+          <button type="button" role="menuitem" onClick={() => void onRemoveCover()}>
+            {t('dashboard.templates.removeCover')}
+          </button>
+        )}
         <button type="button" role="menuitem" onClick={onToggle}>
           {template.isActive ? t('dashboard.templates.hide') : t('dashboard.templates.show')}
         </button>

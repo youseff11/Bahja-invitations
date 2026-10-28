@@ -103,7 +103,7 @@ export function TemplatesSection({ templates, error }: Props) {
           <h2>{t('public.templates.title')}</h2>
           <p>{t('public.templates.sub')}</p>
         </div>
-        <div className="grid grid--4">
+        <div className="grid grid--4 grid--gallery">
           {templates?.map((template) => <HomeTemplateCard key={template.id} template={template} />)}
           {templates?.length === 0 && <p className="empty">{t('public.templates.empty')}</p>}
           {!!error && (

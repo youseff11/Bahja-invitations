@@ -276,6 +276,9 @@ html[lang="en"][data-theme="dark"] .hero-art {
 .grid { display: grid; gap: 18px; }
 .grid--3 { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
 .grid--4 { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }
+/* معرض القوالب: نفس الـ auto-fill بس بحد أقصى ٤ في الصف على الشاشات الكبيرة
+   (الحد الأدنى للعمود = ربع العرض بعد خصم ٣ فجوات ١٨px). */
+.grid--gallery { grid-template-columns: repeat(auto-fill, minmax(max(210px, calc((100% - 54px) / 4)), 1fr)); }
 
 .card {
   background: var(--surface); border: 1px solid var(--line);

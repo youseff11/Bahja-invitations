@@ -152,6 +152,25 @@ export function useDeleteTemplate() {
   )
 }
 
+export function useSetTemplateCover() {
+  return useInvalidatingMutation(({ id, file }: { id: number; file: File }) => {
+    const body = new FormData()
+    body.set('coverImage', file)
+    return api<{ id: number; name: string; cover: string | null }>(`/dashboard/templates/${id}/cover/`, {
+      method: 'POST',
+      body,
+    })
+  })
+}
+
+export function useRemoveTemplateCover() {
+  return useInvalidatingMutation((id: number) =>
+    api<{ id: number; name: string; cover: null }>(`/dashboard/templates/${id}/cover/`, {
+      method: 'DELETE',
+    }),
+  )
+}
+
 export function useCreateTemplate() {
   return useInvalidatingMutation((body: FormData) =>
     api<{ id: number; name: string; editorUrl: string }>('/dashboard/templates/', {
