@@ -144,6 +144,7 @@ describe('intro video field', () => {
     mount(<FieldRenderer spec={intro} value="" onChange={apply} />)
     const before = s().history.length
     fireEvent.click(screen.getByRole('button', { name: 'اختر أو ارفع فيديو' }))
+    fireEvent.click(screen.getByRole('button', { name: /مكتبة الفيديوهات/ }))
     fireEvent.click(screen.getByTitle('a3.png'))
 
     expect(s().doc.settings).toMatchObject({
@@ -174,6 +175,7 @@ describe('intro video field', () => {
     const onChange = vi.fn()
     mount(<FieldRenderer spec={other} value="" onChange={onChange} />)
     fireEvent.click(screen.getByRole('button', { name: 'اختر أو ارفع فيديو' }))
+    fireEvent.click(screen.getByRole('button', { name: /مكتبة الفيديوهات/ }))
     fireEvent.click(screen.getByTitle('a3.png'))
     expect(onChange).toHaveBeenCalled()
     expect(s().doc.settings.intro_poster).toBeUndefined()

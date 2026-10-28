@@ -31,7 +31,16 @@
     "confirmOne": "Delete this video from the library?",
     "confirmMany": "Delete the {{count}} selected videos?",
     "selected": "{{count}} videos selected",
-    "shared": "Video library — available to every invitation"
+    "shared": "Intros — available to every invitation",
+    "chooseTitle": "Where do you want to pick the video from?",
+    "introsEmpty": "No intros yet — move a video from the video library in the dashboard.",
+    "source": {
+      "library": "Video library",
+      "libraryHint": "Videos uploaded in invitations and templates; upload a new one from here.",
+      "intros": "Intro list",
+      "introsHint": "Ready-made intros chosen from the dashboard.",
+      "count": "{{count}} videos"
+    }
   },
   "audio": {
     "title": "Music library",

@@ -87,6 +87,7 @@ describe('AssetLibrary — grid', () => {
 
   it('renders video tiles from the saved frame, or from the file when there is no thumbnail', () => {
     mount(<AssetLibrary kind="video" onClose={() => {}} />)
+    fireEvent.click(screen.getByRole('button', { name: /مكتبة الفيديوهات/ }))
     expect(screen.getByRole('dialog', { name: 'مكتبة الفيديو' })).toBeInTheDocument()
     const withThumb = document.querySelector('[data-asset-id="4"] .ed-asset') as HTMLElement
     expect(withThumb.className).toContain('ed-asset--video-thumb')
@@ -100,6 +101,7 @@ describe('AssetLibrary — grid', () => {
     const onPick = vi.fn()
     const onClose = vi.fn()
     mount(<AssetLibrary kind="video" onPick={onPick} onClose={onClose} />)
+    fireEvent.click(screen.getByRole('button', { name: /مكتبة الفيديوهات/ }))
     fireEvent.click(document.querySelector('[data-asset-id="4"] .ed-asset') as HTMLElement)
     expect(onPick).toHaveBeenCalledWith('/media/assets/2026/01/000000000004/v.mp4', {
       poster: '/media/assets/2026/01/000000000004/poster.jpg',
@@ -286,9 +288,29 @@ describe('AssetLibrary — shared libraries', () => {
     expect(onClose).toHaveBeenCalled()
   })
 
+  it('video: asks for the source first, without listing anything yet', () => {
+    mount(<AssetLibrary kind="video" onClose={() => {}} />)
+    expect(screen.getByText('تختار الفيديو منين؟')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /مكتبة الفيديوهات/ })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /قايمة الافتتاحيات/ })).toBeInTheDocument()
+    expect(document.querySelector('.ed-asset-wrap')).toBeNull()
+    expect(screen.queryByRole('button', { name: /افتتاحية ذهبية/ })).toBeNull()
+  })
+
+  it('video: the library source lists only uploads, and the tabs switch to the intros', () => {
+    mount(<AssetLibrary kind="video" onClose={() => {}} />)
+    fireEvent.click(screen.getByRole('button', { name: /مكتبة الفيديوهات/ }))
+    expect(document.querySelector('[data-asset-id="4"]')).not.toBeNull()
+    expect(screen.queryByRole('button', { name: /افتتاحية ذهبية/ })).toBeNull()
+    fireEvent.click(screen.getByRole('tab', { name: 'قايمة الافتتاحيات' }))
+    expect(screen.getByRole('button', { name: /افتتاحية ذهبية/ })).toBeInTheDocument()
+    expect(document.querySelector('[data-asset-id="4"]')).toBeNull()
+  })
+
   it('video: lists the intro gallery and hands back its saved poster', async () => {
     const onPick = vi.fn()
     mount(<AssetLibrary kind="video" onPick={onPick} onClose={() => {}} />)
+    fireEvent.click(screen.getByRole('button', { name: /قايمة الافتتاحيات/ }))
     fireEvent.click(screen.getByRole('button', { name: /افتتاحية ذهبية · 4s/ }))
     await waitFor(() =>
       expect(onPick).toHaveBeenCalledWith('/media/intros/gold.mp4', { poster: '/media/intros/gold.jpg', thumb: '/media/intros/gold.jpg' }),
