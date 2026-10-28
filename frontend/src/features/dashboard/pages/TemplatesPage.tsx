@@ -14,6 +14,7 @@ import {
 } from '../api'
 import type { TemplateRow } from '../types'
 import { useConfirm } from '../ui/ConfirmDialog'
+import { CoverCropper } from '../ui/CoverCropper'
 import { useLabels } from '../ui/labels'
 import { PageHead, Pill, usePageTitle } from '../ui/page'
 import { QueryState } from '../ui/table'
@@ -31,6 +32,7 @@ function TemplateActionMenu({ template }: { template: TemplateRow }) {
   const [open, setOpen] = useState(false)
   const root = useRef<HTMLDivElement>(null)
   const coverInput = useRef<HTMLInputElement>(null)
+  const [cropping, setCropping] = useState<File | null>(null)
   const panelId = useId()
 
   useEffect(() => {
@@ -65,11 +67,18 @@ function TemplateActionMenu({ template }: { template: TemplateRow }) {
   function onCoverPicked(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0]
     event.target.value = '' // نفس الملف يتختار تاني لو فشل الرفع
-    if (!file) return
+    if (file) setCropping(file)
+  }
+
+  /** الملف جاي من نافذة القص (٣:٤)؛ ما بنقفلهاش إلا لما الرفع ينجح عشان القص مايضيعش. */
+  function onCropped(file: File) {
     setCover.mutate(
       { id: template.id, file },
       {
-        onSuccess: () => toast.success(t('dashboard.templates.coverSaved', { name: template.name })),
+        onSuccess: () => {
+          setCropping(null)
+          toast.success(t('dashboard.templates.coverSaved', { name: template.name }))
+        },
         onError: toast.fail,
       },
     )
@@ -115,6 +124,13 @@ function TemplateActionMenu({ template }: { template: TemplateRow }) {
         aria-label={t('dashboard.templates.addCover')}
         onChange={onCoverPicked}
       />
+      {cropping && (
+        <CoverCropper
+          file={cropping}
+          onCancel={() => !setCover.isPending && setCropping(null)}
+          onDone={onCropped}
+        />
+      )}
       <div
         className="tpl-action-panel"
         id={panelId}
@@ -251,7 +267,7 @@ export function TemplatesPage() {
 
       <QueryState loading={isPending} error={isError} />
       {data && (
-        <div className="grid grid--4">
+        <div className="grid grid--4 grid--gallery">
           {data.results.map((template) => (
             <article className="tpl-card" key={template.id}>
               <div

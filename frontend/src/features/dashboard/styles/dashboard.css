@@ -816,6 +816,10 @@
 .dash-root .grid--4 {
   grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
 }
+/* كروت القوالب: بحد أقصى ٤ في الصف (الحد الأدنى للعمود = ربع العرض بعد خصم ٣ فجوات ١٨px) */
+.dash-root .grid--gallery {
+  grid-template-columns: repeat(auto-fill, minmax(max(210px, calc((100% - 54px) / 4)), 1fr));
+}
 .dash-root .card {
   background: var(--surface);
   border: 1px solid var(--line);
@@ -1556,6 +1560,62 @@ html[lang='en'] .dash-root .tpl-meta {
   display: flex;
   gap: 10px;
   justify-content: flex-end;
+}
+
+/* ---------------------------------------------------------- قص خلفية القالب */
+.dash-dialog.cover-cropper {
+  width: min(380px, 100%);
+  max-height: calc(100vh - 36px);
+  overflow-y: auto;
+  text-align: center;
+}
+.cover-cropper h3 {
+  margin: 0 0 6px;
+}
+.cover-cropper p.cover-cropper-hint {
+  margin: 0 0 14px;
+  font-size: 13px;
+}
+.cover-cropper-frame {
+  position: relative;
+  margin: 0 auto 14px;
+  overflow: hidden;
+  border-radius: 12px;
+  border: 2px solid var(--accent);
+  background: var(--surface-2);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+.cover-cropper-frame:active {
+  cursor: grabbing;
+}
+.cover-cropper-frame:focus-visible {
+  outline: 3px solid var(--accent-soft);
+  outline-offset: 2px;
+}
+.cover-cropper-frame img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  max-width: none;
+  pointer-events: none;
+}
+.cover-cropper-zoom {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  font-size: 13px;
+}
+.cover-cropper-zoom input {
+  flex: 1;
+  accent-color: var(--accent);
+}
+.cover-cropper p.cover-cropper-warn {
+  margin: 0 0 14px;
+  font-size: 12.5px;
+  color: var(--danger, #b3261e);
 }
 
 /* ---------------------------------------------------------- الحركة المخفّضة */
