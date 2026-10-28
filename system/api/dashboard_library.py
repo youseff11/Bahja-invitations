@@ -26,7 +26,7 @@ from .dashboard_common import (
     to_snake,
 )
 from .dashboard_music_dedupe import duplicate_extra
-from .http import ApiError
+from .http import ApiError, json_body
 
 AUDIO_EXTENSIONS = {".mp3", ".m4a", ".mp4", ".aac", ".ogg", ".oga", ".opus", ".wav", ".webm", ".flac"}
 VIDEO_EXTENSIONS = {".mp4", ".m4v", ".mov", ".webm"}
@@ -195,9 +195,18 @@ def intros(request):
     return {"results": [_clip_row(clip) for clip in IntroVideo.objects.all()]}
 
 
-@staff_api("DELETE")
+@staff_api("PATCH", "DELETE")
 def clip_detail(request, pk):
     clip = _get_or_404(IntroVideo, pk)
+    if request.method == "PATCH":
+        # تعديل اسم الافتتاحية بس (الباقي بيتغيّر بالحذف وإعادة الرفع)
+        new_name = str(json_body(request).get("name") or "").strip()
+        if not new_name:
+            raise ApiError(400, "validation_error", "اكتب اسماً للافتتاحية.",
+                           fields={"name": "اكتب اسماً للافتتاحية."})
+        clip.name = new_name[:120]
+        clip.save(update_fields=["name", "updated_at"])
+        return _clip_row(clip)
     name = clip.name
     clip.delete()
     return {"deleted": True, "name": name}

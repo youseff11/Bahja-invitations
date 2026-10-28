@@ -221,7 +221,11 @@ export function useLibrary<K extends LibraryKind>(kind: K) {
   const remove = useInvalidatingMutation((id: number) =>
     api<{ deleted: boolean; name: string }>(`${path}${id}/`, { method: 'DELETE' }),
   )
-  return { list, create, toggle, remove }
+  // تعديل الاسم (الافتتاحيات بس لحد دلوقتي)
+  const rename = useInvalidatingMutation(({ id, name }: { id: number; name: string }) =>
+    api<Row>(`${path}${id}/`, { method: 'PATCH', body: { name } }),
+  )
+  return { list, create, toggle, remove, rename }
 }
 
 /** مكتبة الفيديوهات العامة: القايمة والرفع ونقل فيديو لمكتبة الافتتاحيات (بيختفي من هنا). */

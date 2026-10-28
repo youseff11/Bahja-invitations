@@ -1,19 +1,24 @@
+import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 
 import { useLibrary } from '../api'
+import type { ClipRow } from '../types'
 import { CheckField, ErrorList, FileField, MB, TextField, useFormErrors } from '../ui/forms'
+import { InlineEdit } from '../ui/InlineEdit'
 import { LibraryActions } from '../ui/LibraryActions'
 import { PageHead, Pill, usePageTitle } from '../ui/page'
 import { QueryState, Table } from '../ui/table'
 import { useToast } from '../ui/Toast'
+import { VideoPreviewDialog, VideoThumb } from '../ui/VideoPreview'
 
 /** مكتبة الافتتاحيات (‎templates/dashboard/intros.html‎). */
 export function IntrosPage() {
   const { t } = useTranslation()
   const toast = useToast()
-  const { list, create, toggle, remove } = useLibrary('intros')
+  const { list, create, toggle, remove, rename } = useLibrary('intros')
+  const [preview, setPreview] = useState<ClipRow | null>(null)
   const errors = useFormErrors()
   usePageTitle(t('dashboard.intros.pageTitle'))
 
@@ -35,6 +40,16 @@ export function IntrosPage() {
     })
   }
 
+  function onRename(clip: ClipRow, name: string) {
+    return rename.mutateAsync({ id: clip.id, name }).then(
+      () => toast.success(t('dashboard.intros.renamed', { name })),
+      (error: unknown) => {
+        toast.fail(error)
+        throw error
+      },
+    )
+  }
+
   return (
     <>
       <PageHead title={t('dashboard.intros.title')}>
@@ -53,12 +68,14 @@ export function IntrosPage() {
         </p>
       </div>
 
-      <div className="grid" style={{ gridTemplateColumns: 'minmax(0,2fr) minmax(280px,1fr)', alignItems: 'start' }}>
+      <div className="grid split-layout">
         <div>
           <h2 style={{ fontSize: 18 }}>{t('dashboard.intros.listTitle', { n: clips.length })}</h2>
           <QueryState loading={list.isPending} error={list.isError} />
           {list.data && (
             <Table
+              cards="lg"
+              className="rows-table"
               head={[
                 t('dashboard.intros.cols.name'),
                 t('dashboard.intros.cols.preview'),
@@ -72,43 +89,39 @@ export function IntrosPage() {
             >
               {clips.map((clip) => (
                 <tr key={clip.id}>
-                  <td>
-                    {clip.name}
-                    {clip.note && (
-                      <>
-                        <br />
-                        <span className="muted" style={{ fontSize: 12.5 }}>
-                          {clip.note}
-                        </span>
-                      </>
-                    )}
+                  <td className="cell--title">
+                    <InlineEdit
+                      value={clip.name}
+                      label={t('dashboard.intros.editName')}
+                      maxLength={120}
+                      required
+                      onSave={(name) => onRename(clip, name)}
+                    />
+                    {clip.note && <span className="muted cell-desc">{clip.note}</span>}
                   </td>
-                  <td>
-                    {clip.url ? (
-                      <video
-                        controls
-                        preload="none"
-                        src={clip.url}
-                        poster={clip.posterUrl || undefined}
-                        style={{ width: 190, maxWidth: '100%', borderRadius: 8 }}
-                      />
-                    ) : (
-                      <span className="muted">—</span>
-                    )}
+                  <td data-label={t('dashboard.intros.cols.preview')}>
+                    <VideoThumb clip={clip} onPlay={() => setPreview(clip)} />
                   </td>
-                  <td className="nums">
+                  <td data-label={t('dashboard.intros.cols.duration')} className="nums">
                     {clip.secondsLabel ? `${clip.secondsLabel} ${t('dashboard.intros.secondsUnit')}` : '—'}
                   </td>
-                  <td>{clip.order}</td>
-                  <td>
+                  <td data-label={t('dashboard.intros.cols.order')}>{clip.order}</td>
+                  <td data-label={t('dashboard.intros.cols.status')}>
                     {clip.isActive ? (
                       <Pill kind="published">{t('dashboard.intros.available')}</Pill>
                     ) : (
                       <Pill kind="archived">{t('dashboard.intros.hidden')}</Pill>
                     )}
                   </td>
-                  <td>
-                    <LibraryActions kind="intros" row={clip} toggle={toggle} remove={remove} />
+                  <td className="cell--actions">
+                    <div className="toolbar" style={{ margin: 0 }}>
+                      {clip.url && (
+                        <button className="btn btn--ghost btn--sm" type="button" onClick={() => setPreview(clip)}>
+                          {t('dashboard.common.watch')}
+                        </button>
+                      )}
+                      <LibraryActions kind="intros" row={clip} toggle={toggle} remove={remove} />
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -176,6 +189,7 @@ export function IntrosPage() {
           </p>
         </aside>
       </div>
+      {preview && <VideoPreviewDialog clip={preview} onClose={() => setPreview(null)} />}
     </>
   )
 }

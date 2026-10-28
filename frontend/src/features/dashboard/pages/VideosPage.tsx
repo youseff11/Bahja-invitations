@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
@@ -11,38 +11,7 @@ import { InlineEdit } from '../ui/InlineEdit'
 import { PageHead, usePageTitle } from '../ui/page'
 import { QueryState, Table } from '../ui/table'
 import { useToast } from '../ui/Toast'
-
-/** نافذة تشغيل الفيديو: بتفتح بالضغط على المعاينة وتتقفل بـ‎Escape‎ أو بالضغط برّه. */
-function PreviewDialog({ row, onClose }: { row: VideoRow; onClose: () => void }) {
-  const { t } = useTranslation()
-
-  useEffect(() => {
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose()
-    }
-    document.addEventListener('keydown', onKey)
-    return () => document.removeEventListener('keydown', onKey)
-  }, [onClose])
-
-  return (
-    <div
-      className="dash-dialog-veil"
-      onMouseDown={(event) => {
-        if (event.target === event.currentTarget) onClose()
-      }}
-    >
-      <div className="dash-dialog video-dialog" role="dialog" aria-modal="true" aria-label={row.name}>
-        <video className="video-dialog-player" src={row.url} poster={row.posterUrl || undefined} controls autoPlay playsInline />
-        <div className="video-dialog-foot">
-          <strong>{row.name}</strong>
-          <button type="button" className="btn btn--ghost btn--sm" onClick={onClose}>
-            {t('dashboard.videos.close')}
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-}
+import { VideoPreviewDialog, VideoThumb } from '../ui/VideoPreview'
 
 /** مكتبة الفيديوهات العامة: كل فيديو في أي دعوة أو قالب — واللي بيتنقل للافتتاحيات بيختفي من هنا. */
 export function VideosPage() {
@@ -137,25 +106,7 @@ export function VideosPage() {
                     {row.createdAt && <span className="muted cell-desc">{row.createdAt}</span>}
                   </td>
                   <td data-label={t('dashboard.videos.cols.preview')}>
-                    <button
-                      type="button"
-                      className="video-thumb"
-                      aria-label={t('dashboard.videos.play', { name: row.name })}
-                      onClick={() => setPreview(row)}
-                    >
-                      <video
-                        src={`${row.url}#t=0.1`}
-                        poster={row.posterUrl || undefined}
-                        preload="metadata"
-                        muted
-                        playsInline
-                        aria-hidden="true"
-                        tabIndex={-1}
-                      />
-                      <span className="video-thumb-play" aria-hidden="true">
-                        ▶
-                      </span>
-                    </button>
+                    <VideoThumb clip={row} onPlay={() => setPreview(row)} />
                   </td>
                   <td data-label={t('dashboard.videos.cols.source')}>{row.owner || t('dashboard.videos.shared')}</td>
                   <td data-label={t('dashboard.videos.cols.size')} className="nums">
@@ -164,7 +115,7 @@ export function VideosPage() {
                   <td className="cell--actions">
                     <div className="toolbar" style={{ margin: 0 }}>
                       <button className="btn btn--ghost btn--sm" type="button" onClick={() => setPreview(row)}>
-                        {t('dashboard.videos.watch')}
+                        {t('dashboard.common.watch')}
                       </button>
                       <button
                         className="btn btn--ghost btn--sm"
@@ -200,7 +151,7 @@ export function VideosPage() {
         </aside>
       </div>
 
-      {preview && <PreviewDialog row={preview} onClose={() => setPreview(null)} />}
+      {preview && <VideoPreviewDialog clip={preview} onClose={() => setPreview(null)} />}
     </>
   )
 }

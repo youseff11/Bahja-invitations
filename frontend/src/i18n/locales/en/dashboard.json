@@ -2,6 +2,8 @@
   "title": "Dashboard",
   "common": {
     "close": "Close",
+    "watch": "Watch",
+    "play": "Play “{{name}}”",
     "cancel": "Cancel",
     "confirm": "Confirm",
     "delete": "Delete",
@@ -354,9 +356,6 @@
     "reviewData": "Check the data — a field is missing.",
     "editName": "Click to edit the name",
     "renamed": "Renamed to “{{name}}”.",
-    "watch": "Watch",
-    "play": "Play “{{name}}”",
-    "close": "Close",
     "moveToIntros": "Move to intros",
     "confirmMove": "Move “{{name}}” to the intro library? It will disappear from the video library and stay in intros only.",
     "moved": "Moved “{{name}}” to the intro library."
@@ -364,6 +363,8 @@
   "intros": {
     "pageTitle": "Intro library",
     "title": "Intro library",
+    "editName": "Click to edit the name",
+    "renamed": "Renamed to “{{name}}”.",
     "how": "Upload the video here once and you'll find it in the editor under <strong>Settings ← Intro ← Intro video</strong>, ready to pick in any invitation without uploading it again — just like the music library.",
     "howNote": "The video is compressed automatically on upload (720p) and the audio is kept. Keep it short — 3 to 7 seconds is enough; the guest is waiting for the invitation, not a film.",
     "listTitle": "Videos ({{n}})",

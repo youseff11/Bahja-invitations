@@ -53,6 +53,7 @@ def _endpoints(ids):
         ("POST", f"{BASE}/music/{ids['track']}/toggle/"),
         ("GET", f"{BASE}/intros/"),
         ("POST", f"{BASE}/intros/"),
+        ("PATCH", f"{BASE}/intros/{ids['clip']}/"),
         ("DELETE", f"{BASE}/intros/{ids['clip']}/"),
         ("POST", f"{BASE}/intros/{ids['clip']}/toggle/"),
         ("GET", f"{BASE}/videos/"),
@@ -768,6 +769,15 @@ class IntroTests(DashboardApiCase):
     def test_needs_file_or_url(self):
         response = self.upload(f"{BASE}/intros/", self.valid())
         self.assertIn("__all__", response.json()["error"]["fields"])
+
+    def test_rename(self):
+        response = self.send("PATCH", f"{BASE}/intros/{self.clip.pk}/", {"name": "  ذهبية  "})
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["name"], "ذهبية")
+        self.clip.refresh_from_db()
+        self.assertEqual(self.clip.name, "ذهبية")
+        blank = self.send("PATCH", f"{BASE}/intros/{self.clip.pk}/", {"name": " "})
+        self.assertIn("name", blank.json()["error"]["fields"])
 
     def test_toggle_and_delete(self):
         self.assertFalse(self.post(f"{BASE}/intros/{self.clip.pk}/toggle/").json()["isActive"])
