@@ -1560,7 +1560,17 @@ a.lb-social:hover { transform: translateY(-2px); opacity: .85; }
      وبتكسب على العنصر المقصود لوحده، والسحب الحي inline فبيكسب برضو. */
   --dx: 0px;
   --dy: 0px;
+}
+/* عناصر مربع «كود متقدّم» (‎ce-N‎) بتتحرّك بخاصية ‎translate‎ مش ‎transform‎.
+   كود المصمّم بيحرّك عناصره بـ‎@keyframes‎ فيها ‎transform‎ (ظهور من فوق، تكبير…)
+   مع ‎animation-fill-mode: forwards‎، والأنيميشن بيكسب أي ‎transform‎ تانية —
+   فالعنصر ده كان مابيتحرّكش بالماوس خالص. ‎translate‎ خاصية مستقلة بتتركّب
+   مع ‎transform‎ بتاع الأنيميشن وبتاع المصمّم من غير ما تلغيهم. */
+[data-move]:where(:not([data-move^="ce-"])) {
   transform: translate(var(--dx, 0), var(--dy, 0));
+}
+[data-move^="ce-"] {
+  translate: var(--dx, 0px) var(--dy, 0px);
 }
 
 /* أثناء السحب داخل المحرر */
