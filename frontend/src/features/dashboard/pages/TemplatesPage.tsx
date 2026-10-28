@@ -11,10 +11,12 @@ import {
   useSetTemplateCover,
   useTemplatesList,
   useToggleTemplate,
+  useUpdateTemplate,
 } from '../api'
 import type { TemplateRow } from '../types'
 import { useConfirm } from '../ui/ConfirmDialog'
 import { CoverCropper } from '../ui/CoverCropper'
+import { InlineEdit } from '../ui/InlineEdit'
 import { useLabels } from '../ui/labels'
 import { PageHead, Pill, usePageTitle } from '../ui/page'
 import { QueryState } from '../ui/table'
@@ -185,7 +187,19 @@ export function TemplatesPage() {
   const toast = useToast()
   const { data, isPending, isError } = useTemplatesList()
   const importer = useImportTemplate()
+  const update = useUpdateTemplate()
   usePageTitle(t('dashboard.templates.pageTitle'))
+
+  /** حفظ الاسم أو الوصف من الكارت — الرفض بيتعرض توست والمحرر بيفضل مفتوح. */
+  async function saveText(template: TemplateRow, body: { name?: string; description?: string }) {
+    try {
+      const saved = await update.mutateAsync({ id: template.id, body })
+      toast.success(t('dashboard.templates.textSaved', { name: saved.name }))
+    } catch (error) {
+      toast.fail(error)
+      throw error
+    }
+  }
 
   function onImport(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -277,7 +291,23 @@ export function TemplatesPage() {
                 {!template.cover && template.name.slice(0, 1)}
               </div>
               <div className="tpl-body">
-                <h3>{template.name}</h3>
+                <h3>
+                  <InlineEdit
+                    value={template.name}
+                    label={t('dashboard.templates.editName')}
+                    maxLength={120}
+                    required
+                    onSave={(name) => saveText(template, { name })}
+                  />
+                </h3>
+                <InlineEdit
+                  className="tpl-desc"
+                  value={template.description}
+                  label={t('dashboard.templates.editDescription')}
+                  placeholder={t('dashboard.templates.addDescription')}
+                  multiline
+                  onSave={(description) => saveText(template, { description })}
+                />
                 <span className="tpl-meta">
                   {template.category !== 'none' && `${labels.category(template.category, template.categoryLabel)} · `}
                   {labels.source(template.source, template.sourceLabel)} ·{' '}

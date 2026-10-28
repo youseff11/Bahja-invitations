@@ -2,6 +2,7 @@ import type { BlockData } from '@/features/invite/types'
 
 import { INTRO_ID } from '../doc'
 import { commitHtml, commitSwap } from '../imported/frame'
+import { savedSrc, THUMB_ATTR } from '../imported/lazyImages'
 import type { FromFrame, PreviewPayload } from '../types'
 
 /**
@@ -183,8 +184,9 @@ export function swapCandidate(node: HTMLElement, x: number, y: number): HTMLElem
 
 /** يبدّل مصدر صورتين (‎src‎ و‎srcset‎ — الأخير بيكسب على الأول فلازم يتبدّل معاه). */
 export function swapImages(a: Element, b: Element) {
-  const read = (n: Element) => ({ src: n.getAttribute('src'), srcset: n.getAttribute('srcset') })
+  const read = (n: Element) => ({ src: savedSrc(n), srcset: n.getAttribute('srcset') })
   const write = (n: Element, v: { src: string | null; srcset: string | null }) => {
+    n.removeAttribute(THUMB_ATTR) // المصدر المحفوظ اتبدّل: الأصل بيتجاب تاني في الرسمة الجاية
     if (v.src) n.setAttribute('src', v.src)
     else n.removeAttribute('src')
     if (v.srcset) n.setAttribute('srcset', v.srcset)

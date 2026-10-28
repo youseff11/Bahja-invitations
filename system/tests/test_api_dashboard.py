@@ -38,6 +38,7 @@ def _endpoints(ids):
         ("GET", f"{BASE}/templates/"),
         ("POST", f"{BASE}/templates/"),
         ("POST", f"{BASE}/templates/import/"),
+        ("PATCH", f"{BASE}/templates/{ids['template']}/"),
         ("DELETE", f"{BASE}/templates/{ids['template']}/"),
         ("POST", f"{BASE}/templates/{ids['template']}/toggle/"),
         ("POST", f"{BASE}/templates/{ids['template']}/cover/"),
@@ -170,6 +171,7 @@ class GuardTests(DashboardApiCase):
         for method, path in [
             ("DELETE", f"{BASE}/invitations/999999/"),
             ("POST", f"{BASE}/invitations/999999/duplicate/"),
+            ("PATCH", f"{BASE}/templates/999999/"),
             ("DELETE", f"{BASE}/templates/999999/"),
             ("POST", f"{BASE}/templates/999999/toggle/"),
             ("DELETE", f"{BASE}/templates/999999/cover/"),
@@ -357,6 +359,33 @@ class TemplateTests(DashboardApiCase):
         self.template.refresh_from_db()
         self.assertFalse(self.template.is_active)
         self.assertTrue(self.post(f"{BASE}/templates/{self.template.pk}/toggle/").json()["isActive"])
+
+    def test_quick_edit_name_and_description(self):
+        url = f"{BASE}/templates/{self.template.pk}/"
+        response = self.send("PATCH", url, {"name": "  اسم جديد ", "description": " وصف جديد "})
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["name"], "اسم جديد")
+        self.template.refresh_from_db()
+        self.assertEqual((self.template.name, self.template.description), ("اسم جديد", "وصف جديد"))
+        row = self.get(f"{BASE}/templates/").json()["results"][0]
+        self.assertEqual((row["name"], row["description"]), ("اسم جديد", "وصف جديد"))
+
+    def test_quick_edit_only_touches_sent_fields(self):
+        Template.objects.filter(pk=self.template.pk).update(description="قديم")
+        self.send("PATCH", f"{BASE}/templates/{self.template.pk}/", {"name": "جديد"})
+        self.template.refresh_from_db()
+        self.assertEqual((self.template.name, self.template.description), ("جديد", "قديم"))
+        self.send("PATCH", f"{BASE}/templates/{self.template.pk}/", {"description": ""})
+        self.template.refresh_from_db()
+        self.assertEqual((self.template.name, self.template.description), ("جديد", ""))
+
+    def test_quick_edit_validation(self):
+        url = f"{BASE}/templates/{self.template.pk}/"
+        for name in ("   ", "ا" * 121):
+            response = self.send("PATCH", url, {"name": name})
+            self.assertIn("name", response.json()["error"]["fields"])
+        self.template.refresh_from_db()
+        self.assertEqual(self.template.name, "ذهبي كلاسيكي")
 
     def _png(self, name="bg.png"):
         buffer = io.BytesIO()

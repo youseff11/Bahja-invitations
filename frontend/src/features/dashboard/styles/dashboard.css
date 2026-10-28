@@ -892,6 +892,72 @@
   margin: 0;
   font-size: 17px;
 }
+/* نص بيتعدّل بالضغط عليه (اسم/وصف القالب) */
+.dash-root .inline-edit,
+.dash-root .inline-edit-field {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 3px 6px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  line-height: 1.5;
+}
+.dash-root .inline-edit {
+  cursor: text;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  margin-inline: -6px;
+  width: calc(100% + 12px);
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease;
+}
+.dash-root .inline-edit:hover,
+.dash-root .inline-edit:focus-visible {
+  background: var(--surface-2);
+  border-color: var(--line);
+  outline: none;
+}
+.dash-root .inline-edit--empty {
+  color: var(--muted);
+  font-size: 13px;
+  opacity: 0;
+}
+.dash-root .tpl-card:hover .inline-edit--empty,
+.dash-root .inline-edit--empty:focus-visible {
+  opacity: 1;
+}
+@media (hover: none) {
+  .dash-root .inline-edit--empty {
+    opacity: 1;
+  }
+}
+.dash-root .inline-edit-field {
+  margin-inline: -6px;
+  width: calc(100% + 12px);
+  background: var(--surface);
+  border-color: var(--accent);
+  outline: none;
+  resize: none;
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.dash-root .tpl-desc {
+  font-size: 13px;
+  color: var(--muted);
+}
+.dash-root .inline-edit-field.tpl-desc {
+  color: inherit;
+}
+.dash-root .tpl-body h3 .inline-edit,
+.dash-root .tpl-body h3 .inline-edit-field {
+  font-size: inherit;
+  font-weight: inherit;
+}
 .dash-root .tpl-meta {
   font-size: 12px;
   color: var(--muted);

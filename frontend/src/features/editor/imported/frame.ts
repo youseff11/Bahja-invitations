@@ -1,6 +1,7 @@
 import type { FromFrame, PreviewPayload } from '../types'
 import { applyNodeEdit, videoIn, type NodeEdit } from './nodeEdit'
 import { numberElements } from './numbering'
+import { upgradeLazyImages, savedSrc } from './lazyImages'
 import { serializeCustom } from './serialize'
 import { INTRO_ID } from './source'
 import { CODE_ROOTS } from './units'
@@ -81,7 +82,7 @@ export function commitSwap(a: Element, b: Element, send: Send) {
   const edits = [a, b].flatMap((img) => {
     const slot = img.getAttribute('data-move')
     return slot
-      ? [{ slot, edit: { kind: 'attrs' as const, values: { src: img.getAttribute('src'), srcset: img.getAttribute('srcset') } } }]
+      ? [{ slot, edit: { kind: 'attrs' as const, values: { src: savedSrc(img), srcset: img.getAttribute('srcset') } } }]
       : []
   })
   if (edits.length) send({ type: 'lb-editor:node-edits', id, edits })
@@ -122,6 +123,8 @@ export function prepareImported(payload: PreviewPayload, send: Send, root: Paren
     // الـDOM هنا نصه مترجَم لو المعاينة مترجَمة — مانحفظش حاجة منه
     if (changed && !translated) scheduleWrite(custom, send, true)
   })
+  // الصور المصغّرة (مستورد Tilda) بتتبدّل بأصولها للمعاينة بس — الحفظ بيرجّع المصغّرة (serializeCustom)
+  upgradeLazyImages(root)
   // صناديق الكود: الأرقام (‎ce-N‎) بتتكتب في النص الأصلي بالمسار. الأرقام بتحط ‎data-move‎ بس فمفيش خطر على الترجمة
   root.querySelectorAll<HTMLElement>(CODE_ROOTS).forEach((box) => {
     const id = blockIdOf(box)

@@ -146,6 +146,17 @@ export function useToggleTemplate() {
   )
 }
 
+/** تعديل سريع للاسم/الوصف من كارت القالب — اللي مابيتبعتش مابيتغيّرش. */
+export function useUpdateTemplate() {
+  return useInvalidatingMutation(
+    ({ id, body }: { id: number; body: { name?: string; description?: string } }) =>
+      api<{ id: number; name: string; description: string }>(`/dashboard/templates/${id}/`, {
+        method: 'PATCH',
+        body,
+      }),
+  )
+}
+
 export function useDeleteTemplate() {
   return useInvalidatingMutation((id: number) =>
     api<{ deleted: boolean; name: string }>(`/dashboard/templates/${id}/`, { method: 'DELETE' }),

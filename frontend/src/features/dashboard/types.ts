@@ -115,6 +115,7 @@ export interface TemplateRow {
   id: number
   slug: string
   name: string
+  description: string
   category: string
   categoryLabel: string
   source: string

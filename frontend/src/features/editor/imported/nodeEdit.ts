@@ -1,5 +1,6 @@
 import { findSlot } from './dom'
 import { GOOGLE_MAP } from './map'
+import { savedSrc, THUMB_ATTR } from './lazyImages'
 import { isImportedCountdownPart, isTextual } from './units'
 
 /**
@@ -102,6 +103,7 @@ export function applyNodeEdit(root: Element, slot: string, edit: NodeEdit): bool
     case 'src': {
       const image = imageIn(node)
       if (!image) return false
+      image.removeAttribute(THUMB_ATTR) // صورة جديدة اختارها المصمّم: مفيش مصغّرة نرجّعها
       image.setAttribute('src', edit.value)
       image.removeAttribute('srcset')
       return true
@@ -197,7 +199,7 @@ export function readNode(root: Element, slot: string): NodeInfo | null {
     className,
     kind: image ? 'image' : video ? 'video' : frame ? 'map' : unit ? 'text' : 'shape',
     text: unit ? plainText(unit) : null,
-    src: image?.getAttribute('src') ?? null,
+    src: image ? savedSrc(image) : null,
     videoSrc: video ? (video.getAttribute('src') ?? video.querySelector('source')?.getAttribute('src') ?? '') : null,
     map: frame ? { src: frame.getAttribute('src') ?? '', width: mapSize(node, 'width'), height: mapSize(node, 'height') } : null,
     countdown: isImportedCountdownPart(node),

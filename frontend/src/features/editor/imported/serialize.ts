@@ -1,3 +1,5 @@
+import { restoreThumb } from './lazyImages'
+
 /** علامات المحرر الوقتية اللي لازم تتشال قبل ما الـHTML يتحفظ (كلاسات وسمات وستايل). */
 const OWN_CLASSES = ['lb-el-picked', 'lb-el-typing', 'lb-dragging', 'lb-el-swap']
 
@@ -10,6 +12,7 @@ export function serializeCustom(root: Element): string {
   clone.querySelectorAll('[contenteditable]').forEach((n) => n.removeAttribute('contenteditable'))
   clone.querySelectorAll('[data-lb-edit]').forEach((n) => n.removeAttribute('data-lb-edit'))
   clone.querySelectorAll('[data-lb-text]').forEach((n) => n.removeAttribute('data-lb-text'))
+  clone.querySelectorAll('[data-lb-thumb-src]').forEach(restoreThumb) // المصغّرة هي اللي بتتحفظ مش الأصل المعروض
   clone.querySelectorAll(`.${OWN_CLASSES.join(', .')}`).forEach((n) => {
     n.classList.remove(...OWN_CLASSES)
     if (!n.getAttribute('class')) n.removeAttribute('class')
@@ -31,5 +34,7 @@ export function cleanCopy(node: Element): Element {
   }
   strip(copy)
   copy.querySelectorAll('*').forEach(strip)
+  copy.querySelectorAll('[data-lb-thumb-src]').forEach(restoreThumb)
+  if (copy.hasAttribute('data-lb-thumb-src')) restoreThumb(copy)
   return copy
 }

@@ -25,7 +25,7 @@ from .dashboard_common import (
     snake_keys,
     staff_api,
 )
-from .http import ApiError
+from .http import ApiError, json_body
 
 logger = logging.getLogger(__name__)
 
@@ -36,6 +36,7 @@ def _template_row(tpl, labels: dict) -> dict:
         "id": tpl.pk,
         "slug": tpl.slug,
         "name": tpl.name,
+        "description": tpl.description,
         "category": tpl.category,
         "categoryLabel": labels.get(tpl.category, tpl.category),
         "source": tpl.source,
@@ -72,9 +73,34 @@ def templates(request):
     }
 
 
-@staff_api("DELETE")
+def _quick_edit(request, tpl) -> dict:
+    """تعديل سريع للاسم والوصف من كارت القالب — اللي مابيتبعتش مابيتغيّرش."""
+    data = json_body(request)
+    update_fields = []
+    if "name" in data:
+        name = str(data["name"] or "").strip()
+        max_length = Template._meta.get_field("name").max_length
+        if not name:
+            raise ApiError(400, "validation_error", "اسم القالب مطلوب.",
+                           fields={"name": "اسم القالب مطلوب."})
+        if len(name) > max_length:
+            message = f"الاسم أطول من {max_length} حرف."
+            raise ApiError(400, "validation_error", message, fields={"name": message})
+        tpl.name = name
+        update_fields.append("name")
+    if "description" in data:
+        tpl.description = str(data["description"] or "").strip()
+        update_fields.append("description")
+    if update_fields:
+        tpl.save(update_fields=[*update_fields, "updated_at"])
+    return {"id": tpl.pk, "name": tpl.name, "description": tpl.description}
+
+
+@staff_api("PATCH", "DELETE")
 def template_detail(request, pk):
     tpl = _get_or_404(pk)
+    if request.method == "PATCH":
+        return _quick_edit(request, tpl)
     # الدعوات بتاخد نسخة مستقلة من المستند وقت الإنشاء، فحذف القالب مابيأثرش عليها —
     # بس اللي اتستخدم بنسيبه عشان الإحصائيات تفضل صح
     used = tpl.invitations.count()
