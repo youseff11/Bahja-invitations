@@ -824,6 +824,9 @@ html[lang="en"] .plan-badge { letter-spacing: .1em; }
 .foot-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
 .foot-inner > p { margin: 0; color: var(--muted); font-size: 13px; }
 .foot-brand { height: 34px; margin-inline-start: 0; }
+/* على الموبايل لوجو الفوتر بنفس حجم لوجو النافبار (قواعد .brand فوق بتتغلب هنا لأن .foot-brand جاية بعدها) */
+@media (max-width: 780px) { .foot-brand { height: 19px; } }
+@media (max-width: 380px) { .foot-brand { height: 16px; } }
 
 @media (max-width: 700px) {
   .faq-item summary { padding: 16px 17px; font-size: 18px; }
@@ -1391,6 +1394,18 @@ main { display: block; }
 }
 .plan-addons .plan-addons-list li { margin-bottom: 6px; }
 .toolbar--center { justify-content: center; }
+/* تصنيفات القوالب على الموبايل: صف واحد بيتسحب أفقيًا بدل ما الأزرار تلف على سطرين أو تلاتة */
+@media (max-width: 600px) {
+  .toolbar--center {
+    flex-wrap: nowrap; justify-content: flex-start;
+    overflow-x: auto; overscroll-behavior-x: contain;
+    margin-inline: -18px; padding: 4px 18px 8px;
+    scroll-snap-type: x proximity; scroll-padding-inline: 18px;
+    scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  }
+  .toolbar--center::-webkit-scrollbar { display: none; }
+  .toolbar--center > .btn { flex: 0 0 auto; white-space: nowrap; scroll-snap-align: start; }
+}
 .tpl-body .tpl-desc--sm { font-size: 13px; }
 .login-card .brand--stacked { margin-bottom: 22px; }
 .login-card h2 { font-size: 21px; }

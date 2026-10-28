@@ -197,6 +197,7 @@
     "editName": "اضغط لتعديل الاسم",
     "editDescription": "اضغط لتعديل الوصف",
     "addDescription": "أضف وصفاً…",
+    "category": "التصنيف",
     "textSaved": "اتحفظت بيانات «{{name}}».",
     "meta": "{{blocks}} قسم · استُخدم {{uses}} مرة",
     "empty": "فاضي",

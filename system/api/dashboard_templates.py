@@ -74,7 +74,7 @@ def templates(request):
 
 
 def _quick_edit(request, tpl) -> dict:
-    """تعديل سريع للاسم والوصف من كارت القالب — اللي مابيتبعتش مابيتغيّرش."""
+    """تعديل سريع للاسم والوصف والتصنيف من كارت القالب — اللي مابيتبعتش مابيتغيّرش."""
     data = json_body(request)
     update_fields = []
     if "name" in data:
@@ -91,9 +91,17 @@ def _quick_edit(request, tpl) -> dict:
     if "description" in data:
         tpl.description = str(data["description"] or "").strip()
         update_fields.append("description")
+    if "category" in data:
+        category = str(data["category"] or "")
+        if category not in {value for value, _label in category_choices()}:
+            raise ApiError(400, "validation_error", "التصنيف غير صالح.",
+                           fields={"category": "التصنيف غير صالح."})
+        tpl.category = category
+        update_fields.append("category")
     if update_fields:
         tpl.save(update_fields=[*update_fields, "updated_at"])
-    return {"id": tpl.pk, "name": tpl.name, "description": tpl.description}
+    return {"id": tpl.pk, "name": tpl.name, "description": tpl.description,
+            "category": tpl.category}
 
 
 @staff_api("PATCH", "DELETE")

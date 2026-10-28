@@ -379,6 +379,23 @@ class TemplateTests(DashboardApiCase):
         self.template.refresh_from_db()
         self.assertEqual((self.template.name, self.template.description), ("جديد", ""))
 
+    def test_quick_edit_category(self):
+        url = f"{BASE}/templates/{self.template.pk}/"
+        response = self.send("PATCH", url, {"category": "wedding"})
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["category"], "wedding")
+        self.template.refresh_from_db()
+        self.assertEqual(self.template.category, "wedding")
+        self.assertEqual(self.template.name, "ذهبي كلاسيكي")  # الاسم ماتغيّرش
+        row = self.get(f"{BASE}/templates/").json()["results"][0]
+        self.assertEqual(row["category"], "wedding")
+
+    def test_quick_edit_rejects_unknown_category(self):
+        url = f"{BASE}/templates/{self.template.pk}/"
+        response = self.send("PATCH", url, {"category": "nope"})
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("category", response.json()["error"]["fields"])
+
     def test_quick_edit_validation(self):
         url = f"{BASE}/templates/{self.template.pk}/"
         for name in ("   ", "ا" * 121):

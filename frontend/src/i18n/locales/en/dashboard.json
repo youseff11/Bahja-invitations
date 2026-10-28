@@ -197,6 +197,7 @@
     "editName": "Click to edit the name",
     "editDescription": "Click to edit the description",
     "addDescription": "Add a description…",
+    "category": "Category",
     "textSaved": "Saved “{{name}}”.",
     "meta": "{{blocks}} sections · used {{uses}} times",
     "empty": "Empty",

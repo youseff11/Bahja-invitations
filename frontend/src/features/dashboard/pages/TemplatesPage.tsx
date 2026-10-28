@@ -190,8 +190,8 @@ export function TemplatesPage() {
   const update = useUpdateTemplate()
   usePageTitle(t('dashboard.templates.pageTitle'))
 
-  /** حفظ الاسم أو الوصف من الكارت — الرفض بيتعرض توست والمحرر بيفضل مفتوح. */
-  async function saveText(template: TemplateRow, body: { name?: string; description?: string }) {
+  /** حفظ الاسم أو الوصف أو التصنيف من الكارت — الرفض بيتعرض توست والمحرر بيفضل مفتوح. */
+  async function saveText(template: TemplateRow, body: { name?: string; description?: string; category?: string }) {
     try {
       const saved = await update.mutateAsync({ id: template.id, body })
       toast.success(t('dashboard.templates.textSaved', { name: saved.name }))
@@ -308,6 +308,19 @@ export function TemplatesPage() {
                   multiline
                   onSave={(description) => saveText(template, { description })}
                 />
+                <select
+                  className="tpl-category"
+                  aria-label={t('dashboard.templates.category')}
+                  value={template.category}
+                  disabled={update.isPending}
+                  onChange={(event) => void saveText(template, { category: event.target.value }).catch(() => {})}
+                >
+                  {data.categories.map((category) => (
+                    <option key={category.value} value={category.value}>
+                      {labels.category(category.value, category.label)}
+                    </option>
+                  ))}
+                </select>
                 <span className="tpl-meta">
                   {template.category !== 'none' && `${labels.category(template.category, template.categoryLabel)} · `}
                   {labels.source(template.source, template.sourceLabel)} ·{' '}
