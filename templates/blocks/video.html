@@ -7,6 +7,7 @@
   <div data-move="video" class="lb-video-wrap lb-video-wrap--{{ props.aspect|default:'16x9' }}">
     <div class="lb-video lb-video--{{ props.aspect|default:'16x9' }}" data-video="{{ props.url }}"{% if props.poster %} data-poster="{{ props.poster }}"{% endif %}{% if props.autoplay %} data-autoplay="1"{% endif %}{% if props.sound %} data-sound="1"{% endif %}{% if props.loop %} data-loop="1"{% endif %} data-no-controls="1"></div>
     {% for overlay in props.text_overlays %}{% include "blocks/_overlay_item.html" with overlay=overlay index=forloop.counter0 wrap_class="lb-video-text" is_video=True %}{% endfor %}
+    {% comment %}«كود متقدّم» فوق الفيديو (مش تحته) وبيتسحب بنفس إزاحة ‎data-move="code"‎.{% endcomment %}{% if props.code %}<div class="lb-video-code">{% include "blocks/_section_code.html" %}</div>{% endif %}
   </div>
   {% else %}<div class="lb-gempty">ارفع فيديو أو الصق رابطه من المحرر</div>{% endif %}
 </div>

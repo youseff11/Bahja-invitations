@@ -2316,6 +2316,37 @@ class CodeBoxFullWidthTests(TestCase):
 
 
 # ==========================================================================
+class VideoCodeOverlayTests(TestCase):
+    """«كود متقدّم» في قسم فيديو بيتعرض فوق الفيديو (جوّه ‎lb-video-wrap‎) مش تحته."""
+
+    CODE = "<style>.hi{color:red}</style><div class=\"hi\">أهلاً</div>"
+
+    def _html(self, url):
+        block = B.make_block("video")
+        block["id"] = "vid-1"
+        block["props"]["url"] = url
+        block["props"]["code"] = self.CODE
+        doc = B.normalize_document({"blocks": [block]})
+        return str(render_document(doc, editable=False)["html"])
+
+    def test_code_sits_inside_the_video_wrap(self):
+        html = self._html("/media/v.mp4")
+        wrap = html.index("lb-video-wrap")
+        code = html.index('class="lb-video-code"')
+        self.assertGreater(code, wrap)
+        self.assertLess(code, html.index("</section>"))
+        # مرة واحدة بس — مش نسخة تانية بعد الفيديو
+        self.assertEqual(html.count("lb-extra-html"), 1)
+        self.assertEqual(html.count("أهلاً"), 1)
+        self.assertIn('data-move="code"', html)
+
+    def test_without_a_video_the_code_keeps_its_normal_place(self):
+        html = self._html("")
+        self.assertNotIn("lb-video-code", html)
+        self.assertEqual(html.count("lb-extra-html"), 1)
+
+
+# ==========================================================================
 class CustomSectionTextTests(TestCase):
     """نصوص القسم المستورد — استخراجها من الكود واستبدالها فيه."""
 

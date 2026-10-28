@@ -285,7 +285,11 @@ def _block_payload(block: dict, ctx: dict, extras: dict, *, invitation, guest,
     if str(props.get("code") or "").strip():
         code = render_to_string(
             "blocks/_section_code.html", ctx, request=ctx["request"])
-        record["code"] = code.strip()
+        if btype == "video" and props.get("url"):
+            # فيديو فيه ملف: الكود بيتعرض فوق الفيديو نفسه (جوّه ‎Video.tsx‎)
+            record["props"]["code"] = code.strip()
+        else:
+            record["code"] = code.strip()
     return record
 
 

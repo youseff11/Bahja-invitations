@@ -905,6 +905,24 @@
   text-shadow: var(--ovl-text-shadow, none);
   pointer-events: none;
 }
+/* «كود متقدّم» فوق الفيديو: طبقة بتغطي الفيديو وبتوسّط الكود، والإزاحة (‎--dx/--dy‎ بالبكسل)
+   بتتطبّق ‎left/top‎ على الصندوق نفسه — فالسحب بالماوس بيشتغل بنفس الكود العادي.
+   الطبقة ‎pointer-events:none‎ عشان لمسة الفيديو تعدّي، والصندوق وحده بياخد الضغط. */
+.lb-video-wrap .lb-video-code {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+.lb-video-wrap .lb-video-code .lb-extra-html {
+  pointer-events: auto;
+  left: var(--dx, 0px);
+  top: var(--dy, 0px);
+  margin-top: 0;
+  margin-inline: 0;
+}
 .lb-doc--editing .lb-video-wrap [data-video-text],
 .lb-doc--editing .lb [data-section-text] {
   cursor: grab;

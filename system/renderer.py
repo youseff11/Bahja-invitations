@@ -1360,7 +1360,9 @@ def render_document(
         # ونفس الحاوية ونفس السحب، عشان الشكل والسلوك يبقوا واحد في كل
         # حتة. القسم المستورد ليه ‎html/css‎ بمعنى تاني، بس دول تخزين
         # مالوش دعوة بخانة «الكود».
-        if str(ctx["props"].get("code") or "").strip():
+        # فيديو فيه ملف: الكود اتحط جوّه ‎video.html‎ فوق الفيديو نفسه
+        code_on_video = block["type"] == "video" and bool(ctx["props"].get("url"))
+        if str(ctx["props"].get("code") or "").strip() and not code_on_video:
             code = render_to_string("blocks/_section_code.html", ctx, request=request)
             # ‎rsplit‎ مش ‎replace‎: القسم ممكن يكون جوّاه ‎</section>‎ من
             # HTML إضافي كتبه المصمّم، والمقصود آخر واحدة (بتاعة القسم).

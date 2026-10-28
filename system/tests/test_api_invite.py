@@ -328,6 +328,19 @@ class RenderApiTests(InviteBase):
         self.inv.refresh_from_db()
         self.assertEqual(self.inv.public_views, 0)
 
+    def test_video_code_travels_in_the_video_props_not_as_a_tail(self):
+        """كود القسم بيتعرض فوق الفيديو (‎Video.tsx‎) — مايتحقنش كمان في آخر القسم."""
+        doc = self.inv.get_document()
+        doc["blocks"].append({
+            "id": "vid-x", "type": "video", "visible": True,
+            "props": {"url": "/media/v.mp4", "code": "<div>أهلاً</div>"}})
+        self.inv.document = doc
+        self.inv.save()
+        data = self.client.get(f"/api/v1/invitations/{self.inv.slug}/render/").json()
+        video = next(b for b in data["blocks"] if b["id"] == "vid-x")
+        self.assertIn("أهلاً", video["props"]["code"])
+        self.assertEqual(video["code"], "")
+
     def test_render_404_for_unpublished(self):
         self.inv.status = "draft"
         self.inv.save()

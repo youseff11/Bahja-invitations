@@ -3,6 +3,7 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { useInvite } from '../context'
 import { queueMedia, resetPrimed, setWanted } from '../runtime/media'
 import type { BlockData } from '../types'
+import { Raw } from '../Raw'
 import { Frame } from './Frame'
 
 interface VideoProps {
@@ -14,6 +15,8 @@ interface VideoProps {
   sound?: boolean
   loop?: boolean
   overlays?: string[]
+  /** «كود متقدّم» القسم — بيتعرض فوق الفيديو مش تحته (جاهز من السيرفر) */
+  code?: string
 }
 
 const YT = /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([\w-]{6,})/
@@ -278,6 +281,11 @@ export function Video({ block }: { block: BlockData }) {
           {(p.overlays ?? []).map((html, i) => (
             <div key={i} style={{ display: 'contents' }} dangerouslySetInnerHTML={{ __html: html }} />
           ))}
+          {p.code && (
+            <div className="lb-video-code">
+              <Raw html={p.code} />
+            </div>
+          )}
         </div>
       ) : (
         <div className="lb-gempty">{t('empty.video')}</div>
