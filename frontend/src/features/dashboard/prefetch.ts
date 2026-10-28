@@ -31,6 +31,7 @@ const TARGETS: Record<string, Target> = {
   '/dashboard/analytics': { chunk: () => import('./pages/AnalyticsPage'), data: (c) => c.prefetchQuery(dashQueries.analytics()) },
   '/dashboard/fonts': library('fonts', () => import('./pages/FontsPage')),
   '/dashboard/music': library('music', () => import('./pages/MusicPage')),
+  '/dashboard/videos': { chunk: () => import('./pages/VideosPage'), data: (c) => c.prefetchQuery(dashQueries.videos()) },
   '/dashboard/intros': library('intros', () => import('./pages/IntrosPage')),
   '/dashboard/data': { chunk: () => import('../dataadmin/DataHomePage'), data: (c) => c.prefetchQuery(catalogQuery()) },
 }

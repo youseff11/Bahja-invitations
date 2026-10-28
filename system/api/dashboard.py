@@ -22,6 +22,7 @@ from . import (
     dashboard_music_dedupe,
     dashboard_plans,
     dashboard_templates,
+    dashboard_videos,
 )
 from .dashboard_common import (
     editor_url,
@@ -155,5 +156,6 @@ urlpatterns = [
 urlpatterns += dashboard_invitations.urlpatterns
 urlpatterns += dashboard_templates.urlpatterns
 urlpatterns += dashboard_library.urlpatterns
+urlpatterns += dashboard_videos.urlpatterns
 urlpatterns += dashboard_music_dedupe.urlpatterns
 urlpatterns += dashboard_plans.urlpatterns

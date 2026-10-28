@@ -31,6 +31,7 @@
     "library": "Library",
     "fonts": "Fonts",
     "music": "Music",
+    "videos": "Videos",
     "intros": "Intros",
     "orders": "Orders",
     "plans": "Plans",
@@ -330,6 +331,30 @@
       "doneDocs": "{{docs}} documents were switched to the kept copy.",
       "doneFreed": "Freed {{size}} MB of disk space."
     }
+  },
+  "videos": {
+    "pageTitle": "Video library",
+    "title": "Video library",
+    "how": "Every video uploaded in any invitation or template lives here. If a video works as an intro, press <strong>Move to intros</strong> — it moves to the intro library and disappears from here, staying there only.",
+    "listTitle": "Videos ({{n}})",
+    "cols": {
+      "name": "Name",
+      "preview": "Preview",
+      "source": "Source",
+      "size": "Size"
+    },
+    "shared": "Shared",
+    "none": "No videos yet — upload the first one from the side.",
+    "addTitle": "Add a video",
+    "fields": {
+      "file": "Video"
+    },
+    "upload": "Upload video",
+    "added": "Added “{{name}}” to the library.",
+    "reviewData": "Check the data — a field is missing.",
+    "moveToIntros": "Move to intros",
+    "confirmMove": "Move “{{name}}” to the intro library? It will disappear from the video library and stay in intros only.",
+    "moved": "Moved “{{name}}” to the intro library."
   },
   "intros": {
     "pageTitle": "Intro library",

@@ -79,6 +79,8 @@ def _assets(invitation: Invitation | None) -> list[dict]:
         rows = Asset.objects.filter(Q(invitation=invitation) | Q(invitation__isnull=True))
     else:
         rows = Asset.objects.filter(invitation__isnull=True)
+    # الفيديو المنقول للافتتاحيات بيظهر هناك بس (معرض الافتتاحيات فوق شبكة الفيديو)
+    rows = rows.filter(is_intro=False)
     assets = list(rows.order_by("-id")[:ASSET_LIMIT])
     usage = services._asset_usage_map(assets)  # noqa: SLF001
     return [

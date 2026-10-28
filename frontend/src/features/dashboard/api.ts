@@ -21,6 +21,7 @@ import type {
   TemplateImportResult,
   TemplatesResponse,
   TrackRow,
+  VideoRow,
   DedupeResult,
 } from './types'
 
@@ -35,6 +36,7 @@ export const dashKeys = {
   invitationOptions: [...ROOT, 'invitation-options'] as const,
   templates: [...ROOT, 'templates'] as const,
   library: (kind: LibraryKind) => [...ROOT, 'library', kind] as const,
+  videos: [...ROOT, 'videos'] as const,
   plans: [...ROOT, 'plans'] as const,
   site: [...ROOT, 'site'] as const,
 }
@@ -73,6 +75,8 @@ export const dashQueries = {
   templates: () => queryOptions({ queryKey: dashKeys.templates, queryFn: () => api<TemplatesResponse>('/dashboard/templates/') }),
   plans: () => queryOptions({ queryKey: dashKeys.plans, queryFn: () => api<PlansResponse>('/dashboard/plans/') }),
   site: () => queryOptions({ queryKey: dashKeys.site, queryFn: () => api<SiteResponse>('/dashboard/site/') }),
+  videos: () =>
+    queryOptions({ queryKey: dashKeys.videos, queryFn: () => api<{ results: VideoRow[] }>('/dashboard/videos/') }),
   library: <K extends LibraryKind>(kind: K) =>
     queryOptions({
       queryKey: dashKeys.library(kind),
@@ -218,6 +222,18 @@ export function useLibrary<K extends LibraryKind>(kind: K) {
     api<{ deleted: boolean; name: string }>(`${path}${id}/`, { method: 'DELETE' }),
   )
   return { list, create, toggle, remove }
+}
+
+/** مكتبة الفيديوهات العامة: القايمة والرفع ونقل فيديو لمكتبة الافتتاحيات (بيختفي من هنا). */
+export function useVideos() {
+  const list = useQuery(dashQueries.videos())
+  const create = useInvalidatingMutation((body: FormData) =>
+    api<VideoRow>('/dashboard/videos/', { method: 'POST', body }),
+  )
+  const toIntro = useInvalidatingMutation((id: number) =>
+    api<ClipRow>(`/dashboard/videos/${id}/to-intro/`, { method: 'POST' }),
+  )
+  return { list, create, toIntro }
 }
 
 /** مسح المقطوعات المكررة: ‎dryRun=true‎ بيرجّع الخطة من غير تغيير، وبعده التنفيذ الفعلي. */

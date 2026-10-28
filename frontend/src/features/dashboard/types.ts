@@ -186,6 +186,17 @@ export interface ClipRow {
   isActive: boolean
 }
 
+/** فيديو في مكتبة الفيديوهات العامة (أصل ‎kind=video‎ لسه ماتحدّدش افتتاحية). */
+export interface VideoRow {
+  id: number
+  name: string
+  url: string
+  posterUrl: string
+  sizeLabel: string
+  owner: string
+  createdAt: string
+}
+
 export interface PlanRow {
   id: number
   name: string

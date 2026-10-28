@@ -332,6 +332,9 @@ class Asset(TimeStampedModel):
     width = models.PositiveIntegerField(default=0)
     height = models.PositiveIntegerField(default=0)
     size_bytes = models.PositiveBigIntegerField(default=0)
+    # الفيديو اللي اتنقل لمكتبة الافتتاحيات بيختفي من مكتبة الفيديوهات العامة
+    # ومن شبكة الفيديو في المحرر — بيفضل في الافتتاحيات بس.
+    is_intro = models.BooleanField("منقول للافتتاحيات", default=False)
     invitation = models.ForeignKey("Invitation", on_delete=models.CASCADE,
                                    null=True, blank=True, related_name="assets")
     template = models.ForeignKey(Template, on_delete=models.CASCADE,

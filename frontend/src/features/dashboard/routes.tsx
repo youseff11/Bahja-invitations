@@ -17,6 +17,7 @@ const TemplatesPage = lazy(() => import('./pages/TemplatesPage').then((m) => ({ 
 const TemplateNewPage = lazy(() => import('./pages/TemplateNewPage').then((m) => ({ default: m.TemplateNewPage })))
 const FontsPage = lazy(() => import('./pages/FontsPage').then((m) => ({ default: m.FontsPage })))
 const MusicPage = lazy(() => import('./pages/MusicPage').then((m) => ({ default: m.MusicPage })))
+const VideosPage = lazy(() => import('./pages/VideosPage').then((m) => ({ default: m.VideosPage })))
 const IntrosPage = lazy(() => import('./pages/IntrosPage').then((m) => ({ default: m.IntrosPage })))
 const OrdersPage = lazy(() => import('./pages/OrdersPage').then((m) => ({ default: m.OrdersPage })))
 const PlansPage = lazy(() => import('./pages/PlansPage').then((m) => ({ default: m.PlansPage })))
@@ -30,6 +31,7 @@ export const dashboardRoutes: RouteObject[] = [
   { path: 'templates/new', element: <TemplateNewPage /> },
   { path: 'fonts', element: <FontsPage /> },
   { path: 'music', element: <MusicPage /> },
+  { path: 'videos', element: <VideosPage /> },
   { path: 'intros', element: <IntrosPage /> },
   { path: 'orders', element: <OrdersPage /> },
   { path: 'plans', element: <PlansPage /> },

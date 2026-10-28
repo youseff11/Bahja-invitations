@@ -55,6 +55,9 @@ def _endpoints(ids):
         ("POST", f"{BASE}/intros/"),
         ("DELETE", f"{BASE}/intros/{ids['clip']}/"),
         ("POST", f"{BASE}/intros/{ids['clip']}/toggle/"),
+        ("GET", f"{BASE}/videos/"),
+        ("POST", f"{BASE}/videos/"),
+        ("POST", f"{BASE}/videos/{ids['video']}/to-intro/"),
         ("GET", f"{BASE}/plans/"),
         ("PATCH", f"{BASE}/plans/{ids['plan']}/"),
         ("POST", f"{BASE}/addons/"),
@@ -101,6 +104,10 @@ class DashboardApiCase(TestCase):
                                               external_url="https://example.com/f.woff2")
         self.track = MusicTrack.objects.create(name="مقطوعة", external_url="https://example.com/a.mp3")
         self.clip = IntroVideo.objects.create(name="افتتاحية", external_url="https://example.com/v.mp4")
+        self.video = Asset.objects.create(
+            file=SimpleUploadedFile("clip.mp4", b"0" * 64, content_type="video/mp4"),
+            thumb=SimpleUploadedFile("clip.jpg", b"1" * 32, content_type="image/jpeg"),
+            kind="video", original_name="clip.mp4", invitation=self.invitation)
 
     # ---- أدوات
     def csrf(self):
@@ -127,7 +134,7 @@ class DashboardApiCase(TestCase):
 
     def ids(self):
         return {"invitation": self.invitation.pk, "template": self.template.pk,
-                "font": self.font.pk, "track": self.track.pk, "clip": self.clip.pk,
+                "font": self.font.pk, "track": self.track.pk, "clip": self.clip.pk, "video": self.video.pk,
                 "plan": self.plan.pk, "addon": self.addon.pk}
 
     def assertError(self, response, status, code):
@@ -652,6 +659,49 @@ class MusicTests(DashboardApiCase):
         self.assertFalse(self.post(f"{BASE}/music/{self.track.pk}/toggle/").json()["isActive"])
         self.assertEqual(self.send("DELETE", f"{BASE}/music/{self.track.pk}/").status_code, 200)
         self.assertEqual(MusicTrack.objects.count(), 0)
+
+
+class VideoLibraryTests(DashboardApiCase):
+    def test_lists_every_video_but_not_other_kinds(self):
+        Asset.objects.create(file=SimpleUploadedFile("a.png", b"0", content_type="image/png"),
+                             kind="image", original_name="a.png")
+        shared = Asset.objects.create(
+            file=SimpleUploadedFile("shared.mp4", b"0" * 8, content_type="video/mp4"),
+            kind="video", original_name="shared.mp4")
+        rows = self.get(f"{BASE}/videos/").json()["results"]
+        self.assertEqual([r["id"] for r in rows], [shared.pk, self.video.pk])
+        self.assertEqual(rows[1]["name"], "clip.mp4")
+        self.assertTrue(rows[1]["posterUrl"])
+
+    def test_to_intro_moves_the_video_to_the_intro_library_only(self):
+        response = self.post(f"{BASE}/videos/{self.video.pk}/to-intro/")
+        self.assertEqual(response.status_code, 200, response.content)
+        clip = IntroVideo.objects.get(pk=response.json()["id"])
+        self.assertEqual(clip.name, "clip")
+        self.assertTrue(clip.file and clip.poster)
+        # نسخة مستقلة — مش نفس مسار الأصل
+        self.assertNotEqual(clip.file.name, self.video.file.name)
+        self.video.refresh_from_db()
+        self.assertTrue(self.video.is_intro)
+        # اختفى من مكتبة الفيديوهات ومن شبكة المحرر
+        self.assertEqual(self.get(f"{BASE}/videos/").json()["results"], [])
+        from system.api.editor import _assets
+        self.assertEqual(_assets(self.invitation), [])
+        # ومينفعش ينتقل مرتين
+        self.assertEqual(self.post(f"{BASE}/videos/{self.video.pk}/to-intro/").status_code, 404)
+        self.assertEqual(IntroVideo.objects.filter(name="clip").count(), 1)
+
+    def test_upload_goes_to_the_general_library(self):
+        upload = SimpleUploadedFile("new.mp4", b"0" * 128, content_type="video/mp4")
+        response = self.upload(f"{BASE}/videos/", {}, {"file": upload})
+        self.assertEqual(response.status_code, 200, response.content)
+        asset = Asset.objects.get(pk=response.json()["id"])
+        self.assertEqual((asset.kind, asset.is_intro, asset.invitation_id), ("video", False, None))
+
+    def test_upload_rejects_non_video(self):
+        text = SimpleUploadedFile("n.txt", b"hello", content_type="text/plain")
+        response = self.upload(f"{BASE}/videos/", {}, {"file": text})
+        self.assertIn("file", response.json()["error"]["fields"])
 
 
 class IntroTests(DashboardApiCase):
