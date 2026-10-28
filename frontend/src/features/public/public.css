@@ -1227,7 +1227,15 @@ html[dir="ltr"] .steps { --pz-start: left; }
           drop-shadow(0 16px 20px color-mix(in srgb, var(--accent) 14%, transparent));
   transition: transform .28s cubic-bezier(.22, .8, .3, 1), filter .28s ease;
 }
-.step:hover { transform: translateY(-5px); }
+/* المرور: القطعة ما بتتحرّكش (أي إزاحة بتفك تعشيقها مع جيرانها) — بتتلوّن وظلّها بيزيد */
+@property --pz-fill { syntax: '<color>'; inherits: true; initial-value: #ffffff; }
+.step { transition: --pz-fill .28s ease, filter .28s ease; }
+.step:hover {
+  --pz-fill: color-mix(in srgb, var(--accent) 9%, var(--surface));
+  filter: drop-shadow(0 0 .6px var(--accent))
+          drop-shadow(0 18px 22px color-mix(in srgb, var(--accent) 24%, transparent));
+}
+.step:last-child:hover { --pz-fill: color-mix(in srgb, var(--accent) 88%, #fff); }
 
 /* وجه القطعة + تجويف الاستقبال */
 .step::before {
@@ -1291,7 +1299,6 @@ html[dir="ltr"] .steps { --pz-start: left; }
 }
 @media (prefers-reduced-motion: reduce) {
   .step, .step-number { transition: none; }
-  .step:hover { transform: none; }
 }
 
 

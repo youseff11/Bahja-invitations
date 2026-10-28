@@ -2,6 +2,7 @@ import hashlib
 import os
 
 from django.conf import settings
+from django.templatetags.static import static
 from django.utils.translation import get_language
 
 _ASSET_V = None
@@ -71,20 +72,13 @@ def site_settings(request):
     name_en = getattr(settings, "SITE_NAME_EN", "") or name_ar
     tag_ar = settings.SITE_TAGLINE
     tag_en = getattr(settings, "SITE_TAGLINE_EN", "") or tag_ar
-    path = request.path
-    site_url = settings.SITE_URL
     return {
-        "SEO_URL": site_url,
-        "GOOGLE_SITE_VERIFICATION": settings.GOOGLE_SITE_VERIFICATION,
-        # canonical بدون query string — ?category= وغيره مش صفحات مستقلة
-        "SEO_CANONICAL": site_url + path,
-        "SEO_IMAGE": site_url + settings.STATIC_URL + "images/logo-share.jpg",
+        # معاينة المشاركة: روابط مطلقة من عنوان الطلب نفسه (مش دومين ثابت) عشان تشتغل
+        # على أي استضافة، وصورة الموقع بحجم 1200×630 المطلوب لواتساب وفيسبوك.
+        "SEO_CANONICAL": request.build_absolute_uri(request.path),
+        "SEO_IMAGE": request.build_absolute_uri(static("images/logo-share.jpg")),
         "SEO_DESC": (settings.SEO_DESCRIPTION_EN if en
                      else settings.SEO_DESCRIPTION_AR),
-        "SEO_KEYWORDS": ", ".join([settings.SEO_KEYWORDS_AR if not en
-                                   else settings.SEO_KEYWORDS_EN,
-                                   settings.SEO_KEYWORDS_EN if not en
-                                   else settings.SEO_KEYWORDS_AR]),
         "SEO_DESC_AR": settings.SEO_DESCRIPTION_AR,
         "SEO_DESC_EN": settings.SEO_DESCRIPTION_EN,
         "SEO_LOCALE": "en_US" if en else "ar_EG",
