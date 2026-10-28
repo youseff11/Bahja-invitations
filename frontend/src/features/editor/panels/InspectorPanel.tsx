@@ -62,7 +62,9 @@ export function InspectorPanel({ schema }: { schema: EditorSchema }) {
 
   // قسم «كود مخصص»: بنعرض بس اللي ليه لازمة — الكود مفتوح وجاهز، العدّاد لو فيه عدّاد، والمواضع بتتسحب بالماوس. الألوان من العنصر المحدَّد.
   const custom = block.type === 'custom_html'
-  const usesEventDate = typeof block.props.code === 'string' && /\beventDate\b/.test(block.props.code)
+  // الكود بيقرا ‎eventDate‎ أو فيه تاريخ حرفي (‎new Date(2026, …)‎) — السيرفر بيربطه بالموعد تلقائياً
+  const usesEventDate =
+    typeof block.props.code === 'string' && /\beventDate\b|new\s+Date\(\s*(?:\d{4}\s*,|["']\d{4}-|["'][A-Za-z]+\s+\d{1,2},?\s+\d{4})/.test(block.props.code)
   const groupsOf = (...keys: string[]) => spec.props.filter((f) => keys.includes(f.key)).map((f) => f.group || '')
   // «عناصر فوق القسم» (نص/صورة/زرار) مابتظهرش في لوحة أي قسم: بتتضاف من شريط المعاينة وبتتحدّد وتتسحب وتتحذف من المعاينة
   const hide = [

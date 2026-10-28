@@ -2366,6 +2366,31 @@ class CodeEventDateTests(TestCase):
         # القالب مالوش تاريخ مناسبة: من غير موعد محدّد ‎eventDate‎ بيبقى ‎null‎ والكود ياخد تاريخه
         self.assertNotIn("data-event-date=", html)
 
+    def _js(self, script):
+        from system.templatetags.invite import split_code
+        return str(split_code(f"<div>x</div><script>{script}</script>")["js"])
+
+    def test_a_hard_coded_date_follows_the_event_date_automatically(self):
+        js = self._js("const w = new Date(2026, 11, 31, 20, 0, 0);")
+        self.assertIn("(eventDate||new Date(2026, 11, 31, 20, 0, 0))", js)
+
+    def test_string_dates_are_followed_too(self):
+        self.assertIn('(eventDate||new Date("2026-12-31T20:00:00"))',
+                      self._js('const w = new Date("2026-12-31T20:00:00");'))
+        self.assertIn("(eventDate||new Date('December 31, 2026 20:00'))",
+                      self._js("const w = new Date('December 31, 2026 20:00');"))
+
+    def test_only_the_first_real_literal_and_never_comments_or_plain_dates(self):
+        js = self._js("// new Date(2020, 1, 1)\nconst a = new Date();\nconst w = new Date(2026, 5, 6);\nconst z = new Date(2027, 1, 1);")
+        self.assertEqual(js.count("eventDate||"), 1)
+        self.assertIn("(eventDate||new Date(2026, 5, 6))", js)
+        self.assertNotIn("(eventDate||new Date(2020", js)
+
+    def test_code_that_uses_event_date_itself_is_left_alone(self):
+        js = self._js("const w = eventDate || new Date(2026, 11, 31);")
+        self.assertEqual(js.count("eventDate||"), 0)
+        self.assertEqual(js.count("eventDate ||"), 1)
+
     def test_a_date_picked_on_the_section_wins(self):
         html = self._html(countdown_date="2031-05-06T19:30")
         self.assertIn('data-event-date="2031-05-06T19:30"', html)

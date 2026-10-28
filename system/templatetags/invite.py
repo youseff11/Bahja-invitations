@@ -265,6 +265,36 @@ _SCRIPT_BLOCK_RE = re.compile(
 # المكتوب جوّه الوسم بس هو اللي بيشتغل.
 _SCRIPT_SRC_RE = re.compile(r"\bsrc\s*=", re.I)
 
+# تاريخ مكتوب حرفياً في كود المصمّم: ‎new Date(2026, 11, 31, 20, 0)‎ أو ‎new Date("2026-12-31T20:00")‎
+# أو ‎new Date("December 31, 2026 20:00")‎. (تاريخ بمتغيّرات أو من غير وسايط مابيتلمسش.)
+_DATE_LITERAL_RE = re.compile(
+    r"new\s+Date\(\s*(?:"
+    r"\d{4}\s*,\s*\d{1,2}(?:\s*,\s*\d{1,3}){0,5}"
+    r"|([\"'])(?:\d{4}-\d{2}|[A-Za-z]+\s+\d{1,2},?\s+\d{4})[^\"'\n]*\1"
+    r")\s*\)")
+_EVENT_DATE_RE = re.compile(r"\beventDate\b")
+
+
+def _bind_event_date(js: str) -> str:
+    """يخلّي أول تاريخ حرفي في الكود يتبدّل بموعد الدعوة (‎eventDate‎) لو موجود.
+
+    عدّاد مكتوب بالكود بيحط تاريخه جوّاه، فتغيير موعد الدعوة (أو حقل «موعد
+    للكود») ماكانش بيغيّره إلا لو المصمّم عدّل الكود بإيده. ‎eventDate || <الأصلي>‎
+    بيحافظ على التاريخ المكتوب لما مفيش موعد (القالب)، ويتبع الدعوة لما فيه.
+    الكود اللي بيستخدم ‎eventDate‎ بنفسه مابنلمسوش، والسطور المعلّقة بتتخطّى.
+    """
+    if not js or _EVENT_DATE_RE.search(js):
+        return js
+    lines = js.split("\n")
+    for i, line in enumerate(lines):
+        if line.lstrip().startswith(("//", "*", "/*")):
+            continue
+        replaced, n = _DATE_LITERAL_RE.subn(lambda m: f"(eventDate||{m.group(0)})", line, count=1)
+        if n:
+            lines[i] = replaced
+            return "\n".join(lines)
+    return js
+
 
 # عنصر الكود الأساسي بيعلن ‎width:100%‎؟
 #
@@ -387,7 +417,7 @@ def split_code(value):
     html, events, names = _lift_inline_handlers(html)
 
     return {"css": css, "html": html,
-            "js": wrap_js("\n".join(scripts), events, names),
+            "js": wrap_js(_bind_event_date("\n".join(scripts)), events, names),
             "fluid": fills_width(css, html)}
 
 
