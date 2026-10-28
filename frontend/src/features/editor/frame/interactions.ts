@@ -4,6 +4,7 @@ import { INTRO_ID } from '../doc'
 import { commitHtml, commitSwap } from '../imported/frame'
 import { savedSrc, THUMB_ATTR } from '../imported/lazyImages'
 import type { FromFrame, PreviewPayload } from '../types'
+import { pointTarget } from './pointTarget'
 
 /**
  * تفاعلات المعاينة: كتابة مباشرة في النصوص (‎[data-slot]‎) وسحب العناصر (‎[data-move]‎).
@@ -290,7 +291,7 @@ export function installInteractions({ payload, send }: Options): () => void {
 
   const onPointerDown = (e: PointerEvent) => {
     if (e.button !== 0 || drag) return
-    const node = movableAt(e.target)
+    const node = movableAt(pointTarget(e))
     if (!node) return
     // كود الافتتاحية مش جوّه قسم: بلوكه الوهمي ‎__intro‎ وإزاحاته (بكسل) بتتقرا من الـCSS المحسوب لأنها مش في حمولة الأقسام
     const intro = !!node.closest('.lb-intro-extra')
