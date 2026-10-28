@@ -818,15 +818,6 @@ html[lang="en"] .plan-badge { letter-spacing: .1em; }
 .foot-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
 .foot-inner > p { margin: 0; color: var(--muted); font-size: 13px; }
 .foot-brand { height: 34px; margin-inline-start: 0; }
-.foot-socials { display: flex; align-items: center; gap: 9px; }
-.foot-socials a {
-  width: 38px; height: 38px; display: grid; place-items: center; border-radius: 50%;
-  color: var(--muted); border: 1px solid var(--line); text-decoration: none;
-  transition: color .18s, border-color .18s, transform .18s;
-}
-.foot-socials a:hover { color: var(--accent); border-color: var(--accent); transform: translateY(-2px); }
-.foot-socials svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
-.foot-socials a:nth-child(2) svg { fill: currentColor; stroke: none; }
 
 @media (max-width: 700px) {
   .faq-item summary { padding: 16px 17px; font-size: 18px; }
@@ -844,35 +835,28 @@ html[lang="en"] .plan-badge { letter-spacing: .1em; }
 html[lang="en"] .feature-ar { display: none; }
 html[lang="en"] .feature-en { display: inline; }
 
-/* أيقونات الفوتر: دوائر واضحة، متوازنة، وبألوان المنصات عند المرور */
-.foot-socials { gap: 11px; }
+/* أيقونات الفوتر: دوائر هادية بلون النص، وبلون المنصة عند المرور.
+   كل أيقونة بتحدّد تعبئتها بنفسها: واتساب ملوّنة (fill) وفيسبوك/إنستجرام خطوط (stroke)،
+   فمفيش قاعدة عامة تمسح تعبئة واتساب وتخلّيها تختفي. */
+.foot-socials { display: flex; align-items: center; gap: 11px; }
 .foot-socials a {
-  text-decoration: none !important;
-  position: relative; width: 44px; height: 44px; overflow: hidden;
-  background: color-mix(in srgb, var(--surface-2) 78%, transparent);
-  box-shadow: 0 8px 18px -14px rgba(23, 19, 15, .75);
+  width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%;
+  color: var(--text); text-decoration: none !important;
+  border: 1px solid var(--line); background: var(--surface-2);
+  transition: color .2s ease, border-color .2s ease, background-color .2s ease, transform .2s ease;
 }
-.foot-socials a::before {
-  content: ""; position: absolute; inset: 3px; border-radius: inherit;
-  border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
-  pointer-events: none;
+.foot-socials svg { display: block; width: 20px; height: 20px; }
+.foot-socials a[aria-label="WhatsApp"] svg { fill: currentColor; stroke: none; }
+.foot-socials a[aria-label="Facebook"] svg,
+.foot-socials a[aria-label="Instagram"] svg {
+  fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
 }
-.foot-socials a[aria-label="WhatsApp"] { color: #1daa61; }
-.foot-socials a[aria-label="Facebook"] { color: #1877f2; }
-.foot-socials a[aria-label="Instagram"] { color: #c13584; }
-.foot-socials a:hover { transform: translateY(-3px); box-shadow: 0 13px 22px -14px currentColor; }
-.foot-socials a[aria-label="WhatsApp"] .wa-icon {
-  text-decoration: none !important;
-  display: inline-block;
-  width: auto;
-  height: auto;
-  font-size: 20px;
-  line-height: 1;
-  font-family: "Font Awesome 6 Brands";
-  font-weight: 400;
-}
-.foot-socials a[aria-label="Facebook"] svg { width: 19px; height: 19px; }
-.foot-socials a[aria-label="Instagram"] svg { width: 20px; height: 20px; }
+.foot-socials a[aria-label="Facebook"] svg { fill: currentColor; stroke: none; }
+.foot-socials a:hover { transform: translateY(-3px); color: #fff; border-color: transparent; }
+.foot-socials a[aria-label="WhatsApp"]:hover { background: #1daa61; }
+.foot-socials a[aria-label="Facebook"]:hover { background: #1877f2; }
+.foot-socials a[aria-label="Instagram"]:hover { background: linear-gradient(135deg, #f58529, #dd2a7b 55%, #8134af); }
+.foot-socials a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
 
 /* ======== الرئيسية: الطبقة الاحترافية (مؤثرات، زخارف، أزرار، ظهور، تايم‑لاين) — site.css:1639-2152 ======== */
@@ -1409,7 +1393,6 @@ main { display: block; }
 /* أيقونات واتساب SVG بدل خط Font Awesome — نفس مقاس الخط (عرض ‎448/512‎ من الارتفاع) */
 .wa-icon { width: .875em; height: 1em; flex: none; }
 .wa-float .wa-icon { width: .875em; height: 1em; }
-.foot-socials a[aria-label="WhatsApp"] .wa-icon { width: .875em; height: 1em; }
 .wa-bubble-time svg { color: #53bdeb; font-size: 11px; width: .875em; height: 1em; }
 
 

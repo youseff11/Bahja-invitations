@@ -78,11 +78,32 @@ export function InspectorPanel({ schema }: { schema: EditorSchema }) {
 
   return (
     <>
-      <CollapseAllButton />
+      <div className="ed-top-tools">
+        <CollapseAllButton />
+        <button
+          type="button"
+          className="ed-btn ed-btn--sm"
+          aria-pressed={boundsOn}
+          title={t('editorInline.bounds.hint')}
+          onClick={() => toggleBounds(block.id)}
+        >
+          {t(boundsOn ? 'editorInline.bounds.hide' : 'editorInline.bounds.show')}
+        </button>
+      </div>
       <div className="ed-section-head">
-        <div>
+        <div className="ed-section-name">
           <p className="ed-kicker">{t('editor.inspector.selected')}</p>
-          <strong>{block.label || spec.label}</strong>
+          {/* الاسم نفسه هو خانة التعديل — بيظهر في قايمة الأقسام. فاضي = الاسم الأصلي للنوع. */}
+          <input
+            id="ed-block-name"
+            className="ed-name-input"
+            type="text"
+            maxLength={60}
+            aria-label={t('editor.inspector.rename')}
+            placeholder={spec.label}
+            value={block.label ?? ''}
+            onChange={(e) => rename(block.id, e.target.value)}
+          />
         </div>
         <div className="ed-section-actions">
           <SaveFavoriteButton block={block} spec={spec} />
@@ -94,28 +115,6 @@ export function InspectorPanel({ schema }: { schema: EditorSchema }) {
 
       {overlaySpec && <OverlayPanel block={block} spec={overlaySpec} />}
       {overlaySpec && <OverlayLayers block={block} spec={overlaySpec} />}
-
-      <div className="ed-field">
-        <label htmlFor="ed-block-name">
-          <span>{t('editor.inspector.rename')}</span>
-        </label>
-        <input
-          id="ed-block-name"
-          className="ed-input"
-          type="text"
-          maxLength={60}
-          placeholder={spec.label}
-          value={block.label ?? ''}
-          onChange={(e) => rename(block.id, e.target.value)}
-        />
-      </div>
-
-      <div className="ed-section-bounds-tools">
-        <button type="button" className="ed-btn ed-btn--sm ed-btn--block" aria-pressed={boundsOn} onClick={() => toggleBounds(block.id)}>
-          {t(boundsOn ? 'editorInline.bounds.hide' : 'editorInline.bounds.show')}
-        </button>
-        <small className="ed-hint">{t('editorInline.bounds.hint')}</small>
-      </div>
 
       {spec.description && <p className="ed-hint">{spec.description}</p>}
       {gated && <p className="ed-hint ed-hint--danger">{t('editor.inspector.gated')}</p>}

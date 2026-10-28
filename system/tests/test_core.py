@@ -29,6 +29,47 @@ from pathlib import Path
 
 
 # ==========================================================================
+class InlineHandlerTests(TestCase):
+    """‎onclick="fn()"‎ في كود الافتتاحية/الأقسام: بتتحوّل لسمة خاملة وبيربطها السكربت."""
+
+    CODE = (
+        '<div id="a" onclick="startOpening()">'
+        '<button onclick="viewMap(event)">x</button>'
+        "<b onclick='go(this, 3, \"hi\")'>y</b></div>"
+        "<script>function startOpening(){} function viewMap(e){} const go=()=>{};</script>"
+    )
+
+    def test_supported_handlers_survive_sanitizing(self):
+        parts = invite_tags.split_code(self.CODE)
+        html = str(invite_tags.safe_html(parts["html"], 0))
+        self.assertNotIn(" onclick", html)
+        self.assertIn('data-on-click="startOpening()"', html)
+        self.assertIn('data-on-click="viewMap(event)"', html)
+
+    def test_script_binds_the_functions_it_defines(self):
+        js = invite_tags.split_code(self.CODE)["js"]
+        for name in ("startOpening", "viewMap", "go"):
+            self.assertIn(f'"{name}":typeof {name}==="function"', js)
+        self.assertIn('["click"]', js)
+        # الربط جوّه نفس الـtry عشان يشوف دوال المصمّم
+        self.assertLess(js.index("function startOpening"), js.index("__fn="))
+        self.assertLess(js.index("__fn="), js.index("catch(e)"))
+
+    def test_unsupported_handlers_are_still_dropped(self):
+        for bad in ('alert(1);alert(2)', 'a.b()', 'fn(document.cookie)',
+                    'javascript:x()', 'fn(`x`)', 'fn(1+1)'):
+            parts = invite_tags.split_code(f'<p onclick="{bad}">x</p><script>var q=1</script>')
+            html = str(invite_tags.safe_html(parts["html"], 0))
+            self.assertNotIn("onclick", html, bad)
+            self.assertNotIn("data-on-", html, bad)
+            self.assertNotIn("__fn", parts["js"], bad)
+
+    def test_no_script_means_nothing_to_bind(self):
+        parts = invite_tags.split_code('<p onclick="x()">a</p>')
+        self.assertEqual(parts["js"], "")
+
+
+# ==========================================================================
 class SanitizeTests(TestCase):
     def test_removes_script_and_content(self):
         out = clean_html('مرحباً<script>alert(1)</script>بكم')
@@ -2629,11 +2670,16 @@ class OverlayTextGearTests(TestCase):
                 self.assertTrue(spec["editor_hidden"])
 
     def test_position_fields_stay_out_in_the_open(self):
-        """العرض والموضع مش تنسيق — ليهم مقابض في المعاينة."""
+        """العرض والموضع مش تنسيق — ليهم مقابض في المعاينة.
+
+        العرض لسه خانة في اللوحة، لكن الموضع بالسحب بس فمخفي منها."""
         for key in ("width", "x", "y"):
             with self.subTest(key=key):
                 self.assertIsNone(self._sub(key).get("style_of"))
-                self.assertFalse(self._sub(key).get("editor_hidden"))
+        self.assertFalse(self._sub("width").get("editor_hidden"))
+        for key in ("x", "y"):
+            with self.subTest(key=key):
+                self.assertTrue(self._sub(key).get("editor_hidden"))
 
     def test_the_saved_keys_did_not_move(self):
         """نصوص محفوظة قبل كده لازم تفضل شغالة بنفس المفاتيح.
@@ -2721,6 +2767,15 @@ class SectionOverlayElementsTests(TestCase):
         self.assertIn("lb-ovl--image", html)
         self.assertIn('src="/media/x.jpg"', html)
         self.assertIn("--ovl-radius:24px", html)
+
+    def test_an_image_element_opacity_is_applied_only_when_below_full(self):
+        faded = self._render({"kind": "image", "src": "/media/x.jpg", "opacity": 40})
+        self.assertIn("--ovl-opacity:0.4", faded)
+        for overlay in ({"kind": "image", "src": "/media/x.jpg"},
+                        {"kind": "image", "src": "/media/x.jpg", "opacity": 100}):
+            self.assertNotIn("--ovl-opacity", self._render(overlay))
+        self.assertIn("--ovl-opacity:0",
+                      self._render({"kind": "image", "src": "/media/x.jpg", "opacity": 0}))
 
     def test_a_button_element_renders_a_real_link(self):
         html = self._render({"kind": "button", "label": "احجز مكانك",

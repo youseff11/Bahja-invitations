@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
+import json
 import os
 import re
-from html import escape
+from html import escape, unescape
 
 from django import template
 from django.conf import settings
@@ -313,6 +314,49 @@ def fills_width(css: str, html: str) -> bool:
     return False
 
 
+# ‎onclick="fn(...)"‎ المكتوبة جوّه الـHTML: المنقّي بيشيل أي ‎on*‎ (وصح يشيلها)،
+# والدوال أصلاً جوّه دالة مقفولة مش global. فكل كود جاهز بيستخدمها كان بيقع
+# بالسكوت: الضغطة ماتعملش حاجة والمصمّم مش عارف ليه. بدل كده بنقبل شكل واحد
+# بس — استدعاء دالة بالاسم بحجج بسيطة — ونحوّله لسمة خاملة ‎data-on-click‎،
+# والسكربت اللي بنلفّه بيربطها بالدالة اللي المصمّم كاتبها هو نفسه. أي حاجة
+# أعقد (عبارات متعددة، تعبيرات، ‎javascript:‎) بتفضل تتشال زي الأول.
+_INLINE_EVENTS = (
+    "click", "dblclick", "input", "change", "mousedown", "mouseup",
+    "touchstart", "touchend", "pointerdown", "pointerup", "keydown", "keyup",
+)
+_HANDLER_ARG = (
+    r"event|this|true|false|null|-?\d+(?:\.\d+)?"
+    r"|'[^'\\,()]*'|\"[^\"\\,()]*\""
+)
+_HANDLER_RE = re.compile(
+    r"^\s*([A-Za-z_$][\w$]*)\s*\(\s*(?:(?:%s)(?:\s*,\s*(?:%s))*)?\s*\)\s*;?\s*$"
+    % (_HANDLER_ARG, _HANDLER_ARG))
+_INLINE_ATTR_RE = re.compile(
+    r"""(\s)on(%s)\s*=\s*(?:"([^"]*)"|'([^']*)')""" % "|".join(_INLINE_EVENTS),
+    re.I)
+
+
+def _lift_inline_handlers(html: str) -> tuple[str, list[str], list[str]]:
+    """يحوّل ‎onclick="fn(x)"‎ لـ‎data-on-click="fn(x)"‎ — ويرجّع الأحداث والدوال."""
+    events: list[str] = []
+    names: list[str] = []
+
+    def lift(match: "re.Match[str]") -> str:
+        event = match.group(2).lower()
+        raw = unescape(match.group(3) if match.group(3) is not None else match.group(4) or "")
+        found = _HANDLER_RE.match(raw)
+        if not found:
+            return ""  # شكل مش مدعوم: يتشال زي ما المنقّي كان هيشيله
+        if event not in events:
+            events.append(event)
+        if found.group(1) not in names:
+            names.append(found.group(1))
+        value = escape(raw.strip().rstrip(";"), quote=True)
+        return f'{match.group(1)}data-on-{event}="{value}"'
+
+    return _INLINE_ATTR_RE.sub(lift, html), events, names
+
+
 @register.filter(name="split_code")
 def split_code(value):
     """يفصل خانة «الكود» الواحدة لتلات حتت: ستايل، وHTML، وجافاسكربت.
@@ -340,13 +384,35 @@ def split_code(value):
 
     css = style_css(raw)
     html = _SCRIPT_BLOCK_RE.sub(take_script, strip_style(raw))
+    html, events, names = _lift_inline_handlers(html)
 
-    return {"css": css, "html": html, "js": wrap_js("\n".join(scripts)),
+    return {"css": css, "html": html,
+            "js": wrap_js("\n".join(scripts), events, names),
             "fluid": fills_width(css, html)}
 
 
+# بيتحط في آخر الدالة المقفولة (جوّه نفس الـ‎try‎ عشان يشوف دوال المصمّم)
+# ويربط كل ‎data-on-<event>="fn(args)"‎ بالدالة. الربط على العنصر نفسه مش
+# تفويض على الجذر: ‎stopPropagation()‎ جوّه الدالة لازم توقف الفقاعة قبل
+# ما توصل لمستمع الافتتاحية، زي الـ‎onclick‎ الأصلي بالظبط.
+_HANDLER_BIND_JS = (
+    "var __fn=%s,__ev=%s;"
+    "var __arg=function(t,e,el){t=t.trim();"
+    "if(t==='event')return e;if(t==='this')return el;"
+    "if(t==='true')return true;if(t==='false')return false;if(t==='null')return null;"
+    "if(/^-?\\d/.test(t))return +t;return t.slice(1,-1);};"
+    "__ev.forEach(function(t){(root||document).querySelectorAll('[data-on-'+t+']')"
+    ".forEach(function(el){var m=/^\\s*([\\w$]+)\\s*\\(([^)]*)\\)/"
+    ".exec(el.getAttribute('data-on-'+t)||'');"
+    "if(!m||typeof __fn[m[1]]!=='function')return;"
+    "var raw=m[2].trim()?m[2].split(','):[];"
+    "el.addEventListener(t,function(e){"
+    "__fn[m[1]].apply(el,raw.map(function(a){return __arg(a,e,el);}));});});});"
+)
+
+
 @register.filter(name="wrap_js")
-def wrap_js(value):
+def wrap_js(value, events=None, names=None):
     """يلفّ كود المصمّم في دالة مقفولة عليها ‎try/catch‎ ومعاها ‎root‎.
 
     ‎split_code‎ بتنده الدالة دي على السكربتات اللي فصلتها. متاحة
@@ -358,10 +424,15 @@ def wrap_js(value):
     # ‎</script>‎ جوّه نص في كود المستخدم بينهي الوسم بدري عند المتصفح —
     # بنكسرها زي ما بيتعمل في أي حقن سكربت.
     body = body.replace("</script", "<\\/script")
+    bind = ""
+    if events and names:
+        # ‎typeof name‎ من غير ما يرمي لو الدالة مش متعرّفة
+        fns = "{" + ",".join(f'"{n}":typeof {n}==="function"?{n}:null' for n in names) + "}"
+        bind = "\n" + _HANDLER_BIND_JS % (fns, json.dumps(list(events)))
     return mark_safe(
         "(function(){var s=document.currentScript;"
         "var root=s&&s.closest?s.closest('[data-block],.lb-intro'):null;"
-        "try{" + body + "}catch(e){"
+        "try{" + body + bind + "}catch(e){"
         "console.error('[farha] كود القسم وقع:',e);}})();"
     )
 
@@ -476,6 +547,10 @@ def video_text_style(item):
     if kind == "image":
         radius = _ovl_num(item, "radius", 0.0, 200.0)
         style += f";--ovl-radius:{radius:g}px"
+        # القديم من غير المفتاح = ١٠٠٪، فمابنبعتش المتغيّر إلا لو الصورة أشفّ.
+        opacity = _ovl_num(item, "opacity", 0.0, 100.0, 100.0) if "opacity" in item else 100.0
+        if opacity < 100:
+            style += f";--ovl-opacity:{opacity / 100:g}"
     elif kind == "button":
         btn_size = _ovl_num(item, "btn_size", 0.0, 120.0)
         style += (

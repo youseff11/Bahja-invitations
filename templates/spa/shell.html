@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>{{ SITE_NAME }} — {{ SITE_TAGLINE }}</title>
 <meta name="description" content="{{ SEO_DESC }}">
-<meta property="og:type" content="website">
+{% if noindex %}<meta name="robots" content="noindex, nofollow">
+{% endif %}<meta property="og:type" content="website">
 <meta property="og:site_name" content="{{ SITE_NAME }}">
 <meta property="og:locale" content="{{ SEO_LOCALE }}">
 <meta property="og:title" content="{{ SITE_NAME }} — {{ SITE_TAGLINE }}">

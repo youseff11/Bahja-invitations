@@ -49,6 +49,47 @@ describe('Intro', () => {
     document.removeEventListener('lb:intro-open', opened)
   })
 
+  describe('intro code without a full-screen cover (e.g. a small envelope)', () => {
+    const envelope = { css: '', html: '<div class="env"><i class="seal"></i></div>', js: '' }
+
+    async function renderWithCode() {
+      const view = renderIntro(intro({ code: envelope }))
+      // «غطا الكود» بيتحمّل بـimport ديناميكي
+      await act(async () => {
+        await vi.dynamicImportSettled()
+      })
+      return view
+    }
+
+    it('a tap on the code is left to the code: no instant open while it animates', async () => {
+      const { container } = await renderWithCode()
+      const root = container.querySelector('.lb-intro')!
+      const seal = container.querySelector('.seal')!
+      fireEvent.click(seal)
+      // الكود بيرد: بيغيّر الـDOM (زي ما onclick بتضيف كلاس is-opening)
+      seal.classList.add('is-opening')
+      await act(async () => {
+        await Promise.resolve()
+        vi.advanceTimersByTime(1500)
+      })
+      expect(root.classList.contains('is-open')).toBe(false)
+      // ضغطة على الخلفية برّه الكود بتدخّل الدعوة
+      fireEvent.click(root)
+      expect(root.classList.contains('is-open')).toBe(true)
+    })
+
+    it('a tap the code ignores still opens the invitation, so the guest is never stuck', async () => {
+      const { container } = await renderWithCode()
+      const root = container.querySelector('.lb-intro')!
+      fireEvent.click(container.querySelector('.seal')!)
+      expect(root.classList.contains('is-open')).toBe(false)
+      await act(async () => {
+        vi.advanceTimersByTime(800)
+      })
+      expect(root.classList.contains('is-open')).toBe(true)
+    })
+  })
+
   it('opens by itself after the configured seconds', () => {
     const { container } = renderIntro(intro({ seconds: 3 }))
     expect(container.querySelector('.lb-intro')!.classList.contains('is-open')).toBe(false)

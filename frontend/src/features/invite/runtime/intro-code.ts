@@ -67,6 +67,9 @@ function codeCover(intro: HTMLElement): Element | null {
       if (r.left > vw * 0.05 || r.top > vh * 0.05 || r.right < vw * 0.95 || r.bottom < vh * 0.95) return false
       // طبقة شفافة (ورد بيقع، كونفيتي) مش غطا
       const cs = getComputedStyle(el)
+      // زخرفة فاضية ومش بتستقبل ضغط (فينييت، حبيبات): مش غطا. لو اتحسبت غطا
+      // كانت بتخلي الافتتاحية تفضل مستنية الكود يخفيها وهي أصلاً ثابتة.
+      if (cs.pointerEvents === 'none' && el.childElementCount === 0 && !(el.textContent || '').trim()) return false
       const paints =
         cs.backgroundImage !== 'none' || alphaOf(cs.backgroundColor) > 0.5 || /^(IMG|VIDEO)$/.test(el.tagName)
       if (!paints || !coverShown(el, box)) return false
@@ -155,7 +158,22 @@ export function bindCodeCover(intro: HTMLElement, api: Api) {
       return
     }
     const cover = codeCover(intro)
-    if (!cover) return // مفيش غطا — السلوك القديم
+    const target = e.target as Element | null
+    // الضغطة جت على عنصر من كود الافتتاحية نفسه: الكود هو اللي بيرد عليها.
+    // من غير ده أي افتتاحية من غير غطا بيملا الشاشة (ظرف صغير مثلاً) كانت
+    // بتفتح الدعوة من أول ضغطة والحركة ماتبانش. لو الكود ماردّش خالص
+    // بنفتح بعد ٧٠٠ مللي زي الأول، وأي ضغطة برّه الكود بتفتح على طول.
+    const onCode = !!target && !!target.closest && !!target.closest('.lb-intro-extra') && !target.matches('.lb-intro-extra')
+    if (!cover) {
+      if (!onCode) return // مفيش غطا — السلوك القديم
+      handed = e
+      if (!playAnnounced) {
+        playAnnounced = true
+        document.dispatchEvent(new CustomEvent('lb:intro-play'))
+      }
+      expectReaction()
+      return
+    }
 
     armed = true
     handed = e
@@ -165,7 +183,6 @@ export function bindCodeCover(intro: HTMLElement, api: Api) {
       document.dispatchEvent(new CustomEvent('lb:intro-play'))
     }
 
-    const target = e.target as Element | null
     const hit = target && target.closest ? target.closest(CODE_CONTROLS) : null
     if (!(hit && cover.contains(hit))) {
       const controls = codeControls(cover)
@@ -178,7 +195,7 @@ export function bindCodeCover(intro: HTMLElement, api: Api) {
         } finally {
           forwarding = false
         }
-      } else if (!cover.contains(target)) {
+      } else if (!cover.contains(target) && !onCode) {
         // الغطا عامل pointer-events:none وهو بيتحرّك فالضغطة عدّت لتحت
         e.stopPropagation()
         e.preventDefault()

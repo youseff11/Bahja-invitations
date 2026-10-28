@@ -931,6 +931,7 @@
 .lb-ovl--image img {
   display: block; width: 100%; height: auto;
   border-radius: var(--ovl-radius, 0);
+  opacity: var(--ovl-opacity, 1);
 }
 /* الزرار لازم يتضغط عند الضيف — باقي العناصر ‎pointer-events:none‎
    عشان ما تحجبش الضغط على القسم اللي تحتها. */
