@@ -926,16 +926,8 @@
 .dash-root .inline-edit--empty {
   color: var(--muted);
   font-size: 13px;
-  opacity: 0;
-}
-.dash-root .tpl-card:hover .inline-edit--empty,
-.dash-root .inline-edit--empty:focus-visible {
-  opacity: 1;
-}
-@media (hover: none) {
-  .dash-root .inline-edit--empty {
-    opacity: 1;
-  }
+  border-color: var(--line);
+  border-style: dashed;
 }
 .dash-root .inline-edit-field {
   margin-inline: -6px;
