@@ -13,6 +13,7 @@
 from __future__ import annotations
 
 import datetime as dt
+import functools
 import hashlib
 import json
 import re
@@ -1030,6 +1031,18 @@ def text_style_css(blocks: list[dict], theme: dict | None = None) -> str:
     return mark_safe("".join(rules))
 
 
+@functools.lru_cache(maxsize=8)
+def _scope_shared(css: str, scope: str) -> str:
+    """حصر ستايل مشترك — مخبّأ لأن المحرر بيبعت المستند كله مع كل معاينة.
+
+    ``scope_css`` بتمشي على الـ٢١٠ كيلوبايت حرف حرف في بايثون، وقياس على
+    قالب حقيقي (٩ أقسام): ~٤٫٧ ثانية لكل معاينة، كلها حصر نفس الستايل شيت.
+    المفتاح هو نص الستايل والنطاق، فأي تعديل في الستايل أو في مجموعة
+    الأقسام بيدّي نتيجة جديدة؛ تعديل النصوص بس بيضرب الكاش.
+    """
+    return cssscope.scope_css(css, scope)
+
+
 def shared_block_css(blocks: list[dict]) -> tuple[str, set[str]]:
     """يجمّع الستايل المكرر بين الأقسام المستوردة في نسخة واحدة.
 
@@ -1062,7 +1075,7 @@ def shared_block_css(blocks: list[dict]) -> tuple[str, set[str]]:
         if len(ids) < 2:
             continue
         scope = ":is(" + ",".join("#" + bid for bid in ids) + ")"
-        scoped = cssscope.scope_css(css, scope)
+        scoped = _scope_shared(css, scope)
         if not scoped:
             continue
         parts.append(scoped)

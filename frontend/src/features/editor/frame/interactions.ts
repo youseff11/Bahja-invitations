@@ -380,7 +380,7 @@ export function installInteractions({ payload, send }: Options): () => void {
       d.node.style.removeProperty('--dy')
       swapImages(d.node, d.swap)
       const root = d.node.closest('.lb-custom')
-      if (root) commitHtml(root, send)
+      if (root) commitHtml(root, send, [d.node, d.swap])
       else commitSwap(d.node, d.swap, send)
       return
     }

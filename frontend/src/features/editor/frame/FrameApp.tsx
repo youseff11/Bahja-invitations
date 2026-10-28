@@ -9,16 +9,22 @@ import { makeT } from '@/features/invite/strings'
 
 import type { PreviewPayload, ToFrame } from '../types'
 import { parseMessage, sendToParent, shortcutKey } from './bridge'
-import { installImported, markPicked, patchNode, prepareImported, revealPicked } from '../imported/frame'
+import { hasRuntime, installImported, markPicked, patchNode, prepareImported, revealPicked } from '../imported/frame'
 import { installExtraDrags, prepareExtras } from './extraDrags'
 import { installIntroClicks } from './introClicks'
 import { clearBounds, showBounds, type Bounds } from './sectionBounds'
 import { clearDragVars, editingNode, installInteractions, markEditable, patchText } from './interactions'
 import { installNoHover, stripHover } from './noHover'
+import { installReveal, keepRevealed } from './reveal'
+import { restartTemplateRuntime, stopTemplateRuntime } from './templateRuntime'
 
 const EDITOR_MOD_KEYS = new Set(['s', 'z', 'y'])
 const ELEMENT_MOD_KEYS = new Set(['c', 'v', 'd'])
 const ARROWS = new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'])
+const DATA_ATTR = /^data-[a-zA-Z0-9_-]{1,64}$/
+/** إعادة تشغيل سكربتات القالب بعد ما الرسمة تهدى (كل تعديل في قسم مستورد بيبني الـDOM من جديد) */
+const RUNTIME_FIRST_MS = 50
+const RUNTIME_AGAIN_MS = 400
 
 /** ‎data-block‎ للقسم اللي اتضغط عليه (أو أقرب أب ليه). */
 export function blockIdAt(target: EventTarget | null): string | null {
@@ -53,7 +59,7 @@ function markSelected(id: string | null) {
  * المعاينة جوّه المحرر. الصفحة الأم بتبعت الحمولة (‎lb-editor:render‎) والـframe بيرسمها بنفس
  * مكوّنات عارض الدعوة، وبيرجّع الضغطات (تحديد قسم) واختصارات لوحة المفاتيح. مفيش شبكة هنا.
  * الافتتاحية بتتعرض فوق المسرح؛ ولما تتفتح بتفضل مقفولة مهما اتعدّل، وزرار «الافتتاحية» يعيدها.
- * لسه من غير الموسيقى ولا سكربتات القوالب المستوردة الأصلية (Tilda) — عدّاد القسم المستورد بس بيشتغل.
+ * سكربتات القالب المستورد (Tilda) وحركات الظهور شغّالة هنا؛ لسه من غير الموسيقى.
  */
 export function FrameApp() {
   const [state, setState] = useState<{ payload: PreviewPayload; selected: string | null } | null>(null)
@@ -242,7 +248,7 @@ export function FrameApp() {
     if (payload.css) syncHeadStyles(payload.css)
     stripHover() // ستايل جديد (قسم اتبدّل / CSS اتحدّث) بيتنضّف من الـhover
     applyBody(payload)
-    document.querySelectorAll('.lb-anim').forEach((node) => node.classList.add('is-in')) // من غير حركة ظهور في المحرر
+    keepRevealed() // اللي ظهر قبل كده يفضل ظاهر من غير ما حركته تتعاد مع كل رسمة
     payloadRef.current = payload
     markEditable(payload.blocks)
     prepareImported(payload, sendToParent)
@@ -260,8 +266,30 @@ export function FrameApp() {
     if (payload) prefetchBlocks(new Set(payload.blocks.map((b) => b.type)))
   }, [payload])
 
+  // حركات الظهور: القسم بيتحرّك أول ما يقرّب من الشاشة وهو بيتمرّر
+  useEffect(() => installReveal(), [])
+
+  // سكربتات القالب المستورد: بتتشغّل أول مرة وبتتعاد لما جذور الأقسام المستوردة تتبني من جديد.
+  // الحفظ مابيتأثرش بيها: القسم بيتسلسل من لقطة اتاخدت قبلها (imported/pristine)
+  const runtimeRoots = useRef<Element[] | null>(null)
+  const scripts = payload && hasRuntime(payload) ? payload.runtimeScripts : null
+  useEffect(() => {
+    if (!scripts) return
+    const roots = Array.from(document.querySelectorAll('.lb-custom'))
+    const last = runtimeRoots.current
+    if (last && roots.length === last.length && roots.every((r, i) => r === last[i])) return
+    const timer = setTimeout(
+      () => {
+        runtimeRoots.current = Array.from(document.querySelectorAll('.lb-custom'))
+        void restartTemplateRuntime(scripts)
+      },
+      last ? RUNTIME_AGAIN_MS : RUNTIME_FIRST_MS,
+    )
+    return () => clearTimeout(timer)
+  }, [payload, scripts])
+  useEffect(() => () => stopTemplateRuntime(), [])
+
   // عدّاد القسم المستورد (لو ليه موعد من الإعدادات): نفس اللي بيعمله عارض الدعوة، فالمصمّم يشوف الأرقام شغّالة وهو بيغيّر الموعد.
-  // سكربتات القالب الأصلية (Tilda) مش بتتشغّل هنا — مابتتحمّلش بعد كل رسمة من غير ما تخبّط الـDOM اللي بنحفظه.
   const blocks = payload?.blocks
   useEffect(() => {
     if (!blocks?.some((b) => b.type === 'custom_html')) return
@@ -278,14 +306,26 @@ export function FrameApp() {
 
   if (!payload || !ctx) return null
   const { stage } = payload
-  const stageClass = ['lb-stage', stage.full && 'lb-stage--full', stage.pattern && `lb-pattern lb-pattern--${stage.pattern}`]
+  const scripted = hasRuntime(payload)
+  const stageClass = [
+    'lb-stage',
+    scripted && 'lb-stage--runtime t-records t-records_animated t-records_visible',
+    stage.full && 'lb-stage--full',
+    stage.pattern && `lb-pattern lb-pattern--${stage.pattern}`,
+  ]
     .filter(Boolean)
     .join(' ')
+  // غلاف Tilda اللي مكتباتها بتدوّر عليه (نفس عارض الدعوة)
+  const rootAttrs: Record<string, string> = {}
+  if (scripted) {
+    rootAttrs.id = 'allrecords'
+    for (const [key, value] of Object.entries(stage.rootAttrs)) if (DATA_ATTR.test(key)) rootAttrs[key] = String(value)
+  }
 
   return (
     <InviteContext.Provider value={ctx}>
       {payload.intro && <Intro key={`${introRun}:${introClosedAt ?? introJson}`} data={payload.intro} />}
-      <div className={stageClass}>
+      <div {...rootAttrs} className={stageClass}>
         {payload.blocks.map((block) => (
           <BlockView key={`${block.id}:${remount[block.id] ?? 0}`} block={block} />
         ))}

@@ -2,6 +2,7 @@ import type { FromFrame, PreviewPayload } from '../types'
 import { applyNodeEdit, videoIn, type NodeEdit } from './nodeEdit'
 import { numberElements } from './numbering'
 import { upgradeLazyImages, savedSrc } from './lazyImages'
+import { htmlOf, mirror, snapshot } from './pristine'
 import { serializeCustom } from './serialize'
 import { INTRO_ID } from './source'
 import { CODE_ROOTS } from './units'
@@ -79,13 +80,24 @@ export function commitSwap(a: Element, b: Element, send: Send) {
   const root = rootAt(a)
   const id = root && blockIdOf(root)
   if (!id) return
-  const edits = [a, b].flatMap((img) => {
+  const edits = swapEdits(a, b)
+  if (edits.length) send({ type: 'lb-editor:node-edits', id, edits })
+}
+
+/** تعديلات المصدرين بعد تبديل صورتين (‎src‎ و‎srcset‎ مع بعض). */
+function swapEdits(a: Element, b: Element) {
+  return [a, b].flatMap((img) => {
     const slot = img.getAttribute('data-move')
     return slot
       ? [{ slot, edit: { kind: 'attrs' as const, values: { src: savedSrc(img), srcset: img.getAttribute('srcset') } } }]
       : []
   })
-  if (edits.length) send({ type: 'lb-editor:node-edits', id, edits })
+}
+
+/** كتابة وحدة نص: محتواها (‎innerHTML‎) على لقطة القسم لو السكربتات شغّالة. */
+function mirrorText(root: Element, node: Element) {
+  const slot = node.getAttribute('data-move')
+  if (slot) mirror(root, slot, { kind: 'inner', html: serializeCustom(node) })
 }
 
 function writeNow(root: Element, send: Send, silent: boolean) {
@@ -93,11 +105,12 @@ function writeNow(root: Element, send: Send, silent: boolean) {
   if (timer) clearTimeout(timer)
   writes.delete(root)
   const id = blockIdOf(root)
-  if (id) send({ type: 'lb-editor:html', id, value: serializeCustom(root), silent })
+  if (id) send({ type: 'lb-editor:html', id, value: htmlOf(root), silent })
 }
 
 /** يبعت ‎props.html‎ الحالي لجذر فوراً (خطوة تراجع واحدة) — بعد تبديل صورتين مثلاً. */
-export function commitHtml(root: Element, send: Send) {
+export function commitHtml(root: Element, send: Send, swapped?: [Element, Element]) {
+  if (swapped) for (const { slot, edit } of swapEdits(...swapped)) mirror(root, slot, edit)
   writeNow(root, send, false)
 }
 
@@ -111,15 +124,21 @@ export function scheduleWrite(root: Element, send: Send, silent = false) {
   )
 }
 
+/** سكربتات القالب شغّالة في المعاينة دي؟ (قوالب الـSPA مش بتتشغّل في المحرر) */
+export const hasRuntime = (payload: PreviewPayload | null) =>
+  !!payload?.stage?.runtime && (payload.runtimeScripts?.length ?? 0) > 0 && !payload.runtimeIsSpa
+
 export const isTranslated = (payload: PreviewPayload | null) => !!payload && payload.lang !== payload.baseLang
 
 /** يجهّز كل أقسام ‎custom_html‎ بعد كل رسمة: علامات وحدات النص + ترقيم العناصر (ويحفظه لو اتضاف رقم جديد). */
 export function prepareImported(payload: PreviewPayload, send: Send, root: ParentNode = document) {
   const translated = isTranslated(payload)
+  const scripted = hasRuntime(payload)
   root.querySelectorAll('[data-block-type="custom_html"]').forEach((section) => {
     const custom = section.querySelector(ROOT)
     if (!custom) return
     const { changed } = numberElements(custom)
+    if (scripted) snapshot(custom) // قبل ما سكربتات القالب تشتغل — الحفظ بيتسلسل منها مش من الـDOM الحي
     // الـDOM هنا نصه مترجَم لو المعاينة مترجَمة — مانحفظش حاجة منه
     if (changed && !translated) scheduleWrite(custom, send, true)
   })
@@ -151,6 +170,7 @@ export function patchNode(id: string, slot: string, edit: NodeEdit, root: Parent
   const node = findNode(id, slot, root)
   const parent = rootAt(node)
   if (!node || !parent || !applyNodeEdit(parent, slot, edit)) return
+  mirror(parent, slot, edit)
   // فيديو بمصدر جديد: المتصفح مابيعيدش التحميل لوحده من غير ‎load()‎
   if (edit.kind === 'video-src') {
     const video = videoIn(node)
@@ -237,7 +257,10 @@ export function installImported({ payload, send, onPick }: Options): () => void 
     const root = rootAt(node)
     if (!node || !root || isTranslated(payload())) return
     if (isCodeRoot(root)) scheduleNode(node, send)
-    else scheduleWrite(root, send)
+    else {
+      mirrorText(root, node)
+      scheduleWrite(root, send)
+    }
   }
 
   const onFocusOut = (e: FocusEvent) => {
@@ -248,7 +271,10 @@ export function installImported({ payload, send, onPick }: Options): () => void 
     const root = rootAt(node)
     if (!root || isTranslated(payload())) return
     if (isCodeRoot(root)) writeNode(node, send)
-    else writeNow(root, send, false)
+    else {
+      mirrorText(root, node)
+      writeNow(root, send, false)
+    }
   }
 
   // Esc بيخرج من الكتابة بس — العنصر يفضل محدَّد

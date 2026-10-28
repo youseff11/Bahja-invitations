@@ -4,6 +4,8 @@
 ``t396_init`` خلّص، فالاختبار بيقارن الناتج بالمرجع الحقيقي.
 """
 
+from unittest import mock
+
 from django.test import SimpleTestCase
 
 from system import tildacss
@@ -228,6 +230,28 @@ class SharedBlockCssTests(SimpleTestCase):
         css, ids = shared_block_css(blocks)
         self.assertNotIn("color:blue", css)
         self.assertEqual(ids, {"imp-1", "imp-2"})
+
+    def test_same_stylesheet_is_scoped_once_across_calls(self):
+        """المحرر بيعيد المعاينة مع كل تعديل — الحصر مايتعادش لنفس الستايل."""
+        blocks = [
+            {"id": "imp-1", "props": {"css": ".cached-probe{color:red}"}},
+            {"id": "imp-2", "props": {"css": ".cached-probe{color:red}"}},
+        ]
+        first, _ = shared_block_css(blocks)
+        with mock.patch("system.renderer.cssscope.scope_css") as scope:
+            second, _ = shared_block_css(blocks)
+        scope.assert_not_called()
+        self.assertEqual(first, second)
+
+    def test_changed_stylesheet_is_not_served_from_cache(self):
+        def build(color):
+            css = f".cache-change{{color:{color}}}"
+            return shared_block_css([
+                {"id": "imp-1", "props": {"css": css}},
+                {"id": "imp-2", "props": {"css": css}},
+            ])[0]
+        self.assertIn("color:red", build("red"))
+        self.assertIn("color:blue", build("blue"))
 
 
 class MapFrameAlignmentTests(SimpleTestCase):
