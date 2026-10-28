@@ -1322,8 +1322,13 @@ def render_document(
         # أي قسم ممكن يحدّد موعده (حقل «موعد للكود») — كود القسم بيقراه كمتغيّر ‎eventDate‎
         block_countdown_iso = countdown_iso
         picked = str(resolved_props.get("countdown_date") or "").strip()
-        if re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}", picked):
+        picked_ok = bool(re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}", picked))
+        if picked_ok:
             block_countdown_iso = picked
+        # ‎eventDate‎ في كود القسم: الموعد المحدَّد، وإلا تاريخ الدعوة الحقيقي. القالب مالوش
+        # تاريخ (العينة هي «دلوقتي») فبيفضل فاضي عشان ‎eventDate || new Date(...)‎ ياخد التاريخ
+        # اللي في الكود بدل ما العدّاد يقول صفر.
+        code_event_iso = picked if picked_ok else (countdown_iso if invitation is not None else "")
 
         ctx = {
             "block": block,
@@ -1335,6 +1340,7 @@ def render_document(
             "data": data,
             "invitation": invitation,
             "countdown_iso": block_countdown_iso,
+            "code_event_iso": code_event_iso,
             "editable": editable,
             "hidden": hidden,
             "gated": gated,

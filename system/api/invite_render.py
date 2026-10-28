@@ -397,6 +397,11 @@ def build_payload(
         block_countdown_iso = countdown_iso
         if block["type"] == "countdown":
             block_countdown_iso = _countdown_iso(resolved_props, countdown_iso)
+        # ‎eventDate‎ في كود القسم (نفس ‎renderer.render_document‎): الموعد المحدَّد على القسم،
+        # وإلا تاريخ الدعوة الحقيقي. القالب مالوش تاريخ (العينة «دلوقتي») فبيفضل فاضي
+        # عشان ‎eventDate || new Date(...)‎ ياخد التاريخ اللي في الكود.
+        picked = _countdown_iso(resolved_props, "")
+        code_event_iso = picked or (countdown_iso if invitation is not None else "")
 
         ctx = {
             "block": block,
@@ -407,6 +412,7 @@ def build_payload(
             "data": data,
             "invitation": invitation,
             "countdown_iso": block_countdown_iso,
+            "code_event_iso": code_event_iso,
             "editable": editable,
             "hidden": hidden,
             "gated": gated,

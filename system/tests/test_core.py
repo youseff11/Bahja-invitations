@@ -2360,10 +2360,11 @@ class CodeEventDateTests(TestCase):
         doc = B.normalize_document({"blocks": [block]})
         return str(render_document(doc, editable=False)["html"])
 
-    def test_the_script_defines_event_date_from_its_own_attribute(self):
+    def test_the_script_defines_event_date_and_a_template_has_none(self):
         html = self._html()
         self.assertIn("var eventDate=", html)
-        self.assertIn("data-event-date=", html)
+        # القالب مالوش تاريخ مناسبة: من غير موعد محدّد ‎eventDate‎ بيبقى ‎null‎ والكود ياخد تاريخه
+        self.assertNotIn("data-event-date=", html)
 
     def test_a_date_picked_on_the_section_wins(self):
         html = self._html(countdown_date="2031-05-06T19:30")

@@ -341,6 +341,18 @@ class RenderApiTests(InviteBase):
         self.assertIn("أهلاً", video["props"]["code"])
         self.assertEqual(video["code"], "")
 
+    def test_section_code_gets_the_invitations_event_date(self):
+        doc = self.inv.get_document()
+        doc["blocks"].append({
+            "id": "cd-x", "type": "text", "visible": True,
+            "props": {"code": "<div>x</div><script>var t = eventDate;</script>"}})
+        self.inv.document = doc
+        self.inv.save()
+        data = self.client.get(f"/api/v1/invitations/{self.inv.slug}/render/").json()
+        block = next(b for b in data["blocks"] if b["id"] == "cd-x")
+        self.assertIn("data-event-date=", block["code"])
+        self.assertIn("var eventDate=", block["code"])
+
     def test_render_404_for_unpublished(self):
         self.inv.status = "draft"
         self.inv.save()
