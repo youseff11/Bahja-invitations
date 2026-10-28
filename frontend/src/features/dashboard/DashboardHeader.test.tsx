@@ -9,7 +9,7 @@ import { initI18n } from '@/i18n'
 import { DashboardHeader } from './DashboardHeader'
 
 const user: ApiUser = { id: 1, username: 'owner', displayName: 'Owner', isStaff: true, isSuperuser: true }
-const site = { name: { ar: 'تي ديزاينيشن', en: 'T DESIGNATION' } } as unknown as SiteInfo
+const site = { name: { ar: 'بهجة', en: 'Bahja Invitations' } } as unknown as SiteInfo
 
 function GoTo({ to }: { to: string }) {
   const navigate = useNavigate()

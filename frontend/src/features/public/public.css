@@ -10,13 +10,13 @@
 /* ---------------------------------------------------------- الأزرار */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  padding: 11px 22px; border-radius: 999px; border: 1px solid transparent;
+  padding: 11px 22px; border-radius: var(--radius-btn); border: 1px solid transparent;
   background: none; color: inherit; cursor: pointer; font: inherit; font-size: 14px;
   text-decoration: none; transition: transform .18s, filter .18s, border-color .18s;
 }
 .btn:hover { transform: translateY(-2px); }
 .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-.btn--gold { background: var(--accent); color: #fff; }
+.btn--gold { background: var(--accent); color: var(--on-accent); }
 .btn--gold:hover { filter: brightness(1.07); }
 .btn--ghost { border-color: var(--line); }
 .btn--ghost:hover { border-color: var(--accent); color: var(--accent); }
@@ -31,7 +31,7 @@
 
 .skip-link {
   position: absolute; inset-inline-start: -9999px; top: 0; z-index: 100;
-  background: var(--accent); color: #fff; padding: 10px 20px;
+  background: var(--accent); color: var(--on-accent); padding: 10px 20px;
   border-radius: 0 0 12px 12px; text-decoration: none; font-size: 14px;
 }
 .skip-link:focus { inset-inline-start: 24px; }
@@ -53,7 +53,7 @@
   margin-inline: auto;
   display: flex; align-items: center; gap: 10px;
   height: 62px; padding-inline: 8px;
-  border-radius: 999px;
+  border-radius: var(--radius-nav);
   background: color-mix(in srgb, var(--surface) 74%, transparent);
   border: 1px solid color-mix(in srgb, var(--line) 85%, transparent);
   box-shadow: 0 2px 10px -7px rgba(0, 0, 0, .3);
@@ -84,11 +84,7 @@
 .nav.is-stuck .brand { height: 28px; }
 
 /* النسخة الكاملة المرصوصة — صفحة الدخول */
-.brand--stacked {
-  height: 120px; aspect-ratio: 694 / 658; margin-inline: auto;
-  background-image: url("/static/images/logo-full-light.png");
-}
-[data-theme="dark"] .brand--stacked { background-image: url("/static/images/logo-full-dark.png"); }
+.brand--stacked { height: 46px; margin-inline: auto; }
 
 .sr-only {
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
@@ -97,7 +93,7 @@
 
 .nav-links { display: flex; align-items: center; gap: 2px; margin-inline-start: auto; }
 .nav-links a {
-  padding: 9px 14px; border-radius: 999px; text-decoration: none; white-space: nowrap;
+  padding: 9px 14px; border-radius: var(--radius-btn); text-decoration: none; white-space: nowrap;
   color: var(--muted); font-size: 14.5px; transition: background .18s, color .18s;
 }
 .nav-links a:hover { color: var(--text); }
@@ -240,7 +236,7 @@ html[lang="en"][data-theme="dark"] .hero-art {
   font-size: clamp(19px, 2.05vw, 34px); line-height: 1.35; margin-bottom: 2px;
 }
 .h1-main {
-  display: block; color: var(--accent); font-weight: 400;
+  display: block; color: var(--accent); font-weight: 700;
   font-size: clamp(31px, 4.1vw, 66px); line-height: 1.2; text-wrap: balance;
 }
 
@@ -296,7 +292,7 @@ html[lang="en"][data-theme="dark"] .hero-art {
 .tpl-cover {
   aspect-ratio: 3/4; background: linear-gradient(150deg, var(--accent-soft), var(--surface-2));
   display: grid; place-items: center; color: var(--accent);
-  font-family: "Amiri", serif; font-size: 30px; background-size: cover; background-position: center;
+  font-family: var(--font-display); font-size: 30px; background-size: cover; background-position: center;
 }
 .tpl-body { padding: 15px 16px 18px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
 .tpl-body h3 { margin: 0; font-size: 17px; }
@@ -313,11 +309,11 @@ html[lang="en"] .tpl-meta { letter-spacing: .1em; }
 .plan--featured { border-color: var(--accent); border-width: 2px; }
 .plan-badge {
   position: absolute; top: -12px; inset-inline-start: 22px;
-  background: var(--accent); color: #fff; font-size: 11px;
+  background: var(--accent); color: var(--on-accent); font-size: 11px;
   padding: 3px 12px; border-radius: 999px; letter-spacing: normal;
 }
 html[lang="en"] .plan-badge { letter-spacing: .1em; }
-.plan-price { font-family: "Amiri", serif; font-size: 40px; color: var(--accent); line-height: 1; }
+.plan-price { font-family: var(--font-display); font-size: 40px; color: var(--accent); line-height: 1; }
 .plan-price small { font-size: 14px; color: var(--muted); font-family: inherit; }
 .plan ul { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-direction: column; gap: 7px; font-size: 14px; }
 .plan li::before { content: "✓"; color: var(--accent); margin-inline-end: 8px; }
@@ -797,26 +793,6 @@ html[lang="en"] .plan-badge { letter-spacing: .1em; }
 /* ======== الرئيسية: المميزات والأسئلة والـCTA والفوتر — site.css:1345-1452 ======== */
 
 .section--features { background: var(--bg); }
-.feature-grid {
-  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px; max-width: 1050px; margin-inline: auto;
-}
-.feature-card {
-  min-height: 205px; padding: 28px 20px 24px; text-align: center;
-  border: 1px solid var(--line); border-radius: 20px;
-  background: var(--surface); box-shadow: var(--shadow);
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
-}
-.feature-card:hover { transform: translateY(-4px); border-color: color-mix(in srgb, var(--accent) 55%, var(--line)); }
-.feature-icon {
-  width: 52px; height: 52px; display: grid; place-items: center;
-  margin-bottom: 14px; border-radius: 50%; color: var(--accent);
-  background: var(--accent-soft); border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
-}
-.feature-icon svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
-.feature-card h3 { margin: 0 0 5px; color: var(--text); font-size: 21px; }
-.feature-card p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.7; }
 
 .wrap--narrow { width: min(760px, 100% - 36px); }
 .section--faq { background: var(--surface-2); }
@@ -827,7 +803,7 @@ html[lang="en"] .plan-badge { letter-spacing: .1em; }
 }
 .faq-item summary {
   cursor: pointer; list-style: none; padding: 18px 22px;
-  color: var(--text); font-family: "Amiri", Georgia, serif; font-size: 20px;
+  color: var(--text); font-family: var(--font-display); font-size: 20px;
   font-weight: 600; display: flex; align-items: center; justify-content: space-between; gap: 14px;
 }
 .faq-item summary::-webkit-details-marker { display: none; }
@@ -841,8 +817,7 @@ html[lang="en"] .plan-badge { letter-spacing: .1em; }
 .foot { padding: 28px 0; border-top: 1px solid var(--line); background: var(--surface); }
 .foot-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
 .foot-inner > p { margin: 0; color: var(--muted); font-size: 13px; }
-.foot-brand { display: inline-flex; width: 42px; height: 42px; align-items: center; justify-content: center; }
-.foot-brand img { width: 100%; height: 100%; object-fit: contain; }
+.foot-brand { height: 34px; margin-inline-start: 0; }
 .foot-socials { display: flex; align-items: center; gap: 9px; }
 .foot-socials a {
   width: 38px; height: 38px; display: grid; place-items: center; border-radius: 50%;
@@ -854,10 +829,6 @@ html[lang="en"] .plan-badge { letter-spacing: .1em; }
 .foot-socials a:nth-child(2) svg { fill: currentColor; stroke: none; }
 
 @media (max-width: 700px) {
-  .feature-grid { grid-template-columns: 1fr; gap: 13px; }
-  .feature-card { min-height: 176px; padding: 24px 18px; }
-  .feature-card h3 { font-size: 20px; }
-  .feature-card p { font-size: 13.5px; }
   .faq-item summary { padding: 16px 17px; font-size: 18px; }
   .faq-answer { padding: 0 17px 16px; font-size: 14px; }
   .home-cta { padding-block: 70px; }
@@ -903,27 +874,6 @@ html[lang="en"] .feature-en { display: inline; }
 .foot-socials a[aria-label="Facebook"] svg { width: 19px; height: 19px; }
 .foot-socials a[aria-label="Instagram"] svg { width: 20px; height: 20px; }
 
-
-/* ======== الرئيسية: المميزات على الهاتف — site.css:1454-1472 ======== */
-
-
-/* المميزات على الهاتف: كارتان في كل صف */
-@media (max-width: 700px) {
-  .feature-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-  .feature-card {
-    min-height: 156px; padding: 18px 9px 16px; border-radius: 16px;
-  }
-  .feature-icon { width: 42px; height: 42px; margin-bottom: 9px; }
-  .feature-icon svg { width: 20px; height: 20px; }
-  .feature-card h3 { font-size: 16px; line-height: 1.35; margin-bottom: 4px; }
-  .feature-card p { font-size: 11.5px; line-height: 1.55; }
-}
-@media (max-width: 360px) {
-  .feature-grid { gap: 8px; }
-  .feature-card { min-height: 148px; padding-inline: 6px; }
-  .feature-card h3 { font-size: 14.5px; }
-  .feature-card p { font-size: 10.5px; }
-}
 
 /* ======== الرئيسية: الطبقة الاحترافية (مؤثرات، زخارف، أزرار، ظهور، تايم‑لاين) — site.css:1639-2152 ======== */
 /* ================================================================
@@ -1071,7 +1021,7 @@ html[lang="en"] .feature-en { display: inline; }
    و‎border-radius: inherit‎ على مربّع ١٣٠px بيسيب حواف مستقيمة باينة.
    الهوفر دلوقتي بيقول حاجة مفهومة: الكارت بيرتفع، إطاره بيتحوّل دهب،
    وظله بيغمق — يعني «الكارت ده قابل للاختيار». */
-.feature-card, .plan { position: relative; }
+.plan { position: relative; }
 
 /* ---------------------------------------------------------- 5) الهيرو */
 .hero-copy-in { position: relative; z-index: 2; }
@@ -1090,7 +1040,7 @@ html[lang="en"] .feature-en { display: inline; }
 }
 .hero-trust li:last-child { border-inline-end: 0; }
 .hero-trust b {
-  font-family: "Amiri", Georgia, serif; color: var(--accent);
+  font-family: var(--font-display); color: var(--accent);
   font-size: clamp(15px, 1.5vw, 21px); line-height: 1.2; font-weight: 500;
 }
 .hero-trust span { font-size: clamp(10px, .95vw, 12.5px); color: var(--muted); line-height: 1.3; }
@@ -1110,11 +1060,8 @@ html[lang="en"] .feature-en { display: inline; }
 .btn:active { transform: translateY(0) scale(.985); }
 
 .btn--gold {
-  background: linear-gradient(135deg,
-              color-mix(in srgb, var(--accent) 88%, #fff) 0%,
-              var(--accent) 52%,
-              color-mix(in srgb, var(--accent) 82%, #000) 100%);
-  color: #fff; border-color: transparent;
+  background: var(--accent);
+  color: var(--on-accent); border-color: transparent;
   box-shadow: 0 10px 24px -14px color-mix(in srgb, var(--accent) 85%, transparent);
 }
 .btn--gold:hover {
@@ -1186,25 +1133,6 @@ html.js [data-reveal].is-in { opacity: 1; transform: none; }
 }
 .tpl-card:hover .tpl-cover::after { opacity: 1; }
 
-.feature-card {
-  /* من غير ‎backdrop-filter‎: بيجبر المتصفح يقرا ويموّه اللي ورا كل كارت
-     من تاني مع كل فريم سكرول، ومكانش بيبان منه حاجة أصلاً فوق خلفية سادة. */
-  transition: transform .24s cubic-bezier(.22, .8, .3, 1), border-color .24s ease, box-shadow .24s ease;
-}
-.feature-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 24px 44px -30px color-mix(in srgb, var(--accent) 65%, rgba(23, 19, 15, .55));
-}
-.feature-icon {
-  transition: transform .28s cubic-bezier(.22, .8, .3, 1),
-              background-color .28s ease, color .28s ease, border-color .28s ease;
-}
-/* الأيقونة بتتملي دهب ورمزها يبقى أبيض — إشارة واضحة إن الكارت نشط */
-.feature-card:hover .feature-icon {
-  transform: translateY(-2px) scale(1.06);
-  background: var(--accent); color: #fff;
-  border-color: var(--accent);
-}
 
 .plan { transition: transform .24s cubic-bezier(.22, .8, .3, 1), border-color .24s ease, box-shadow .24s ease; }
 .plan:hover {
@@ -1216,10 +1144,6 @@ html.js [data-reveal].is-in { opacity: 1; transform: none; }
 .plan--featured:hover { border-color: var(--accent); }
 /* الزرار الأساسي جوّه الكارت بينوّر مع الكارت — بيوضّح الفعل المتاح */
 .plan:hover .btn--gold { filter: brightness(1.06); box-shadow: 0 14px 28px -14px color-mix(in srgb, var(--accent) 90%, transparent); }
-
-/* الخطوات: الرقم بقى دايرة مليانة عند المرور */
-.step::before { transition: background-color .25s ease, color .25s ease, transform .25s ease; }
-.step:hover::before { background: var(--accent); color: #fff; transform: scale(1.06); }
 
 .faq-item { transition: border-color .2s ease, box-shadow .2s ease; }
 .faq-item[open], .faq-item:hover { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); }
@@ -1268,122 +1192,106 @@ html.js [data-reveal].is-in { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) {
   .fx-sky, .hero-sparks, .hero-shooting { display: none; }
   html.js [data-reveal] { opacity: 1; transform: none; transition: none; }
-  .btn, .tpl-card, .feature-card, .plan { transition: none; }
-  .btn:hover, .tpl-card:hover, .feature-card:hover, .plan:hover { transform: none; }
+  .btn, .tpl-card, .plan { transition: none; }
+  .btn:hover, .tpl-card:hover, .plan:hover { transform: none; }
   .orn-diamond, .fx-glow { animation: none; }
 }
 
 
 /* ================================================================
-   «أربع خطوات فقط» — تايم‑لاين متوصّل
-   كان فيه رقمين على بعض: ‎<span class="step-number">01</span>‎ من الـHTML
-   و‎.step::before‎ عدّاد من الـCSS. الأول بقى هو الدايرة، والتاني اتقفل.
-   وكمان ‎.grid--4‎ كان بيعمل ٥ أعمدة لأربع خطوات فبيسيب عمود فاضي —
-   الأعمدة هنا مثبّتة بأربعة.
+   «كيف تعمل» — قطع بازل متداخلة
+   كل خطوة قطعة: بروز دايري (::after) في طرفها الأخير بيدخل في تجويف
+   (قناع قطع دايري) في بداية القطعة اللي بعدها، فالأربعة بيتركّبوا كلغز.
+   البروز والتجويف متحدّين المركز، فالفراغ بينهم ثابت على الدايرة كلها.
+   القطعة الأخيرة بلون الأكسنت: اللغز اكتمل.
    ================================================================ */
 .steps {
-  --step-gap: 22px;
-  --step-dot: 56px;                 /* قطر الدايرة */
-  --step-line: color-mix(in srgb, var(--accent) 45%, transparent);
-  /* نفس لون خلفية القسم بالظبط: ‎.section--alt‎ بيتحط بشفافية ٩٠٪ فوق ‎--bg‎،
-     فالدايرة بتاخد الناتج المركّب عشان تقطع الخط من غير ما تبان كبقعة. */
-  --step-punch: color-mix(in srgb, var(--surface-2) 90%, var(--bg));
-  position: relative;
+  --pz-gap: 8px;                    /* المسافة بين القطع */
+  --pz-knob: 17px;                  /* نصف قطر البروز */
+  --pz-clear: 4px;                  /* فراغ بين البروز والتجويف */
+  --pz-y: 50px;                     /* ارتفاع مركز البروز من أعلى القطعة */
+  --pz-start: right;
+  --pz-fill: var(--surface);
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 30px var(--step-gap);
+  gap: var(--pz-gap);
   counter-reset: none;
 }
-
-/* الخيط الذهبي اللي بيوصل الخطوات ببعض — بيبدأ ويخلص متلاشي */
-.steps::before {
-  content: ""; position: absolute; z-index: 0; pointer-events: none;
-  top: calc(var(--step-dot) / 2); inset-inline: 12%; height: 1px;
-  background: linear-gradient(to left, transparent, var(--step-line) 14%,
-                              var(--step-line) 86%, transparent);
-}
+html[dir="ltr"] .steps { --pz-start: left; }
 
 .step {
-  position: relative; z-index: 1;
-  padding-inline-start: 0; text-align: center;
+  position: relative; z-index: 1; isolation: isolate;
+  padding: 24px 28px 28px;
+  text-align: start;
+  /* ظل بيتبع شكل القطعة بالبروز والتجويف (filter بيشتغل على الشكل النهائي) */
+  filter: drop-shadow(0 0 .6px color-mix(in srgb, var(--accent) 40%, var(--line)))
+          drop-shadow(0 16px 20px color-mix(in srgb, var(--accent) 14%, transparent));
+  transition: transform .28s cubic-bezier(.22, .8, .3, 1), filter .28s ease;
 }
-.step::before { content: none; }    /* إلغاء دايرة العدّاد القديمة */
+.step:hover { transform: translateY(-5px); }
 
-/* الرقم بقى هو الدايرة نفسها */
-.step-number {
-  position: relative; z-index: 1;
-  width: var(--step-dot); height: var(--step-dot);
-  display: grid; place-items: center; margin: 0 auto 16px;
-  border-radius: 50%; border: 1px solid var(--accent);
-  background: var(--step-punch); color: var(--accent);
-  font-family: "Amiri", Georgia, serif; font-size: 19px; line-height: 1;
-  /* من غير ‎direction: ltr‎ عن قصد: الأرقام بتتعرض صح من غيرها، ولو اتحطت
-     بتخلّي ‎inset-inline-start‎ للدايرة نفسها يتحسب شمال بدل يمين في RTL. */
-  letter-spacing: normal;
-  box-shadow: 0 0 0 5px var(--step-punch),
-              0 10px 24px -16px color-mix(in srgb, var(--accent) 80%, transparent);
-  transition: background-color .28s ease, color .28s ease,
-              transform .28s cubic-bezier(.22, .8, .3, 1), box-shadow .28s ease;
+/* وجه القطعة + تجويف الاستقبال */
+.step::before {
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  background: var(--pz-fill); border-radius: 14px;
 }
-
-/* معيّن صغير قاعد على الخيط في نص المسافة بين كل خطوتين */
+.step:not(:first-child)::before {
+  -webkit-mask: radial-gradient(circle calc(var(--pz-knob) + var(--pz-clear)) at var(--pz-start) 0 top var(--pz-y), transparent 98%, #000 100%);
+          mask: radial-gradient(circle calc(var(--pz-knob) + var(--pz-clear)) at var(--pz-start) 0 top var(--pz-y), transparent 98%, #000 100%);
+}
+/* البروز: مركزه على حافة القطعة اللي بعدها بالظبط */
 .step:not(:last-child)::after {
-  content: ""; position: absolute; z-index: 1; pointer-events: none;
-  top: calc(var(--step-dot) / 2); margin-top: -3.5px;
-  inset-inline-start: 100%; margin-inline-start: calc((var(--step-gap) - 7px) / 2);
-  width: 7px; height: 7px; transform: rotate(45deg);
-  background: var(--accent); opacity: .75;
+  content: ""; position: absolute; z-index: -1; pointer-events: none;
+  width: calc(var(--pz-knob) * 2); height: calc(var(--pz-knob) * 2);
+  top: calc(var(--pz-y) - var(--pz-knob));
+  inset-inline-end: calc(-1 * (var(--pz-gap) + var(--pz-knob)));
+  border-radius: 50%; background: var(--pz-fill);
 }
 
+.step-number {
+  display: block; margin: 0 0 18px;
+  font-family: var(--font-display); font-size: 40px; font-weight: 700; line-height: 1;
+  letter-spacing: normal; color: var(--accent);
+  /* الرقم بيتحاذى مع مركز البروز: القطعة تفضل مقروءة حتى لو البروز اتحرك */
+  transition: transform .28s cubic-bezier(.22, .8, .3, 1);
+}
+.step:hover .step-number { transform: scale(1.06); transform-origin: var(--pz-start) center; }
 .step h3 { margin: 0 0 6px; font-size: 20px; }
-.step p { margin: 0; max-width: 24ch; margin-inline: auto; font-size: 14px; line-height: 1.75; }
+.step p { margin: 0; font-size: 14px; line-height: 1.75; }
 
-/* المرور: الدايرة بتتملي دهب والخطوة بتطلع لفوق شوية */
-.step:hover .step-number {
-  background: var(--accent); color: #fff; transform: translateY(-3px) scale(1.06);
-  box-shadow: 0 0 0 5px var(--step-punch),
-              0 16px 30px -14px color-mix(in srgb, var(--accent) 90%, transparent);
-}
+/* القطعة الأخيرة: ملوّنة */
+.step:last-child { --pz-fill: var(--accent); color: var(--on-accent); }
+.step:last-child .step-number { color: inherit; opacity: .9; }
+.step:last-child p { color: inherit; opacity: .88; }
 
-/* ---- تابلت: نفس الصف الأفقي بمقاسات أصغر.
-       عمودين كانوا بيقطعوا الخيط ويضيّعوا فكرة إن الخطوات متوصلة. ---- */
+/* ---- تابلت ---- */
 @media (max-width: 980px) and (min-width: 761px) {
-  .steps { --step-dot: 48px; --step-gap: 16px; gap: 26px var(--step-gap); }
-  .steps::before { inset-inline: 12.5%; }
-  .step-number { font-size: 16px; margin-bottom: 13px; }
+  .steps { --pz-knob: 14px; --pz-y: 42px; }
+  .step { padding: 20px 20px 22px; }
+  .step-number { font-size: 32px; margin-bottom: 14px; }
   .step h3 { font-size: 17px; }
-  .step p { font-size: 13px; max-width: none; }
+  .step p { font-size: 13px; }
 }
 
-/* ---- الموبايل: نفس التايم‑لاين بس رأسي، والخط جنب الأرقام ---- */
+/* ---- الموبايل: القطع فوق بعض والبروز بينزل لتحت ---- */
 @media (max-width: 760px) {
-  .steps {
-    --step-dot: 48px;
-    /* الخيط أوضح شوية هنا: القطع اللي بين الدواير قصيرة، فلو باهت
-       بيبان كأن فيه معيّنات سايبة من غير خط. */
-    --step-line: color-mix(in srgb, var(--accent) 60%, transparent);
-    grid-template-columns: 1fr; gap: 0;
+  .steps { grid-template-columns: 1fr; --pz-x: 40px; }
+  .step { padding: 22px 24px 26px; }
+  .step:not(:first-child)::before {
+    -webkit-mask: radial-gradient(circle calc(var(--pz-knob) + var(--pz-clear)) at var(--pz-start) var(--pz-x) top 0, transparent 98%, #000 100%);
+            mask: radial-gradient(circle calc(var(--pz-knob) + var(--pz-clear)) at var(--pz-start) var(--pz-x) top 0, transparent 98%, #000 100%);
   }
-  .steps::before {
-    top: 14px; bottom: 22px; height: auto; width: 1px;
-    inset-inline: auto; inset-inline-start: calc(var(--step-dot) / 2);
-    background: linear-gradient(to bottom, transparent, var(--step-line) 8%,
-                                var(--step-line) 92%, transparent);
-  }
-  .step {
-    text-align: start; padding-block: 19px;   /* مساحة كافية تخلّي الخيط يبان */
-    padding-inline-start: calc(var(--step-dot) + 16px); padding-inline-end: 0;
-  }
-  .step-number {
-    position: absolute; top: 12px; inset-inline-start: 0; margin: 0; font-size: 16px;
-    box-shadow: 0 0 0 3px var(--step-punch),
-                0 8px 18px -14px color-mix(in srgb, var(--accent) 80%, transparent);
-  }
-  .step h3 { font-size: 18px; margin-bottom: 3px; }
-  .step p { max-width: none; margin-inline: 0; font-size: 13.5px; }
   .step:not(:last-child)::after {
-    top: auto; bottom: -3.5px; margin-top: 0;
-    inset-inline-start: calc(var(--step-dot) / 2 - 3.5px); margin-inline-start: 0;
+    top: auto; inset-inline-end: auto;
+    bottom: calc(-1 * (var(--pz-gap) + var(--pz-knob)));
+    inset-inline-start: calc(var(--pz-x) - var(--pz-knob));
   }
+  .step-number { font-size: 32px; margin-bottom: 10px; }
+  .step h3 { font-size: 18px; }
+  .step p { font-size: 13.5px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .step, .step-number { transition: none; }
+  .step:hover { transform: none; }
 }
 
 
@@ -1496,3 +1404,223 @@ main { display: block; }
 .wa-float .wa-icon { width: .875em; height: 1em; }
 .foot-socials a[aria-label="WhatsApp"] .wa-icon { width: .875em; height: 1em; }
 .wa-bubble-time svg { color: #53bdeb; font-size: 11px; width: .875em; height: 1em; }
+
+
+/* ================================================================
+   المميزات — Bento متحرّك
+   كل مربّع بيعرض الميزة شغّالة بدل أيقونة ساكنة: عدّاد بيعدّ، رسايل بتتبعت،
+   إيقاع موسيقى، دبّوس خريطة بينزل، ماسح QR، تقويم بيقلب.
+   الحركة CSS خالصة (إلا العدّاد) ومتوقّفة لحد ما المربّع يظهر في الشاشة
+   (‎.is-in‎ من useReveal)، وبتقف خالص مع ‎prefers-reduced-motion‎.
+   ================================================================ */
+.bento {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px; max-width: 1120px; margin-inline: auto;
+}
+.bento-tile {
+  position: relative; display: flex; flex-direction: column; gap: 14px;
+  min-height: 268px; padding: 14px 14px 22px; overflow: hidden;
+  border: 1px solid var(--line); border-radius: 22px; background: var(--surface);
+  box-shadow: var(--shadow);
+  transition: transform .26s cubic-bezier(.22, .8, .3, 1), border-color .26s ease, box-shadow .26s ease;
+}
+.bento-tile:hover {
+  transform: translateY(-5px);
+  border-color: color-mix(in srgb, var(--accent) 50%, var(--line));
+  box-shadow: 0 26px 44px -30px color-mix(in srgb, var(--accent) 60%, rgba(40, 14, 22, .5));
+}
+.bento-wide { grid-column: span 2; }
+.bento-art {
+  position: relative; flex: 1; min-height: 132px; display: grid; place-items: center;
+  border-radius: 14px; overflow: hidden;
+  background:
+    radial-gradient(120% 90% at 85% 0%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 60%),
+    var(--surface-2);
+}
+.bento-copy { padding-inline: 8px; }
+.bento-copy h3 { margin: 0 0 4px; font-size: 20px; }
+.bento-copy p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.7; }
+
+/* ألوان مميّزة لمربّعين: عنّابي ممتلئ وغامق */
+.bento-accent { background: var(--accent); border-color: transparent; color: var(--on-accent); }
+.bento-accent .bento-art { background: color-mix(in srgb, #000 16%, var(--accent)); }
+.bento-accent .bento-copy p { color: inherit; opacity: .86; }
+.bento-dark {
+  --surface-2: #221d1e; background: #171314; border-color: #2d2729; color: #eee8e3;
+}
+html[data-theme="dark"] .bento-dark { background: #1f1a1b; }
+.bento-dark .bento-art { background: #221d1e; }
+.bento-dark .bento-copy p { color: #b3aaa4; }
+
+/* كل الحركات متوقّفة لحد ما المربّع يدخل الشاشة */
+.bento-art *, .bento-art *::before, .bento-art *::after { animation-play-state: paused !important; }
+.bento-tile.is-in .bento-art *, .bento-tile.is-in .bento-art *::before, .bento-tile.is-in .bento-art *::after {
+  animation-play-state: running !important;
+}
+
+/* ---- عدّاد ---- */
+.art-count { display: flex; gap: 10px; direction: ltr; }
+.art-count-unit {
+  min-width: 62px; padding: 12px 6px 9px; text-align: center; border-radius: 12px;
+  background: rgba(255, 255, 255, .13); border: 1px solid rgba(255, 255, 255, .22);
+}
+.art-count-unit b {
+  display: block; font-family: var(--font-display); font-size: 30px; font-weight: 700; line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+}
+.art-count-unit small { display: block; margin-top: 3px; font-size: 11px; opacity: .8; }
+.art-count-unit:last-child b { animation: art-tick 1s steps(1) infinite; }
+@keyframes art-tick { 0%, 100% { transform: translateY(0); opacity: 1; } 8% { transform: translateY(-3px); opacity: .55; } 16% { transform: none; opacity: 1; } }
+
+/* ---- تأكيد حضور ---- */
+.art-rsvp { display: grid; gap: 9px; width: min(180px, 80%); }
+.art-rsvp-row {
+  display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px;
+  background: var(--surface); border: 1px solid var(--line);
+}
+.art-rsvp-row i {
+  position: relative; flex: none; width: 20px; height: 20px; border-radius: 50%;
+  border: 1.5px solid var(--accent); animation: art-fill 4.5s ease-in-out infinite; animation-delay: calc(var(--i) * .7s);
+}
+.art-rsvp-row i::after {
+  content: ""; position: absolute; inset: 3px 5px 5px 5px; border: solid #fff; border-width: 0 2px 2px 0;
+  transform: rotate(45deg) scale(0); animation: art-check 4.5s ease-in-out infinite; animation-delay: calc(var(--i) * .7s);
+}
+.art-rsvp-row span { flex: 1; height: 6px; border-radius: 4px; background: var(--line); }
+.art-rsvp-row:nth-child(2) span { flex: .7; }
+@keyframes art-fill { 0%, 12% { background: transparent; } 22%, 78% { background: var(--accent); } 90%, 100% { background: transparent; } }
+@keyframes art-check { 0%, 14% { transform: rotate(45deg) scale(0); } 26%, 78% { transform: rotate(45deg) scale(1); } 90%, 100% { transform: rotate(45deg) scale(0); } }
+
+/* ---- واتساب ---- */
+.art-chat { position: relative; width: min(190px, 82%); height: 96px; }
+.art-bubble { position: absolute; display: block; height: 30px; border-radius: 14px; }
+.art-bubble::after { content: ""; position: absolute; inset: 11px 12px; border-radius: 3px; background: currentColor; opacity: .35; }
+.art-bubble--in { inset-inline-start: 0; top: 0; width: 120px; background: var(--surface); border: 1px solid var(--line); color: var(--muted); animation: art-pop 5s ease-in-out infinite; }
+.art-bubble--out { inset-inline-end: 0; top: 40px; width: 140px; background: #25d366; color: #fff; animation: art-pop 5s ease-in-out infinite .9s; }
+.art-plane {
+  position: absolute; inset-inline-end: 6px; bottom: -6px; width: 26px; height: 26px; fill: none;
+  stroke: var(--accent); stroke-width: 1.6; stroke-linejoin: round; animation: art-fly 5s ease-in-out infinite 1.6s; opacity: 0;
+}
+@keyframes art-pop { 0%, 6% { transform: scale(.6); opacity: 0; } 14%, 80% { transform: scale(1); opacity: 1; } 92%, 100% { transform: scale(.9); opacity: 0; } }
+@keyframes art-fly { 0% { transform: translate(0, 0) rotate(0); opacity: 0; } 10% { opacity: 1; } 60% { transform: translate(-46px, -46px) rotate(-12deg); opacity: 1; } 100% { transform: translate(-90px, -90px) rotate(-12deg); opacity: 0; } }
+html[dir="rtl"] .art-plane { scale: -1 1; }
+
+/* ---- موسيقى ---- */
+.art-eq { display: flex; align-items: flex-end; gap: 7px; height: 78px; }
+.art-eq i {
+  width: 9px; height: 100%; border-radius: 6px; transform-origin: bottom;
+  background: linear-gradient(to top, var(--accent), color-mix(in srgb, var(--accent) 45%, #fff));
+  animation: art-eq 1.15s ease-in-out infinite; animation-delay: calc(var(--i) * -.17s);
+}
+@keyframes art-eq { 0%, 100% { transform: scaleY(.22); } 45% { transform: scaleY(1); } 70% { transform: scaleY(.5); } }
+
+/* ---- ألبوم ---- */
+.art-photos { position: relative; width: 150px; height: 104px; }
+.ph {
+  position: absolute; inset: 0; border-radius: 12px; border: 4px solid #fff;
+  box-shadow: 0 10px 20px -10px rgba(40, 14, 22, .5); overflow: hidden;
+}
+.ph::before { content: ""; position: absolute; width: 18px; height: 18px; border-radius: 50%; top: 14px; inset-inline-end: 18px; background: rgba(255, 255, 255, .85); }
+.ph::after { content: ""; position: absolute; inset-inline: -10%; bottom: -30%; height: 60%; border-radius: 50% 50% 0 0; background: rgba(255, 255, 255, .32); }
+.ph--1 { background: linear-gradient(140deg, #d9a3b0, #7d2e43); animation: art-ph1 6s ease-in-out infinite; }
+.ph--2 { background: linear-gradient(140deg, #f1d9b9, #c9a56a); animation: art-ph2 6s ease-in-out infinite; }
+.ph--3 { background: linear-gradient(140deg, #e9d7dc, #b98a97); animation: art-ph3 6s ease-in-out infinite; }
+@keyframes art-ph1 { 0%, 100% { transform: rotate(-9deg) translateX(-22px); z-index: 1; } 50% { transform: rotate(0) translateX(0) scale(1.04); z-index: 3; } }
+@keyframes art-ph2 { 0%, 100% { transform: rotate(8deg) translateX(22px); z-index: 2; } 50% { transform: rotate(-9deg) translateX(-22px); z-index: 1; } }
+@keyframes art-ph3 { 0%, 100% { transform: rotate(0) scale(1.04); z-index: 3; } 50% { transform: rotate(8deg) translateX(22px); z-index: 2; } }
+
+/* ---- خريطة ---- */
+.art-map {
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(color-mix(in srgb, var(--line) 80%, transparent) 1px, transparent 1px) 0 0 / 100% 26px,
+    linear-gradient(90deg, color-mix(in srgb, var(--line) 80%, transparent) 1px, transparent 1px) 0 0 / 26px 100%;
+}
+.art-map-road {
+  position: absolute; inset-inline: -10%; top: 58%; height: 10px; border-radius: 6px; transform: rotate(-14deg);
+  background: color-mix(in srgb, var(--accent) 22%, var(--surface));
+}
+.art-map-ring, .art-map-pin { position: absolute; inset-inline-start: 50%; top: 58%; }
+.art-map-ring {
+  width: 22px; height: 10px; margin: 0 0 0 -11px; border-radius: 50%; border: 2px solid var(--accent);
+  animation: art-ring 2.4s ease-out infinite;
+}
+html[dir="rtl"] .art-map-ring { margin: 0 -11px 0 0; }
+.art-map-pin {
+  width: 34px; height: 34px; margin: -34px 0 0 -17px; fill: var(--accent); stroke: #fff; stroke-width: 1.3;
+  animation: art-drop 2.4s cubic-bezier(.3, 1.4, .5, 1) infinite; transform-origin: bottom;
+}
+html[dir="rtl"] .art-map-pin { margin: -34px -17px 0 0; }
+.art-map-pin circle { fill: #fff; stroke: none; }
+@keyframes art-drop { 0% { transform: translateY(-46px); opacity: 0; } 25% { opacity: 1; } 45%, 100% { transform: translateY(0); opacity: 1; } }
+@keyframes art-ring { 0%, 40% { transform: scale(.3); opacity: 0; } 50% { opacity: .9; } 100% { transform: scale(2.6); opacity: 0; } }
+
+/* ---- QR ---- */
+.art-qr {
+  position: relative; display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px;
+  width: 84px; height: 84px; padding: 7px; border-radius: 10px; background: #fff; overflow: hidden;
+  box-shadow: 0 10px 22px -14px rgba(40, 14, 22, .55);
+}
+.art-qr i { display: block; border-radius: 2px; background: transparent; }
+.art-qr i.on { background: #261a1d; }
+.art-qr-scan {
+  position: absolute; inset-inline: 0; top: 0; height: 12px;
+  background: linear-gradient(to bottom, transparent, color-mix(in srgb, var(--accent) 55%, transparent));
+  border-bottom: 2px solid var(--accent); animation: art-scan 2.2s ease-in-out infinite;
+}
+@keyframes art-scan { 0% { transform: translateY(-14px); } 100% { transform: translateY(86px); } }
+
+/* ---- تقويم ---- */
+.art-cal { width: 118px; border-radius: 12px; overflow: hidden; background: #fff; box-shadow: 0 12px 24px -14px rgba(40, 14, 22, .55); }
+.art-cal-top { display: flex; justify-content: space-around; padding: 7px 0; background: var(--accent); }
+.art-cal-top i { width: 8px; height: 8px; border-radius: 50%; background: rgba(255, 255, 255, .85); }
+.art-cal-num { position: relative; height: 40px; overflow: hidden; color: var(--accent); }
+.art-cal-num b {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  font-family: var(--font-display); font-size: 28px; line-height: 1; backface-visibility: hidden;
+  animation: art-flip 4s ease-in-out infinite;
+}
+.art-cal-num b + b { animation-delay: -2s; }
+@keyframes art-flip { 0%, 40% { transform: rotateX(0); opacity: 1; } 50%, 90% { transform: rotateX(-90deg); opacity: 0; } 100% { transform: rotateX(0); opacity: 1; } }
+.art-cal-dots { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; padding: 3px 9px 11px; }
+.art-cal-dots i { height: 6px; border-radius: 50%; background: var(--line); }
+.art-cal-dots i.on { background: var(--accent); animation: art-pulse 1.6s ease-in-out infinite; }
+@keyframes art-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.7); } }
+
+/* ---- تذكرة دخول ---- */
+.art-ticket {
+  position: relative; display: flex; align-items: center; gap: 16px; padding: 14px 18px;
+  border-radius: 14px; background: #fff; color: #261a1d; box-shadow: 0 14px 26px -16px rgba(0, 0, 0, .7);
+}
+.art-ticket .art-qr { box-shadow: none; padding: 0; width: 64px; height: 64px; gap: 2px; }
+.art-ticket-lines { display: grid; gap: 7px; width: 82px; }
+.art-ticket-lines span { height: 6px; border-radius: 4px; background: #e9dfe2; }
+.art-ticket-lines span:first-child { width: 70%; background: var(--accent); opacity: .8; }
+.art-ticket-ok {
+  position: absolute; inset-inline-end: -12px; top: -12px; width: 34px; height: 34px; fill: #3f8a55; stroke: #fff;
+  stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; animation: art-badge 3.2s cubic-bezier(.3, 1.5, .5, 1) infinite;
+}
+.art-ticket-ok path { fill: none; }
+@keyframes art-badge { 0%, 30% { transform: scale(0) rotate(-40deg); } 45%, 85% { transform: scale(1) rotate(0); } 100% { transform: scale(0); } }
+
+/* ---- تابلت / موبايل ---- */
+@media (max-width: 980px) {
+  .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+}
+@media (max-width: 600px) {
+  .bento { grid-template-columns: 1fr; }
+  .bento-wide { grid-column: auto; }
+  .bento-tile { min-height: 0; }
+  .art-count { gap: 7px; }
+  .art-count-unit { min-width: 54px; }
+  .art-count-unit b { font-size: 25px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bento-art *, .bento-art *::before, .bento-art *::after { animation: none !important; }
+  .bento-tile, .bento-tile:hover { transition: none; transform: none; }
+  .art-bubble, .art-ticket-ok, .art-rsvp-row i::after { opacity: 1; transform: none; }
+  .art-rsvp-row i { background: var(--accent); }
+  .art-rsvp-row i::after { transform: rotate(45deg) scale(1); }
+  .art-plane { opacity: 0; }
+}

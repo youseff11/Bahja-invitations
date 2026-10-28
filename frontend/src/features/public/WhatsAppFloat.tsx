@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 
 import { useSite } from '@/api/hooks'
 import { CheckDoubleIcon, WhatsAppIcon } from './icons'
-import { useLang } from './text'
+import { pick, useLang } from './text'
 
 function CloseIcon() {
   return (
@@ -136,9 +136,9 @@ export function WhatsAppFloat() {
         aria-label={label}
       >
         <header className="wa-chat-head">
-          <img className="wa-chat-avatar" src="/static/images/logo.jpeg" alt="" width="46" height="46" />
+          <img className="wa-chat-avatar" src="/site-icon.png" alt="" width="46" height="46" />
           <div className="wa-chat-who">
-            <strong>T DESIGNATION</strong>
+            <strong>{pick(lang, site?.name?.ar ?? '', site?.name?.en ?? '')}</strong>
             <small>{t('public.whatsapp.status')}</small>
           </div>
           <button

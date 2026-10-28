@@ -18,7 +18,7 @@ const EMPTY: HeroInfo = {
 const show = (hero?: HeroInfo) =>
   render(
     <MemoryRouter>
-      <HeroSection plansPublic hero={hero} />
+      <HeroSection hero={hero} />
     </MemoryRouter>,
   )
 
@@ -31,8 +31,10 @@ afterEach(async () => {
 describe('HeroSection settings', () => {
   it('falls back to the translated defaults when nothing is set', () => {
     show(EMPTY)
-    expect(screen.getByText('تعكس قصة حبك')).toBeInTheDocument()
-    expect(screen.getByText('ابدأ تصميم دعوتك')).toBeInTheDocument()
+    expect(screen.getByText('تروي بدايتكم بأناقة')).toBeInTheDocument()
+    expect(screen.getByText('شوف القوالب')).toBeInTheDocument()
+    expect(screen.queryByText('شوف الباقات')).toBeNull() // زرار واحد بس
+    expect(document.querySelectorAll('.hero-actions a')).toHaveLength(1)
     expect(document.querySelector('style')).toBeNull()
   })
 
@@ -43,10 +45,10 @@ describe('HeroSection settings', () => {
     }
     show(hero)
     expect(screen.getByText('عنوان مخصص')).toBeInTheDocument()
-    expect(screen.queryByText('تعكس قصة حبك')).toBeNull()
-    expect(screen.getByText('تصميم دعوات زفاف')).toBeInTheDocument() // السطر الصغير لسه الافتراضي
+    expect(screen.queryByText('تروي بدايتكم بأناقة')).toBeNull()
+    expect(screen.getByText('دعوات زفاف رقمية')).toBeInTheDocument() // السطر الصغير لسه الافتراضي
     expect(screen.getByText('+٨٠')).toBeInTheDocument()
-    expect(screen.getByText('قالب جاهز')).toBeInTheDocument() // التسمية فاضية → الافتراضي
+    expect(screen.getByText('تصميم أنيق')).toBeInTheDocument() // التسمية فاضية → الافتراضي
   })
 
   it('shows the text of the current language', async () => {
@@ -60,12 +62,20 @@ describe('HeroSection settings', () => {
     expect(screen.queryByText('عربي')).toBeNull()
   })
 
+  it('does not double-encode URLs the server already percent-encoded (Arabic file names)', () => {
+    show({ ...EMPTY, images: { ...EMPTY.images, darkAr: '/media/home/x/%D8%A7%D8%B9%D9%85%D9%84.webp' } })
+    const css = document.querySelector('style')?.textContent ?? ''
+    expect(css).toContain('url("/media/home/x/%D8%A7%D8%B9%D9%85%D9%84.webp")')
+    expect(css).not.toContain('%25')
+  })
+
   it('emits a background rule per filled image with the same selectors as the stylesheet', () => {
     show({ ...EMPTY, images: { lightAr: '/media/home/a/l.webp', lightEn: '', darkAr: '/media/home/b/d ar.webp', darkEn: '/media/home/c/de.webp' } })
     const css = document.querySelector('style')?.textContent ?? ''
     expect(css).toContain('.hero-art{--hero-img:url("/media/home/a/l.webp")}')
     expect(css).toContain('[data-theme="dark"] .hero-art{--hero-img:url("/media/home/b/d%20ar.webp")}')
     expect(css).toContain('html[lang="en"][data-theme="dark"] .hero-art{--hero-img:url("/media/home/c/de.webp")}')
-    expect(css).not.toContain('html[lang="en"] .hero-art{')
+    // لايت إنجليزي فاضي → بياخد صورة لايت العربي
+    expect(css).toContain('html[lang="en"] .hero-art{--hero-img:url("/media/home/a/l.webp")}')
   })
 })

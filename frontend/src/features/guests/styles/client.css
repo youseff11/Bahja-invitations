@@ -37,12 +37,13 @@
 .client-followup .brand--stacked {
   display: block;
   flex: none;
-  aspect-ratio: 694 / 658;
+  height: 46px;
+  aspect-ratio: 7 / 1;
   margin-inline: auto;
-  background: url('/static/images/logo-full-light.png') center / contain no-repeat;
+  background: var(--site-logo-light, url('/site-logo/light.png')) center / contain no-repeat;
 }
 [data-theme='dark'] .client-followup .brand--stacked {
-  background-image: url('/static/images/logo-full-dark.png');
+  background-image: var(--site-logo-dark, url('/site-logo/dark.png'));
 }
 .client-followup .brand--stacked:hover {
   opacity: 0.82;

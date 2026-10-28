@@ -1223,7 +1223,7 @@ register(
         field("logo_width", "عرض الصورة", "range", 42,
               minimum=10, maximum=100, step=1, unit="%",
               help_text="نسبة من عرض القسم."),
-        field("text", "الكلام", "textarea", "صُممت هذه الدعوة عبر T DESIGNATION"),
+        field("text", "الكلام", "textarea", "صُممت هذه الدعوة عبر بهجة"),
         *_social_fields(),
     ],
 )

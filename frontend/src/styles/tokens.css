@@ -1,34 +1,40 @@
 /* ================================================================
-   متغيّرات التصميم — منقولة حرفياً من static/css/site.css.
-   اللايت أبيض والدارك أسود. النص مش أسود/أبيض خالص عن قصد:
-   #000 على #fff (والعكس) بيعمل إجهاد للعين وهالة حوالين الحروف العربية الرفيعة.
+   متغيّرات التصميم — هوية «بهجة»: عنّابي على عاجي (لايت) وعنّابي غامق (دارك).
+   النص مش أسود/أبيض خالص عن قصد: #000 على #fff (والعكس) بيعمل إجهاد للعين
+   وهالة حوالين الحروف العربية الرفيعة.
    ================================================================ */
 :root {
-  --bg: #ffffff;
+  --bg: #fbf8f4;
   --surface: #ffffff;
-  --surface-2: #f6f5f3;
-  --text: #17130f;
-  --muted: #6d675f;
-  --accent: #b8914f;
-  --accent-soft: rgba(184, 145, 79, 0.1);
-  --line: #e9e6e1;
+  --surface-2: #f4ede6;
+  --text: #261a1d;
+  --muted: #7a6a6e;
+  --accent: #7d2e43;
+  --accent-soft: rgba(125, 46, 67, 0.09);
+  --on-accent: #ffffff;
+  --line: #eadfd8;
   --ok: #3f8a55;
   --danger: #c1544d;
-  --radius: 14px;
-  --shadow: 0 20px 50px -34px rgba(23, 19, 15, 0.45);
-  --shadow-nav: 0 14px 34px -20px rgba(23, 19, 15, 0.35);
+  --radius: 10px;
+  --radius-btn: 8px;
+  --radius-nav: 16px;
+  --font-display: 'El Messiri', 'Amiri', Georgia, serif;
+  --font-body: 'IBM Plex Sans Arabic', 'Tajawal', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --shadow: 0 20px 50px -34px rgba(60, 20, 32, 0.45);
+  --shadow-nav: 0 14px 34px -20px rgba(60, 20, 32, 0.35);
   --nav-space: 94px; /* 16 + 62 + 16 — الهيرو بيتسحب تحتها */
 }
 
 [data-theme='dark'] {
-  --bg: #000000;
-  --surface: #0d0d0d;
-  --surface-2: #151514;
-  --text: #eeeae4;
-  --muted: #99938b;
-  --accent: #d4ab63;
-  --accent-soft: rgba(212, 171, 99, 0.13);
-  --line: #262523;
+  --bg: #0f0d0e;
+  --surface: #171314;
+  --surface-2: #1f1a1b;
+  --text: #eee8e3;
+  --muted: #a39a94;
+  --accent: #d6b98c;
+  --accent-soft: rgba(214, 185, 140, 0.13);
+  --on-accent: #1d1610;
+  --line: #2d2729;
   --ok: #5cb075;
   --shadow: 0 24px 60px -34px #000;
   --shadow-nav: 0 16px 40px -22px rgba(0, 0, 0, 0.9);

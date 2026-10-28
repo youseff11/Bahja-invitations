@@ -693,7 +693,7 @@
 }
 .dash-root .stat b {
   display: block;
-  font-family: 'Amiri', serif;
+  font-family: var(--font-display);
   font-size: 32px;
   color: var(--accent);
   line-height: 1.1;
@@ -854,7 +854,7 @@
   display: grid;
   place-items: center;
   color: var(--accent);
-  font-family: 'Amiri', serif;
+  font-family: var(--font-display);
   font-size: 30px;
   background-size: cover;
   background-position: center;

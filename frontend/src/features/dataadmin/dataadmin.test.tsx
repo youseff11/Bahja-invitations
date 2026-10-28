@@ -342,14 +342,14 @@ describe('hero live preview', () => {
     mount('/dashboard/data/system.homehero/1')
     const stage = await screen.findByTestId('hero-bg')
     const preview = stage.closest('.hp') as HTMLElement
-    expect(within(preview).getByText('تعكس قصة حبك')).toBeInTheDocument() // الافتراضي المترجم
+    expect(within(preview).getByText('تروي بدايتكم بأناقة')).toBeInTheDocument() // الافتراضي المترجم
 
     const input = screen.getByLabelText('العنوان الرئيسي — عربي')
     fireEvent.focus(input)
     fireEvent.change(input, { target: { value: 'قصة حبكم تبدأ هنا' } })
     const typed = within(preview).getByText('قصة حبكم تبدأ هنا')
     expect(typed).toHaveClass('is-active')
-    expect(within(preview).queryByText('تعكس قصة حبك')).toBeNull()
+    expect(within(preview).queryByText('تروي بدايتكم بأناقة')).toBeNull()
     expect(within(preview).getByText(/بتعدّل: العنوان الرئيسي — عربي/)).toBeInTheDocument()
   })
 
@@ -377,7 +377,7 @@ describe('hero live preview', () => {
     const preview = (await screen.findByTestId('hero-bg')).closest('.hp') as HTMLElement
     const title = screen.getByLabelText('العنوان الرئيسي — عربي') as HTMLInputElement
     expect(title.value).toBe('')
-    expect(title.placeholder).toBe('تعكس قصة حبك')
+    expect(title.placeholder).toBe('تروي بدايتكم بأناقة')
     expect((screen.getByLabelText('خانة ١ — القيمة (عربي)') as HTMLInputElement).placeholder).toBe('+٥٠')
 
     fireEvent.change(title, { target: { value: 'عنواني' } })
@@ -387,13 +387,14 @@ describe('hero live preview', () => {
     expect((screen.getByLabelText('العنوان الرئيسي — عربي') as HTMLInputElement).value).toBe('عنواني')
   })
 
-  it('lets the viewer switch language and theme by hand, falling back to the default image', async () => {
+  it('lets the viewer switch language and theme by hand, English falls back to the Arabic image', async () => {
     mount('/dashboard/data/system.homehero/1')
     const preview = (await screen.findByTestId('hero-bg')).closest('.hp') as HTMLElement
     expect(screen.getByTestId('hero-bg').style.backgroundImage).toContain('/static/images/home-arabic-light.webp')
     fireEvent.click(within(preview).getByRole('button', { name: 'English' }))
     fireEvent.click(within(preview).getByRole('button', { name: 'داكن' }))
-    expect(screen.getByTestId('hero-bg').style.backgroundImage).toContain('/static/images/home-english-dark.webp')
+    // دارك إنجليزي فاضي ودارك عربي مرفوع (/media/home/x/dark.webp) → بياخد صورة العربي
+    expect(screen.getByTestId('hero-bg').style.backgroundImage).toContain('/media/home/x/dark.webp')
   })
 
   it('is not shown for other tables', async () => {

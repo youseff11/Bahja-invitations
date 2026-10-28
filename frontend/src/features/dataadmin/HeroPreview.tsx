@@ -43,7 +43,7 @@ export function heroDefaultKey(field: string): string {
   const trust = /^trust(\d)_(value|label)_/.exec(field)
   if (trust) return `trust.${['templates', 'delivery', 'editable'][Number(trust[1]) - 1]}${trust[2] === 'value' ? 'Value' : 'Label'}`
   const name = field.replace(/_(ar|en)$/, '')
-  return name === 'cta' ? 'start' : name
+  return name === 'cta' ? 'templates' : name
 }
 
 const fileUrl = (value: FieldValue | undefined) =>
@@ -80,7 +80,7 @@ export function HeroPreview({
     setLocal({ file: picked, url })
     return () => URL.revokeObjectURL(url)
   }, [picked])
-  const background = picked && local?.file === picked ? local.url : fileUrl(values[key]) || DEFAULT_BG[theme][lang]
+  const background = picked && local?.file === picked ? local.url : fileUrl(values[key]) || (lang === 'en' ? fileUrl(values[`bg_${theme}_ar`]) : '') || DEFAULT_BG[theme][lang]
 
   const text = useMemo(() => {
     const word = (name: string, defaultKey: string) => {
@@ -95,8 +95,7 @@ export function HeroPreview({
       top: word('top', 'top'),
       main: word('main', 'main'),
       sub: word('sub', 'sub'),
-      cta: word('cta', 'start'),
-      plans: word('plans', 'plans'),
+      cta: word('cta', 'templates'),
       trust,
     }
   }, [values, lang, i18n])
@@ -128,11 +127,9 @@ export function HeroPreview({
         <div className="hp-copy">
           <p className={`hp-top ${mark('top')}`}>{text.top}</p>
           <p className={`hp-main ${mark('main')}`}>{text.main}</p>
-          <i className="hp-rule" aria-hidden="true" />
           <p className={`hp-sub ${mark('sub')}`}>{text.sub}</p>
           <div className="hp-actions">
             <span className={`hp-btn hp-btn--gold ${mark('cta')}`}>{text.cta}</span>
-            <span className={`hp-btn ${mark('plans')}`}>{text.plans}</span>
           </div>
           <ul className="hp-trust">
             {text.trust.map((item, index) => (

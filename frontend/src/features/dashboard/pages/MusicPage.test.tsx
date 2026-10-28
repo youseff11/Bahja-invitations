@@ -42,7 +42,7 @@ function mockApi(opts: { duplicateExtra: number; dryRun?: DedupeResult; apply?: 
       posts.push(body)
       return json(body.dryRun ? (opts.dryRun ?? plan()) : (opts.apply ?? plan({ dryRun: false })))
     }
-    if (url.endsWith('/site/')) return json({ name: { ar: 'تي ديزاينيشن', en: 'T DESIGNATION' } })
+    if (url.endsWith('/site/')) return json({ name: { ar: 'بهجة', en: 'Bahja Invitations' } })
     if (url.endsWith('/dashboard/music/')) {
       return json({ results: [track(1), track(2), track(3)], duplicateExtra: opts.duplicateExtra })
     }

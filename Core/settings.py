@@ -69,7 +69,7 @@ if not SECRET_KEY:
 ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", "*")
 CSRF_TRUSTED_ORIGINS = env_list(
     "DJANGO_CSRF_TRUSTED_ORIGINS",
-    "http://localhost,http://127.0.0.1,https://www.tdesignation.com,https://tdesignation.com",
+    "http://localhost,http://127.0.0.1,https://www.bahja-invitations.com,https://bahja-invitations.com",
 )
 
 INSTALLED_APPS = [
@@ -258,27 +258,27 @@ CACHES = {
 }
 
 # ---------------------------------------------------------------- app settings
-SITE_NAME = env("SITE_NAME", "T DESIGNATION")
-SITE_TAGLINE = env("SITE_TAGLINE", "دعوات رقمية تعكس قصة حبك")
-SITE_NAME_EN = env("SITE_NAME_EN", "T DESIGNATION")
-SITE_TAGLINE_EN = env("SITE_TAGLINE_EN", "Digital invitations that tell your love story")
+SITE_NAME = env("SITE_NAME", "بهجة")
+SITE_TAGLINE = env("SITE_TAGLINE", "دعوات رقمية تروي بدايتكم بأناقة")
+SITE_NAME_EN = env("SITE_NAME_EN", "Bahja Invitations")
+SITE_TAGLINE_EN = env("SITE_TAGLINE_EN", "Digital invitations that open your day with grace")
 SITE_WHATSAPP = env("SITE_WHATSAPP", "")
 SITE_EMAIL = env("SITE_EMAIL", "")
 SITE_CURRENCY = env("SITE_CURRENCY", "ج.م")
 
 # ---------------------------------------------------------------- SEO
 # الدومين الأساسي — بيتبني منه canonical وsitemap وصور المشاركة.
-SITE_URL = env("SITE_URL", "https://www.tdesignation.com").rstrip("/")
+SITE_URL = env("SITE_URL", "https://www.bahja-invitations.com").rstrip("/")
 # كود تحقق ملكية Google Search Console (علامة meta في الصفحات العامة).
 GOOGLE_SITE_VERIFICATION = env("GOOGLE_SITE_VERIFICATION", "NF9zjwiDtdsp61UptngXOyJI6DHzO39TREPq9hGWdio")
 SEO_DESCRIPTION_AR = env(
     "SEO_DESCRIPTION_AR",
-    "T DESIGNATION: صمّم دعوة زفاف إلكترونية أو دعوة فرح رقمية بالأسماء واللوكيشن والخريطة "
+    "بهجة: صمّم دعوة زفاف إلكترونية أو دعوة فرح رقمية بالأسماء واللوكيشن والخريطة "
     "وعداد تنازلي وRSVP، وشاركها برابط على واتساب. دعوات أفراح وكتب كتاب وخطوبة في مصر.",
 )
 SEO_DESCRIPTION_EN = env(
     "SEO_DESCRIPTION_EN",
-    "T DESIGNATION: create an elegant digital wedding invitation website with location map, "
+    "Bahja Invitations: create an elegant digital wedding invitation website with location map, "
     "countdown, RSVP and WhatsApp sharing. Online wedding invitations in Egypt.",
 )
 SEO_KEYWORDS_AR = (

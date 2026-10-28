@@ -174,9 +174,9 @@ class HomeHeroAdmin(admin.ModelAdmin):
     """هيرو الرئيسية: خلفيات (دارك/لايت × عربي/إنجليزي) + الكلام. فاضي = الافتراضي المترجم."""
 
     fieldsets = (
-        ("الخلفيات (بتتضغط وتتحوّل WebP تلقائياً)", {"fields": ("bg_light_ar", "bg_light_en", "bg_dark_ar", "bg_dark_en")}),
-        ("النصوص — عربي", {"fields": ("top_ar", "main_ar", "sub_ar", "cta_ar", "plans_ar")}),
-        ("النصوص — إنجليزي", {"fields": ("top_en", "main_en", "sub_en", "cta_en", "plans_en")}),
+        ("الخلفيات (بتتضغط وتتحوّل WebP تلقائياً) — صورتين كفاية: لايت ودارك بالعربي، والإنجليزي اختياري وبياخد صورة العربي لو فاضي", {"fields": ("bg_light_ar", "bg_light_en", "bg_dark_ar", "bg_dark_en")}),
+        ("النصوص — عربي", {"fields": ("top_ar", "main_ar", "sub_ar", "cta_ar")}),
+        ("النصوص — إنجليزي", {"fields": ("top_en", "main_en", "sub_en", "cta_en")}),
         ("خانات الثقة — عربي", {"fields": (
             "trust1_value_ar", "trust1_label_ar", "trust2_value_ar", "trust2_label_ar", "trust3_value_ar", "trust3_label_ar")}),
         ("خانات الثقة — إنجليزي", {"fields": (

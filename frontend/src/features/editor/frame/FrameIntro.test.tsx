@@ -26,7 +26,7 @@ const preview = (introData: IntroData | null): PreviewPayload => ({
   runtimeScripts: [],
   runtimeIsSpa: false,
   guest: null,
-  siteName: 'T DESIGNATION',
+  siteName: 'Bahja Invitations',
   siteUrl: '/',
 })
 

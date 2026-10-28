@@ -58,7 +58,7 @@ export function payload(overrides: Partial<RenderPayload> = {}): RenderPayload {
     scroll: { enabled: false },
     cta: null,
     demo: false,
-    siteName: 'T DESIGNATION',
+    siteName: 'Bahja Invitations',
     siteUrl: 'http://x/',
     ...overrides,
   }

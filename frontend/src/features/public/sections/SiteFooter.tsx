@@ -13,9 +13,7 @@ export function HomeFooter({ site }: { site: SiteInfo }) {
   return (
     <footer className="foot">
       <div className="wrap foot-inner">
-        <Link className="foot-brand" to="/" aria-label={name}>
-          <img src="/static/images/logo.jpeg" alt={name} />
-        </Link>
+        <Link className="brand foot-brand" to="/" aria-label={name} />
         <p>
           {name} — {pick(lang, site.tagline.ar, site.tagline.en)}
         </p>

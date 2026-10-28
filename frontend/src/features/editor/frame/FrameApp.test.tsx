@@ -27,7 +27,7 @@ const preview = (blocks: BlockData[], extra: Partial<PreviewPayload> = {}): Prev
   runtimeScripts: [],
   runtimeIsSpa: false,
   guest: null,
-  siteName: 'T DESIGNATION',
+  siteName: 'Bahja Invitations',
   siteUrl: '/',
   ...extra,
 })
