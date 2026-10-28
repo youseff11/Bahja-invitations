@@ -131,7 +131,15 @@ export function Music({ config }: { config: MusicConfig }) {
       className={`lb-music${config.player === 'bar' ? ' lb-music--bar' : ''}`}
       aria-label={t('music.play')}
     >
-      ♪
+      <svg className="i-note" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M17 3.5v11.6a3.6 3.6 0 1 1-2-3.2V7.2l-6 1.5v8.4a3.6 3.6 0 1 1-2-3.2V6.6L17 3.5Z" />
+      </svg>
+      <span className="lb-eq" aria-hidden="true">
+        <i />
+        <i />
+        <i />
+        <i />
+      </span>
     </button>
   )
 }

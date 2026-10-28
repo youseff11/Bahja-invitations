@@ -3,7 +3,7 @@ import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRe
 import { fetchRender, type Source } from './api'
 import { BlockView } from './blocks'
 import { prefetchBlocks } from './blocks/lazy'
-import { BackToSite, LangToggle, PreviewCtaBar } from './Chrome'
+import { BackToSite, LangToggle, PreviewCtaBar, ShareTemplate } from './Chrome'
 import { InviteContext } from './context'
 import { applyPageMeta, syncHeadStyles } from './head'
 import { Intro } from './Intro'
@@ -207,6 +207,7 @@ function Viewer({ initial }: { initial: RenderPayload }) {
   return (
     <InviteContext.Provider value={ctx}>
       {kind === 'template' && <BackToSite siteUrl={payload.siteUrl} />}
+      {kind === 'template' && <ShareTemplate />}
       {payload.hasAlt && <LangToggle altLang={altLang} onSwitch={switchLang} busy={busy} />}
       {payload.intro && <Intro data={payload.intro} lockSkip />}
       <div {...rootAttrs} className={stageClass}>

@@ -1290,25 +1290,49 @@ a.lb-social:hover { transform: translateY(-2px); opacity: .85; }
 .lb-qr-link { margin: 0; font-size: 0.76em; color: var(--muted); word-break: break-all; }
 
 /* ---------------------------------------------------------- الموسيقى */
+/* زرار الأغنية وزرار التمرير: شكل واحد — زجاج شفاف بحلقة بلون الدعوة. الأغنية
+   لما تشتغل بتظهر موجات صوت متحركة بدل النوتة، وفيه نبضة هادية حوالين الزرار. */
 .lb-music {
   position: fixed;
   inset-block-end: calc(18px + env(safe-area-inset-bottom, 0px));
 
   inset-inline-end: 18px;
   z-index: 60;
-  width: 48px;
-  height: 48px;
+  width: 50px;
+  height: 50px;
+  padding: 0;
   border-radius: 50%;
   border: 1px solid var(--accent-40);
-  background: var(--surface);
+  background: color-mix(in srgb, var(--surface) 72%, transparent);
+  backdrop-filter: blur(10px) saturate(1.3);
+  -webkit-backdrop-filter: blur(10px) saturate(1.3);
   color: var(--accent);
   display: grid;
   place-items: center;
   cursor: pointer;
-  box-shadow: var(--shadow);
+  box-shadow: 0 10px 26px -10px rgba(0, 0, 0, .5), inset 0 1px 0 rgba(255, 255, 255, .35);
+  transition: transform .2s ease, background .2s ease, box-shadow .2s ease;
 }
-.lb-music.is-playing { animation: lb-spin 6s linear infinite; }
-@keyframes lb-spin { to { transform: rotate(360deg); } }
+.lb-music:hover, .lb-music:focus-visible { transform: translateY(-2px) scale(1.04); background: color-mix(in srgb, var(--surface) 88%, transparent); }
+.lb-music:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.lb-music .i-note { width: 22px; height: 22px; grid-area: 1 / 1; }
+.lb-music .lb-eq { grid-area: 1 / 1; display: none; align-items: flex-end; gap: 3px; height: 20px; }
+.lb-music .lb-eq i {
+  display: block; width: 3px; height: 100%; border-radius: 2px;
+  background: currentColor; transform-origin: bottom;
+  animation: lb-eq 1s ease-in-out infinite;
+}
+.lb-music .lb-eq i:nth-child(2) { animation-delay: -.45s; animation-duration: .85s; }
+.lb-music .lb-eq i:nth-child(3) { animation-delay: -.2s; animation-duration: 1.15s; }
+.lb-music .lb-eq i:nth-child(4) { animation-delay: -.7s; animation-duration: .95s; }
+@keyframes lb-eq { 0%, 100% { transform: scaleY(.25); } 50% { transform: scaleY(1); } }
+.lb-music.is-playing .i-note { display: none; }
+.lb-music.is-playing .lb-eq { display: flex; }
+.lb-music.is-playing { animation: lb-pulse 2.4s ease-out infinite; }
+@keyframes lb-pulse {
+  0% { box-shadow: 0 10px 26px -10px rgba(0, 0, 0, .5), 0 0 0 0 var(--accent-40); }
+  70%, 100% { box-shadow: 0 10px 26px -10px rgba(0, 0, 0, .5), 0 0 0 14px transparent; }
+}
 .lb-music--bar {
   inset-inline: 0;
   width: auto;
@@ -1381,19 +1405,25 @@ a.lb-social:hover { transform: translateY(-2px); opacity: .85; }
   inset-block-end: 18px;
   inset-inline-start: 18px;
   z-index: 60;
-  width: 44px; height: 44px; padding: 0;
+  width: 50px; height: 50px; padding: 0;
   border-radius: 50%;
   border: 1px solid var(--accent-40);
-  background: var(--surface);
+  background: color-mix(in srgb, var(--surface) 72%, transparent);
+  backdrop-filter: blur(10px) saturate(1.3);
+  -webkit-backdrop-filter: blur(10px) saturate(1.3);
   color: var(--accent);
   display: grid; place-items: center;
   cursor: pointer;
-  box-shadow: var(--shadow);
-  opacity: .72;
-  transition: opacity .2s ease, transform .2s ease;
+  box-shadow: 0 10px 26px -10px rgba(0, 0, 0, .5), inset 0 1px 0 rgba(255, 255, 255, .35);
+  opacity: .88;
+  transition: opacity .2s ease, transform .2s ease, background .2s ease;
 }
-.lb-autoscroll:hover, .lb-autoscroll:focus-visible { opacity: 1; transform: scale(1.06); }
-.lb-autoscroll svg { width: 17px; height: 17px; }
+.lb-autoscroll:hover, .lb-autoscroll:focus-visible { opacity: 1; transform: translateY(-2px) scale(1.04); background: color-mix(in srgb, var(--surface) 88%, transparent); }
+.lb-autoscroll:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.lb-autoscroll svg { width: 20px; height: 20px; grid-area: 1 / 1; }
+/* شغّال: سهم بيتحرك لتحت بدل علامة الإيقاف — عشان الزرار يوصف اللي بيحصل */
+.lb-autoscroll:not(.is-paused) .i-pause { animation: lb-arrow 1.6s ease-in-out infinite; }
+@keyframes lb-arrow { 0%, 100% { transform: translateY(-2px); } 50% { transform: translateY(2px); } }
 /* أيقونة واحدة ظاهرة حسب الحالة */
 .lb-autoscroll .i-play { display: none; }
 .lb-autoscroll.is-paused .i-pause { display: none; }
@@ -1510,7 +1540,7 @@ a.lb-social:hover { transform: translateY(-2px); opacity: .85; }
 
 @media (prefers-reduced-motion: reduce) {
   .lb-anim { opacity: 1 !important; transform: none !important; filter: none !important; }
-  .lb-scroll-hint i, .lb-music.is-playing { animation: none; }
+  .lb-scroll-hint i, .lb-music.is-playing, .lb-music .lb-eq i, .lb-autoscroll .i-pause { animation: none; }
   * { scroll-behavior: auto !important; }
 }
 
@@ -1920,6 +1950,30 @@ a.lb-social:hover { transform: translateY(-2px); opacity: .85; }
   .lb-doc:has(.lb-lang) .lb-back { inset-inline-start: 62px; }
 }
 @media print { .lb-back { display: none !important; } }
+
+/* ------------------------------------------------ مشاركة القالب (معاينة القالب) */
+/* فوق على الناحية المقابلة لزرار الرجوع (شمال في العربي، يمين في الإنجليزي) وفوق
+   الافتتاحية كمان عشان الزائر يقدر يبعت القالب من أول شاشة. */
+.lb-share-fab {
+  position: fixed; z-index: 95;
+  inset-block-start: 16px; inset-inline-end: 16px;
+  block-size: 42px; padding-inline: 16px;
+  display: inline-flex; align-items: center; gap: 8px;
+  border: 1px solid var(--border); border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 86%, transparent);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  color: var(--text); cursor: pointer;
+  font: 600 13px/1 var(--font-body, inherit);
+  white-space: nowrap;
+  box-shadow: 0 8px 22px -12px rgba(0, 0, 0, .45);
+  transition: transform .18s ease, background .18s ease;
+}
+.lb-share-fab:hover { transform: translateY(-1px); background: var(--accent-10); }
+.lb-share-fab:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+@media (max-width: 480px) {
+  .lb-share-fab { inset-block-start: 12px; inset-inline-end: 12px; block-size: 38px; padding-inline: 13px; }
+}
+@media print { .lb-share-fab { display: none !important; } }
 
 /* المحرر: أوقف Hover القالب الذي يحرّك العنصر بعد تغيير موضعه،
    لكن اترك إطار التحديد .is-selected و .lb-el-picked كما هو. */
