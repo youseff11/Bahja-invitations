@@ -923,6 +923,16 @@
   margin-top: 0;
   margin-inline: 0;
 }
+/* الكود المتقدّم يظهر في أي مكان جوّه القسم — مايتقصّش على حدود حاوية بتاعته:
+   - إطار الفيديو (‎overflow:hidden‎) كان بيقص اللي بيتسحب برّاه، والفيديو نفسه
+     (‎.lb-video‎) ليه قص وتدوير لوحده فمش محتاج الإطار.
+   - الحاوية اللي جوّه الكود وفيها عناصر تتسحب (‎ce-N‎) غالباً مكتوب عليها
+     ‎overflow:hidden‎ (زي مربع الأسماء) فالعنصر اللي يتحرّك لبرّاها كان بيختفي.
+     الإزاحات المحفوظة جاية من قاعدة CSS مش من ‎style‎، فمفيش طريقة نعرف بيها
+     مين اللي اتحرّك — بنفتح الحاويات اللي فيها عناصر قابلة للسحب بس، والعناصر
+     الورقية (صورة بإطار دايري مثلاً) بتفضل بقصّها. */
+.lb-video-wrap:has(.lb-video-code) { overflow: visible; }
+.lb-extra-html :has([data-move^="ce-"]) { overflow: visible !important; }
 .lb-doc--editing .lb-video-wrap [data-video-text],
 .lb-doc--editing .lb [data-section-text] {
   cursor: grab;
