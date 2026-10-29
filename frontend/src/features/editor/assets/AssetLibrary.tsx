@@ -285,7 +285,7 @@ export function AssetLibrary({ kind, onPick, onClose }: Props) {
   }
 
   const deleteOne = async (asset: AssetRow) => {
-    if (!ui.confirm(t(`editorAssets.${asset.kind}.confirmOne`))) return
+    if (!(await ui.confirm(t(`editorAssets.${asset.kind}.confirmOne`), { danger: true }))) return
     setDeleting(asset.id)
     try {
       await deleteAsset(mode, id, asset.id, asset.kind as DeletableKind)
@@ -302,7 +302,7 @@ export function AssetLibrary({ kind, onPick, onClose }: Props) {
   const deleteSelected = async () => {
     const ids = [...selected]
     if (!ids.length || !canDelete) return
-    if (!ui.confirm(t(`editorAssets.${kind}.confirmMany`, { count: ids.length }))) return
+    if (!(await ui.confirm(t(`editorAssets.${kind}.confirmMany`, { count: ids.length }), { danger: true }))) return
     setBusy(true)
     try {
       const res = await bulkDeleteAssets(mode, id, ids, kind as DeletableKind)

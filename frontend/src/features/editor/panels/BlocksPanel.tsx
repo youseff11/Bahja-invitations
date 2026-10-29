@@ -122,8 +122,8 @@ export function BlocksPanel({ schema }: { schema: EditorSchema }) {
     if (over && active.id !== over.id) move(String(active.id), String(over.id))
   }
 
-  const onDelete = (block: DocBlock, name: string) => {
-    if (!ui.confirm(t('editor.blocks.deleteConfirm', { name }))) return
+  const onDelete = async (block: DocBlock, name: string) => {
+    if (!(await ui.confirm(t('editor.blocks.deleteConfirm', { name }), { danger: true }))) return
     remove(block.id)
     ui.toast(t('editor.toast.removed', { name }), 'ok')
   }

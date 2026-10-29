@@ -5,6 +5,8 @@
     "watch": "مشاهدة",
     "play": "تشغيل «{{name}}»",
     "cancel": "إلغاء",
+    "confirmTitle": "تأكيد الإجراء",
+    "dangerTitle": "تأكيد الحذف",
     "confirm": "تأكيد",
     "delete": "حذف",
     "edit": "تعديل",

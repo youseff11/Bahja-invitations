@@ -1,11 +1,12 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { fireEvent, render, screen, within } from '@testing-library/react'
-import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
 import { initI18n } from '@/i18n'
 
 import '../fields'
 import { newListItem } from '../fields/ListField'
+import { answerConfirm } from '../assets/testkit'
 import { resetEditor, useEditor } from '../store'
 import type { BlockSpec, Bootstrap, DocBlock, EditorSchema, FieldSpec } from '../types'
 import { EditorUiProvider } from '../ui'
@@ -118,17 +119,15 @@ describe('BlocksPanel', () => {
     expect(screen.getByText('هذا القسم لا يمكن تكراره.')).toBeInTheDocument()
   })
 
-  it('asks before deleting and deletes only when confirmed', () => {
-    const confirm = vi.spyOn(window, 'confirm')
+  it('asks before deleting and deletes only when confirmed', async () => {
     mount(<BlocksPanel schema={schema} />)
     const del = () => within(document.querySelector('[data-id="a"]') as HTMLElement).getByTitle('حذف القسم')
-    confirm.mockReturnValueOnce(false)
     fireEvent.click(del())
+    await answerConfirm(false)
     expect(useEditor.getState().doc.blocks).toHaveLength(3)
-    confirm.mockReturnValueOnce(true)
     fireEvent.click(del())
+    await answerConfirm(true)
     expect(useEditor.getState().doc.blocks.map((b) => b.id)).toEqual(['b', 'c'])
-    confirm.mockRestore()
   })
 
   it('opens the picker, disables an existing singleton and adds a section after the selection', () => {

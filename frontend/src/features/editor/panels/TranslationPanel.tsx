@@ -197,8 +197,8 @@ export function TranslationPanel() {
         <button
           type="button"
           className="ed-btn ed-btn--sm ed-btn--block"
-          onClick={() => {
-            if (!ui.confirm(t('editorInline.i18n.clearConfirm', { lang: langName(alt) }))) return
+          onClick={async () => {
+            if (!(await ui.confirm(t('editorInline.i18n.clearConfirm', { lang: langName(alt) }), { danger: true }))) return
             clear()
             ui.toast(t('editorInline.i18n.cleared', { lang: langName(alt) }), 'ok')
           }}

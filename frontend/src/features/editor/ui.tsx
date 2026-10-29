@@ -1,11 +1,13 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 
+import { ConfirmDialog, type ConfirmOptions } from './ConfirmDialog'
+
 export type ToastKind = 'ok' | 'error' | 'info'
 
 interface Ui {
   toast: (text: string, kind?: ToastKind) => void
-  /** نفس ‎window.confirm‎ زي المحرر القديم */
-  confirm: (text: string) => boolean
+  /** بديل ‎window.confirm‎: نافذة تأكيد بشكل المحرر، بترجع ‎true‎ لو أكّد */
+  confirm: (text: string, options?: ConfirmOptions) => Promise<boolean>
 }
 
 const UiContext = createContext<Ui | null>(null)
@@ -47,11 +49,25 @@ export function EditorUiProvider({ children }: { children: ReactNode }) {
     return () => live.forEach(clearTimeout)
   }, [])
 
-  const ui = useMemo<Ui>(() => ({ toast, confirm: (text) => window.confirm(text) }), [toast])
+  const [asking, setAsking] = useState<{ text: string; options?: ConfirmOptions; resolve: (ok: boolean) => void } | null>(null)
+  const confirm = useCallback<Ui['confirm']>(
+    (text, options) => new Promise<boolean>((resolve) => setAsking((current) => {
+      current?.resolve(false) // سؤال جديد بيلغي القديم بدل ما يفضل معلّق
+      return { text, options, resolve }
+    })),
+    [],
+  )
+  const answer = (ok: boolean) => {
+    asking?.resolve(ok)
+    setAsking(null)
+  }
+
+  const ui = useMemo<Ui>(() => ({ toast, confirm }), [toast, confirm])
 
   return (
     <UiContext.Provider value={ui}>
       {children}
+      {asking && <ConfirmDialog message={asking.text} {...asking.options} onResult={answer} />}
       <div className="ed-toasts" aria-live="polite">
         {items.map((item) => (
           <div key={item.id} className={`ed-toast${item.kind === 'info' ? '' : ` ed-toast--${item.kind}`}`} role={item.kind === 'error' ? 'alert' : 'status'}>

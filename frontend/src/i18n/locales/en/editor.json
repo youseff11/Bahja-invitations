@@ -3,6 +3,13 @@
   "loading": "Loading the editor…",
   "loadFailed": "Couldn't open the editor",
   "retry": "Try again",
+  "confirm": {
+    "title": "Please confirm",
+    "dangerTitle": "Confirm deletion",
+    "ok": "Confirm",
+    "delete": "Delete",
+    "cancel": "Cancel"
+  },
   "top": {
     "back": "Back",
     "undo": "Undo (Ctrl+Z)",

@@ -5,6 +5,7 @@ import { ApiError } from '@/api/client'
 import { initI18n } from '@/i18n'
 
 import '../fields'
+import { answerConfirm } from '../assets/testkit'
 import { resetEditor, useEditor } from '../store'
 import type { Bootstrap, EditorSchema, EventFields, FieldSpec } from '../types'
 import { EditorUiProvider } from '../ui'
@@ -221,18 +222,17 @@ describe('DataPanel', () => {
       expect(save).not.toHaveBeenCalled()
     })
 
-    it('does nothing when the confirmation is declined', () => {
-      const confirm = vi.spyOn(window, 'confirm').mockReturnValue(false)
+    it('does nothing when the confirmation is declined', async () => {
       ui(<DataPanel />)
       fireEvent.change(slugBox(), { target: { value: 'fresh-link' } })
       apply()
-      expect(confirm).toHaveBeenCalledWith(expect.stringContaining('fresh-link'))
+      expect(await screen.findByRole('alertdialog')).toHaveTextContent('fresh-link')
+      await answerConfirm(false)
       expect(s().fields?.slug).toBe('laila-ahmed')
       expect(save).not.toHaveBeenCalled()
     })
 
     it('saves right away once confirmed and shows the link the server returned', async () => {
-      vi.spyOn(window, 'confirm').mockReturnValue(true)
       save.mockResolvedValue({
         savedAt: '10:00:00', slug: 'fresh-link', status: 'draft',
         publicUrl: 'https://example.test/i/fresh-link/', clientFollowupUrl: 'https://example.test/client/xyz/',
@@ -240,6 +240,7 @@ describe('DataPanel', () => {
       ui(<DataPanel />)
       fireEvent.change(slugBox(), { target: { value: 'Fresh Link' } })
       apply()
+      await answerConfirm(true)
       await waitFor(() => expect(screen.getByText('اتغيّر رابط الدعوة.')).toBeInTheDocument())
       expect(save.mock.calls[0][3]).toMatchObject({ slug: 'fresh-link' })
       expect(s().fields?.slug).toBe('fresh-link')
@@ -249,11 +250,11 @@ describe('DataPanel', () => {
     })
 
     it('puts the old link back and shows the server error when the new one is rejected', async () => {
-      vi.spyOn(window, 'confirm').mockReturnValue(true)
       save.mockRejectedValue(new ApiError(400, 'validation_error', 'تحقق', { slug: 'الرابط ده مستخدم في دعوة تانية.' }))
       ui(<DataPanel />)
       fireEvent.change(slugBox(), { target: { value: 'taken' } })
       apply()
+      await answerConfirm(true)
       await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('الرابط ده مستخدم في دعوة تانية.'))
       // الرابط المرفوض ماينفعش يفضل في الستور وإلا كل حفظة جاية هتفشل بسببه
       expect(s().fields?.slug).toBe('laila-ahmed')
@@ -263,19 +264,18 @@ describe('DataPanel', () => {
     })
 
     it('keeps the unsaved marker when other edits were already waiting to be saved', async () => {
-      vi.spyOn(window, 'confirm').mockReturnValue(true)
       save.mockRejectedValue(new ApiError(400, 'validation_error', 'تحقق', { slug: 'محجوز' }))
       ui(<DataPanel />)
       fireEvent.change(input('nameOne'), { target: { value: 'سارة' } })
       fireEvent.change(slugBox(), { target: { value: 'taken' } })
       apply()
+      await answerConfirm(true)
       await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('محجوز'))
       expect(s().saveStatus).not.toBe('saved')
       expect(s().fields?.nameOne).toBe('سارة')
     })
 
     it('waits for a save already in flight instead of dropping the change', async () => {
-      vi.spyOn(window, 'confirm').mockReturnValue(true)
       let finishFirst: (value: Awaited<ReturnType<typeof postSave>>) => void = () => {}
       save.mockImplementationOnce(() => new Promise((resolve) => (finishFirst = resolve)))
       save.mockResolvedValueOnce({
@@ -289,6 +289,7 @@ describe('DataPanel', () => {
       })
       fireEvent.change(slugBox(), { target: { value: 'later-link' } })
       apply()
+      await answerConfirm(true)
       await act(async () => {
         finishFirst({ savedAt: '10:00:01', slug: 'laila-ahmed', status: 'draft', publicUrl: '', clientFollowupUrl: '' })
       })

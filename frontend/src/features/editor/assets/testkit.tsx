@@ -1,6 +1,7 @@
 /** أدوات مشتركة لاختبارات مكتبة الأصول (C3) — مش بتتحمّل في التطبيق. */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { expect } from 'vitest'
 import type { ReactElement } from 'react'
 
 import { EditorUiProvider } from '../ui'
@@ -95,4 +96,11 @@ export function deferred<T>() {
     reject = rej
   })
   return { promise, resolve, reject }
+}
+
+/** يجاوب على نافذة التأكيد (‎ui.confirm‎) اللي ظهرت: الإلغاء أول زرار والتأكيد تاني زرار. */
+export async function answerConfirm(ok: boolean) {
+  const dialog = await screen.findByRole('alertdialog')
+  fireEvent.click(within(dialog).getAllByRole('button')[ok ? 1 : 0])
+  await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull())
 }

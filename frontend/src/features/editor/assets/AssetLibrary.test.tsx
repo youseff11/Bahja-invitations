@@ -8,7 +8,7 @@ import { resetEditor, useEditor } from '../store'
 import type { AssetRow } from '../types'
 import * as api from './api'
 import { AssetLibrary } from './AssetLibrary'
-import { asset, boot, deferred, mount } from './testkit'
+import { answerConfirm, asset, boot, deferred, mount } from './testkit'
 
 vi.mock('./api', async (original) => ({
   ...(await original<typeof import('./api')>()),
@@ -34,7 +34,6 @@ beforeAll(() => initI18n('ar'))
 beforeEach(() => {
   resetEditor()
   vi.clearAllMocks()
-  vi.spyOn(window, 'confirm').mockReturnValue(true)
   useEditor.getState().load(
     boot({
       assets: [
@@ -124,17 +123,17 @@ describe('AssetLibrary — delete', () => {
     deleteAsset.mockResolvedValue({ deleted: 1 })
     mount(<AssetLibrary kind="image" onClose={() => {}} />)
     fireEvent.click(within(document.querySelector('[data-asset-id="1"]') as HTMLElement).getByTitle('حذف الصورة من المكتبة'))
-    expect(window.confirm).toHaveBeenCalled()
+    await answerConfirm(true)
     await waitFor(() => expect(tiles()).toEqual([2, 3]))
     expect(deleteAsset).toHaveBeenCalledWith('invitation', 7, 1, 'image')
     expect(library().map((a) => a.id)).not.toContain(1)
     expect(await screen.findByText('تم حذف الملف من المكتبة.')).toBeInTheDocument()
   })
 
-  it('does nothing when the confirmation is declined', () => {
-    vi.mocked(window.confirm).mockReturnValue(false)
+  it('does nothing when the confirmation is declined', async () => {
     mount(<AssetLibrary kind="image" onClose={() => {}} />)
     fireEvent.click(within(document.querySelector('[data-asset-id="1"]') as HTMLElement).getByTitle('حذف الصورة من المكتبة'))
+    await answerConfirm(false)
     expect(deleteAsset).not.toHaveBeenCalled()
     expect(tiles()).toEqual([1, 2, 3])
   })
@@ -144,6 +143,7 @@ describe('AssetLibrary — delete', () => {
     fetchAssets.mockResolvedValue({ assets: [asset(1, { used: true }), asset(2, { used: true }), asset(3)] })
     mount(<AssetLibrary kind="image" onClose={() => {}} />)
     fireEvent.click(within(document.querySelector('[data-asset-id="1"]') as HTMLElement).getByTitle('حذف الصورة من المكتبة'))
+    await answerConfirm(true)
     expect(await screen.findByRole('alert')).toHaveTextContent('مينفعش تمسح الصورة')
     await waitFor(() => expect(fetchAssets).toHaveBeenCalledWith('invitation', 7))
     await waitFor(() => expect(library().find((a) => a.id === 1)?.used).toBe(true))
@@ -162,6 +162,7 @@ describe('AssetLibrary — delete', () => {
     fireEvent.click(screen.getByLabelText('تحديد a3.png'))
     expect(screen.getByText('تم تحديد 2 صورة')).toBeInTheDocument()
     fireEvent.click(remove)
+    await answerConfirm(true)
 
     await waitFor(() => expect(tiles()).toEqual([2]))
     expect(bulkDelete).toHaveBeenCalledWith('invitation', 7, [1, 3], 'image')
@@ -187,6 +188,7 @@ describe('AssetLibrary — delete', () => {
     mount(<AssetLibrary kind="image" onClose={() => {}} />)
     fireEvent.click(screen.getByLabelText('تحديد a1.png'))
     fireEvent.click(screen.getByRole('button', { name: 'حذف المحدد' }))
+    await answerConfirm(true)
     expect(await screen.findByRole('alert')).toHaveTextContent('بعض الملفات المحددة مستخدمة')
     expect(tiles()).toEqual([1, 2, 3])
     expect(screen.getByText('تم تحديد 1 صورة')).toBeInTheDocument()

@@ -128,7 +128,7 @@ function SlugRow() {
     setFailure('')
     if (value.length < SLUG_MIN) return ui.toast(t('editorSettings.data.slug.tooShort'), 'error')
     if (value === slug) return ui.toast(t('editorSettings.data.slug.same'), 'ok')
-    if (!ui.confirm(t('editorSettings.data.slug.confirm', { slug: value }))) return
+    if (!(await ui.confirm(t('editorSettings.data.slug.confirm', { slug: value })))) return
 
     const previous = slug
     const before = useEditor.getState()

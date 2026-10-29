@@ -37,10 +37,10 @@ export function LayersGroup({ blockId, kind = 'html' }: { blockId: string; kind?
     event.preventDefault()
     pick(slot)
   }
-  const remove = (event: MouseEvent, slot: string) => {
+  const remove = async (event: MouseEvent, slot: string) => {
     event.preventDefault()
     event.stopPropagation()
-    if (ui.confirm(t('editorInline.layers.removeConfirm'))) actions.remove(slot)
+    if (await ui.confirm(t('editorInline.layers.removeConfirm'), { danger: true })) actions.remove(slot)
   }
 
   return (

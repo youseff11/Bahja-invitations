@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 
 import { ApiError } from '@/api/client'
+import { useConfirm } from '@/features/dashboard/ui/ConfirmDialog'
 import { useDeleteGuest, useToggleCheckin } from '../api'
 import { absoluteUrl, passPath, personalPath, qrPngUrl, whatsappGuestUrl } from '../links'
 import { passLabel, rsvpLabel } from '../scanner/useScanFlow'
@@ -23,13 +24,15 @@ export function GuestsTable({ invitationId, slug, guests, passEnabled, editingId
   const { t } = useTranslation()
   const toggle = useToggleCheckin(invitationId)
   const remove = useDeleteGuest(invitationId)
+  const confirm = useConfirm()
 
   function failed(error: unknown) {
     onNotify('error', error instanceof ApiError ? error.message || t('errors.generic') : t('errors.network'))
   }
 
-  function confirmDelete(guest: GuestRow) {
-    if (!window.confirm(t('guests.table.confirmDelete', { name: guest.name }))) return
+  async function confirmDelete(guest: GuestRow) {
+    const message = t('guests.table.confirmDelete', { name: guest.name })
+    if (!(await confirm({ message, danger: true, confirmLabel: t('dashboard.common.delete') }))) return
     remove.mutate(guest.id, {
       onSuccess: () => onNotify('success', t('guests.flash.deleted')),
       onError: failed,

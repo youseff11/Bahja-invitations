@@ -65,6 +65,19 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
           }}
         >
           <div className="dash-dialog" role="alertdialog" aria-modal="true" aria-label={pending.message}>
+            <span className={`dash-dialog-icon${pending.danger ? ' is-danger' : ''}`} aria-hidden="true">
+              {pending.danger ? (
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3" />
+                </svg>
+              ) : (
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="9" />
+                  <path d="M12 8v5M12 16.5v.01" />
+                </svg>
+              )}
+            </span>
+            <h3>{t(pending.danger ? 'dashboard.common.dangerTitle' : 'dashboard.common.confirmTitle')}</h3>
             <p>{pending.message}</p>
             <div className="dash-dialog-actions">
               <button type="button" className="btn btn--ghost btn--sm" onClick={() => settle(false)}>
@@ -73,7 +86,7 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
               <button
                 ref={confirmButton}
                 type="button"
-                className={`btn btn--sm ${pending.danger ? 'btn--ghost btn--danger' : 'btn--gold'}`}
+                className={`btn btn--sm ${pending.danger ? 'btn--danger-solid' : 'btn--gold'}`}
                 onClick={() => settle(true)}
               >
                 {pending.confirmLabel ?? t('dashboard.common.confirm')}

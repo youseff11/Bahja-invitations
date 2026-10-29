@@ -123,6 +123,38 @@ export function Intro({ data, lockSkip = false }: { data: IntroData; lockSkip?: 
     if (!manual) startAuto()
 
     let startManual: (() => void) | null = null
+    // التشغيل التلقائي اترفض ومستنيين لمسة، أو اشتغل صامت والمطلوب صوت
+    let needsTap = false
+    let mutedFallback = false
+    // اللمسة دي تشغّل الفيديو (أو ترجّع صوته) من جوّه مكدس الضغطة؛ true = الضغطة اتصرّفت
+    const resumeOnTouch = (): boolean => {
+      if (!vid) return false
+      if (needsTap) {
+        needsTap = false
+        vid.muted = data.audio !== 'sound'
+        const start = vid.play()
+        if (start && start.catch) {
+          start.catch(() => {
+            vid.muted = true
+            const again = vid.play()
+            if (again && again.catch)
+              again.catch(() => {
+                // مفيش طريقة نشغّله — الضيف مايتحبسش
+                setBlocked(true)
+                unlock()
+              })
+          })
+        }
+        setBlocked(false)
+        return true
+      }
+      if (mutedFallback && locked) {
+        mutedFallback = false
+        vid.muted = false
+        return true
+      }
+      return false
+    }
     if (vid) {
       if (!data.poster) {
         // مفيش صورة غلاف: نلتقط أول فريم من الفيديو ونستخدمه كغلاف
@@ -201,12 +233,22 @@ export function Intro({ data, lockSkip = false }: { data: IntroData; lockSkip?: 
       } else {
         vid.muted = !wantsSound
         if (!selfPlay) {
+          const refused = () => {
+            // المتصفح رفض حتى الصامت (توفير الطاقة في iOS): الغلاف بيفضل ظاهر
+            // ومنستنّى أول لمسة تشغّل الفيديو بدل ما تفتح الدعوة وتتخطّاه
+            setBlocked(true)
+            needsTap = true
+            armFailsafe()
+          }
           const tryPlay = vid.play()
           if (tryPlay && tryPlay.catch) {
-            // iOS في وضع توفير الطاقة بيرفض التشغيل — الغلاف بيفضل ظاهر
             tryPlay.catch(() => {
-              setBlocked(true)
-              unlock()
+              if (vid.muted) return refused()
+              // الموبايل بيرفض التشغيل التلقائي بصوت — نجرّب صامت الأول
+              vid.muted = true
+              mutedFallback = true
+              const again = vid.play()
+              if (again && again.catch) again.catch(refused)
             })
           }
         }
@@ -262,6 +304,7 @@ export function Intro({ data, lockSkip = false }: { data: IntroData; lockSkip?: 
         startManual?.()
         return
       }
+      if (resumeOnTouch()) return
       if (locked) return
       doOpen()
     }

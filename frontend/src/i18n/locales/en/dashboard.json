@@ -5,6 +5,8 @@
     "watch": "Watch",
     "play": "Play “{{name}}”",
     "cancel": "Cancel",
+    "confirmTitle": "Please confirm",
+    "dangerTitle": "Confirm deletion",
     "confirm": "Confirm",
     "delete": "Delete",
     "edit": "Edit",

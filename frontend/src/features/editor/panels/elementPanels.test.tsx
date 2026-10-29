@@ -3,6 +3,7 @@ import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vite
 
 import { initI18n } from '@/i18n'
 
+import { answerConfirm } from '../assets/testkit'
 import { resetEditor, useEditor } from '../store'
 import type { Bootstrap, DocBlock, FieldSpec } from '../types'
 import { EditorUiProvider } from '../ui'
@@ -376,17 +377,16 @@ describe('LayersGroup', () => {
     expect(s().selEl?.slot).toBe('el-5')
   })
 
-  it('the × deletes the layer after a confirm, and a "no" keeps it', () => {
-    const confirm = vi.spyOn(window, 'confirm').mockReturnValue(false)
+  it('the × deletes the layer after a confirm, and a "no" keeps it', async () => {
     const { container } = mount()
     open(container)
     const remove = () => within(container.querySelector('[data-layer-slot="el-3"]') as HTMLElement).getByRole('button', { name: 'حذف الطبقة' })
     fireEvent.click(remove())
-    expect(confirm).toHaveBeenCalledTimes(1)
+    await answerConfirm(false)
     expect(String(current().props.html)).toBe(HTML)
 
-    confirm.mockReturnValue(true)
     fireEvent.click(remove())
+    await answerConfirm(true)
     expect(String(current().props.html)).not.toContain('<img')
     expect(container.querySelector('[data-layer-slot="el-3"]')).toBeNull() // القايمة اتحدّثت
     expect(s().history).toHaveLength(1)

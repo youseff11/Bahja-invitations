@@ -32,7 +32,7 @@ export function FavoritesDialog({ schema, onClose }: { schema: EditorSchema; onC
   }
 
   const remove = async (favorite: FavoriteRow) => {
-    if (!ui.confirm(t('editorAssets.favorites.confirmDelete'))) return
+    if (!(await ui.confirm(t('editorAssets.favorites.confirmDelete'), { danger: true }))) return
     setRemoving(favorite.id)
     try {
       await deleteFavorite(favorite.id)

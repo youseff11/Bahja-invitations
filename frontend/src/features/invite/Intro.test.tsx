@@ -213,6 +213,37 @@ describe('Intro — the guest cannot skip the video', () => {
     expect(root.classList.contains('is-skip-locked')).toBe(false)
   })
 
+  it('when the browser refuses autoplay, a tap starts the video instead of skipping it', async () => {
+    // صامت أصلاً: الرفض الأول نهائي، واللمسة هي المحاولة التانية
+    const play = vi.fn().mockRejectedValueOnce(new Error('NotAllowed')).mockResolvedValue(undefined)
+    HTMLMediaElement.prototype.play = play
+    const { container } = rendered()
+    const root = container.querySelector('.lb-intro')!
+    await act(async () => {
+      await Promise.resolve()
+      await Promise.resolve()
+    })
+    expect(root.classList.contains('is-video-blocked')).toBe(true)
+    expect(root.classList.contains('is-skip-locked')).toBe(true)
+    fireEvent.click(root)
+    expect(root.classList.contains('is-open')).toBe(false)
+    expect(root.classList.contains('is-video-blocked')).toBe(false)
+    expect(play).toHaveBeenCalledTimes(2)
+  })
+
+  it('retries muted when autoplay with sound is refused', async () => {
+    const play = vi.fn().mockRejectedValueOnce(new Error('NotAllowed')).mockResolvedValue(undefined)
+    HTMLMediaElement.prototype.play = play
+    const { container } = renderIntro(intro({ video: '/v.mp4', audio: 'sound' }), true)
+    await act(async () => {
+      await Promise.resolve()
+      await Promise.resolve()
+    })
+    expect(play).toHaveBeenCalledTimes(2)
+    expect(container.querySelector('video')!.muted).toBe(true)
+    expect(container.querySelector('.lb-intro')!.classList.contains('is-video-blocked')).toBe(false)
+  })
+
   it('does not lock the editor preview or a no-video intro', () => {
     const editor = renderIntro(intro({ video: '/v.mp4' }), false)
     fireEvent.click(editor.container.querySelector('.lb-intro')!)

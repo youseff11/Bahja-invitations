@@ -134,6 +134,8 @@
 .ed-btn--icon { padding: 8px; width: 34px; }
 .ed-btn--sm { padding: 5px 10px; font-size: 12px; }
 .ed-btn--danger:hover { border-color: var(--e-danger); color: var(--e-danger); }
+.ed-btn--danger-solid { background: var(--e-danger); border-color: var(--e-danger); color: #fff; font-weight: 600; }
+.ed-btn--danger-solid:hover:not(:disabled) { border-color: var(--e-danger); filter: brightness(1.08); }
 .ed-btn--block { width: 100%; }
 
 .ed-seg { display: flex; background: var(--e-panel-2); border: 1px solid var(--e-line); border-radius: 8px; padding: 2px; }
@@ -419,6 +421,22 @@
 .ed-modal-card > p { margin: 0 0 16px; color: var(--e-muted); font-size: 12.5px; }
 .ed-form-stack { display: flex; flex-direction: column; gap: 12px; }
 .ed-modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; }
+
+/* نافذة التأكيد (بديل window.confirm) — فوق أي نافذة مفتوحة */
+.ed-confirm { z-index: 90; animation: ed-confirm-veil .14s ease-out; }
+.ed-confirm-card { width: min(380px, 100%); text-align: center; padding: 26px 22px 20px; box-shadow: 0 18px 50px rgba(0, 0, 0, .28); animation: ed-confirm-pop .16s ease-out; }
+.ed-confirm-icon {
+  display: inline-grid; place-items: center; width: 48px; height: 48px; margin-bottom: 12px; border-radius: 50%;
+  background: color-mix(in srgb, var(--e-accent) 16%, transparent); color: var(--e-accent);
+}
+.ed-confirm-card.is-danger .ed-confirm-icon { background: color-mix(in srgb, var(--e-danger) 14%, transparent); color: var(--e-danger); }
+.ed-confirm-card h3 { margin: 0 0 6px; font-size: 17px; }
+.ed-confirm-card > p { margin: 0; font-size: 13.5px; line-height: 1.7; white-space: pre-line; color: var(--e-muted); }
+.ed-confirm-actions { display: flex; gap: 10px; margin-top: 22px; }
+.ed-confirm-actions .ed-btn { flex: 1; padding: 10px 14px; }
+@keyframes ed-confirm-veil { from { opacity: 0; } to { opacity: 1; } }
+@keyframes ed-confirm-pop { from { opacity: 0; transform: translateY(6px) scale(.97); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .ed-confirm, .ed-confirm-card { animation: none; } }
 
 /* ---- مكتبة الملفات: الرأس والزراير ثابتين، والقايمة هي اللي بتتمرّر
 

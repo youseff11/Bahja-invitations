@@ -4,6 +4,7 @@ import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vite
 import { initI18n } from '@/i18n'
 
 import '../fields'
+import { answerConfirm } from '../assets/testkit'
 import { resetEditor, useEditor } from '../store'
 import type { Bootstrap, TranslationRows } from '../types'
 import { EditorUiProvider } from '../ui'
@@ -110,14 +111,13 @@ describe('TranslationPanel', () => {
   })
 
   it('clears the whole version only after confirming', async () => {
-    const confirm = vi.spyOn(window, 'confirm')
     mount()
     await screen.findByText('الغلاف')
-    confirm.mockReturnValueOnce(false)
     fireEvent.click(screen.getByRole('button', { name: 'مسح الترجمة' }))
+    await answerConfirm(false)
     expect(useEditor.getState().doc.i18n?.en).toHaveProperty('hero-1.kicker')
-    confirm.mockReturnValueOnce(true)
     fireEvent.click(screen.getByRole('button', { name: 'مسح الترجمة' }))
+    await answerConfirm(true)
     expect(useEditor.getState().doc.i18n?.en).toEqual({})
   })
 
