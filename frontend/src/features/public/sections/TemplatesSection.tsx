@@ -49,6 +49,7 @@ export function HomeTemplateCard({ template }: { template: PublicTemplate }) {
       <div className="tpl-body">
         <h3>{name}</h3>
         <Meta template={template} />
+        <span className="tpl-orn" aria-hidden="true"><i /></span>
         {hasDescription && <p className="tpl-desc">{pick(lang, template.description, template.descriptionEn)}</p>}
         <div className="tpl-actions">
           <Link className="btn btn--gold btn--sm" to={previewPath(template)} target="_blank" rel="noopener">
