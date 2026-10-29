@@ -59,6 +59,7 @@ export function Intro({ data, lockSkip = false }: { data: IntroData; lockSkip?: 
   const [awaiting, setAwaiting] = useState(manual)
   const [blocked, setBlocked] = useState(false)
   const [gone, setGone] = useState(false)
+  const [soundHint, setSoundHint] = useState(false)
   // الضيف مايقدرش يتخطّى فيديو الافتتاحية: لا زرار ولا لمسة بتفتح الدعوة قبل ما الفيديو يخلص
   // (أو العدّاد يخلّص). المحرر مابيقفلش (‎lockSkip‎ = false) عشان المصمّم يعاين براحته.
   const [skipLocked, setSkipLocked] = useState(lockSkip && Boolean(data.video))
@@ -148,13 +149,19 @@ export function Intro({ data, lockSkip = false }: { data: IntroData; lockSkip?: 
         setBlocked(false)
         return true
       }
-      if (mutedFallback && locked) {
-        mutedFallback = false
-        vid.muted = false
-        return true
-      }
       return false
     }
+    // المتصفح ماينفعش يشغّل صوت بدون لمسة من الضيف: الفيديو بيشتغل صامت، وأول
+    // لمسة (أي مكان) بترجّع الصوت وهو شغّال من غير ما يتخطّى حاجة
+    const unmuteOnGesture = () => {
+      if (!mutedFallback || !vid) return
+      mutedFallback = false
+      vid.muted = false
+      setSoundHint(false)
+      gestures.forEach((ev) => document.removeEventListener(ev, unmuteOnGesture, true))
+    }
+    const gestures = ['pointerup', 'touchend', 'click', 'keydown']
+    cleanup.push(() => gestures.forEach((ev) => document.removeEventListener(ev, unmuteOnGesture, true)))
     if (vid) {
       if (!data.poster) {
         // مفيش صورة غلاف: نلتقط أول فريم من الفيديو ونستخدمه كغلاف
@@ -247,6 +254,8 @@ export function Intro({ data, lockSkip = false }: { data: IntroData; lockSkip?: 
               // الموبايل بيرفض التشغيل التلقائي بصوت — نجرّب صامت الأول
               vid.muted = true
               mutedFallback = true
+              setSoundHint(true)
+              gestures.forEach((ev) => document.addEventListener(ev, unmuteOnGesture, true))
               const again = vid.play()
               if (again && again.catch) again.catch(refused)
             })
@@ -330,6 +339,7 @@ export function Intro({ data, lockSkip = false }: { data: IntroData; lockSkip?: 
   if (open) cls.push('is-open')
   if (awaiting) cls.push('is-awaiting-play')
   if (blocked) cls.push('is-video-blocked')
+  if (soundHint) cls.push('is-sound-pending')
   if (skipLocked) cls.push('is-skip-locked')
   const items = data.itemStyles
   // أول ما play() يتنادى المتصفح بيشيل الغلاف قبل ما أول فريم يترسم، فبتظهر

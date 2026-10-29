@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { beforeAll, describe, expect, it, vi } from 'vitest'
 
 import { initI18n } from '@/i18n'
@@ -10,6 +10,7 @@ function Asker({ onAnswer, danger }: { onAnswer: (ok: boolean) => void; danger?:
 }
 
 function setup(danger?: boolean) {
+  cleanup()
   const onAnswer = vi.fn()
   render(
     <EditorUiProvider>

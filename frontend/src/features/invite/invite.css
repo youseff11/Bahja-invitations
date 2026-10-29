@@ -1871,6 +1871,14 @@ a.lb-social:hover { transform: translateY(-2px); opacity: .85; }
 .lb-intro-inner { transition: opacity .45s ease .15s; }
 @media (prefers-reduced-motion: reduce) { .lb-intro-inner { transition: none; } }
 .lb-intro:not(.is-awaiting-play) .lb-intro-play { display: none; }
+/* الفيديو شغّال صامت لحد أول لمسة: أيقونة سماعة صغيرة بتلفت النظر */
+.lb-intro.is-sound-pending::before {
+  content: ''; position: absolute; inset-block-end: 18px; inset-inline-end: 18px; z-index: 4;
+  pointer-events: none; inline-size: 40px; block-size: 40px; border-radius: 50%;
+  background: rgba(20, 18, 16, .5)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23fff'%3E%3Cpath d='M3 9v6h4l5 5V4L7 9H3Zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12Z'/%3E%3C/svg%3E")
+    center / 22px no-repeat;
+}
 /* المتصفح رفض التشغيل التلقائي: علامة تشغيل توضّح إن لمسة هتبدأ الفيديو */
 .lb-intro.is-video-blocked::after {
   content: ''; position: absolute; inset: 0; margin: auto; z-index: 4; pointer-events: none;

@@ -241,7 +241,14 @@ describe('Intro — the guest cannot skip the video', () => {
     })
     expect(play).toHaveBeenCalledTimes(2)
     expect(container.querySelector('video')!.muted).toBe(true)
-    expect(container.querySelector('.lb-intro')!.classList.contains('is-video-blocked')).toBe(false)
+    const root = container.querySelector('.lb-intro')!
+    expect(root.classList.contains('is-video-blocked')).toBe(false)
+    expect(root.classList.contains('is-sound-pending')).toBe(true)
+    // أول لمسة ترجّع الصوت من غير ما تفتح الدعوة
+    fireEvent.click(root)
+    expect(container.querySelector('video')!.muted).toBe(false)
+    expect(root.classList.contains('is-sound-pending')).toBe(false)
+    expect(root.classList.contains('is-open')).toBe(false)
   })
 
   it('does not lock the editor preview or a no-video intro', () => {
