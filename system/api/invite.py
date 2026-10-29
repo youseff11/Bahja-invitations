@@ -70,6 +70,7 @@ def _music(settings_doc: dict) -> dict | None:
     return {
         "url": settings_doc["music_url"],
         "autoplay": bool(settings_doc.get("music_autoplay")),
+        "duringIntro": bool(settings_doc.get("music_during_intro")),
         "loop": bool(settings_doc.get("music_loop")),
         "player": settings_doc.get("music_player") or "floating",
     }

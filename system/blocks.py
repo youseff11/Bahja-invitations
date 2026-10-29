@@ -1362,6 +1362,11 @@ SETTINGS_FIELDS = [
     field("music_url", "رابط الموسيقى", "media", "", media_kind="audio", group="الموسيقى", feature="music"),
     field("music_autoplay", "تشغيل تلقائي", "toggle", True, group="الموسيقى", feature="music",
           help_text="المتصفحات تمنع التشغيل التلقائي أحياناً — سيظهر زر تشغيل"),
+    field("music_during_intro", "تشغيل الموسيقى مع الافتتاحية", "toggle", False,
+          group="الموسيقى", feature="music",
+          help_text="الموسيقى تبدأ مع الشاشة الافتتاحية نفسها مش بعد فتحها. "
+               "شغّال مع «تشغيل تلقائي» بس. لو المتصفح منع الصوت قبل أول "
+               "لمسة، هتبدأ مع أول ضغطة من الضيف."),
     field("music_loop", "تكرار", "toggle", True, group="الموسيقى", feature="music"),
     field("music_player", "شكل المشغّل", "select", "floating", group="الموسيقى",
           feature="music", options=[

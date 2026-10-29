@@ -125,6 +125,20 @@ class BootstrapTests(EditorApiCase):
         for key in ("assets", "fonts", "intros", "music", "categories"):
             self.assertIsInstance(data[key], list, key)
 
+    def test_old_shared_video_survives_newer_image_flood(self):
+        # قالب مستورد بينزّل صور كتير بعد الفيديو: الفيديو لازم يفضل في المكتبة
+        from system.api import editor
+        from system.models import Asset
+        Asset.objects.create(file="assets/2026/01/aaaaaaaaaaaa/v.mp4", kind="video",
+                             original_name="v.mp4")
+        for i in range(editor.ASSET_LIMIT + 5):
+            Asset.objects.create(file=f"assets/2026/01/bbbbbbbbbbbb/{i}.png", kind="image",
+                                 original_name=f"{i}.png")
+        for path in (f"{BASE}/templates/{self.template.pk}/", f"{BASE}/invitations/{self.inv.pk}/"):
+            kinds = [a["kind"] for a in self.client.get(path).json()["assets"]]
+            self.assertIn("video", kinds, path)
+            self.assertEqual(kinds.count("image"), editor.ASSET_LIMIT, path)
+
     def test_empty_invitation_document_falls_back_to_template(self):
         self.assertFalse(self.inv.get_document()["blocks"])
         data = self.client.get(f"{BASE}/invitations/{self.inv.pk}/").json()

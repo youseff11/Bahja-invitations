@@ -122,6 +122,8 @@ export interface HeadCss {
 export interface MusicConfig {
   url: string
   autoplay: boolean
+  /** تبدأ الموسيقى مع الافتتاحية بدل ما تستنى فتحها (مع autoplay بس) */
+  duringIntro?: boolean
   loop: boolean
   player: string
 }

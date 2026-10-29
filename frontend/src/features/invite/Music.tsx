@@ -17,7 +17,8 @@ declare global {
 
 /**
  * مشغّل الموسيقى — نفس ‎initMusic‎. مع شاشة افتتاحية: الأغنية **مابتبدأش** غير
- * لما الضيف يفتح الدعوة (أو يدوس تشغيل على فيديو الافتتاحية الصامت). الزر
+ * لما الضيف يفتح الدعوة (أو يدوس تشغيل على فيديو الافتتاحية الصامت)، إلا لو
+ * فعّل صاحب الدعوة ‎duringIntro‎ فتبدأ مع الافتتاحية نفسها. الزر
  * مستقل عن التمرير التلقائي: الضغطة عليه ماتطلعش للـwindow.
  */
 export function Music({ config }: { config: MusicConfig }) {
@@ -81,7 +82,17 @@ export function Music({ config }: { config: MusicConfig }) {
 
     if (config.autoplay) {
       const pendingIntro = document.querySelector('.lb-intro:not(.is-open)')
-      if (pendingIntro) {
+      if (pendingIntro && config.duringIntro) {
+        // الإعداد مفعّل: الموسيقى تبدأ مع الافتتاحية. لو المتصفح رفض، ضغطة
+        // تشغيل الفيديو الصامت (أول لمسة) بتعيد المحاولة
+        beginAutoplay()
+        introOpenStart = () => {
+          document.removeEventListener('lb:intro-play', introOpenStart!)
+          introOpenStart = null
+          if (audio.paused) play()
+        }
+        document.addEventListener('lb:intro-play', introOpenStart)
+      } else if (pendingIntro) {
         // إشارتين، اللي يوصل الأول بيشغّل: lb:intro-play (ضغطة تشغيل الفيديو
         // الصامت) و lb:intro-open (الافتتاحية خلصت أو اتفتحت)
         introOpenStart = () => {
@@ -121,7 +132,7 @@ export function Music({ config }: { config: MusicConfig }) {
     }
     window.__lbMusic = handle
     return () => handle.destroy()
-  }, [config.url, config.loop, config.autoplay, hidden])
+  }, [config.url, config.loop, config.autoplay, config.duringIntro, hidden])
 
   if (!config.url || hidden) return null
   return (

@@ -143,7 +143,7 @@ export function Header() {
         {t('public.nav.skip')}
       </a>
 
-      <header className={'nav' + (stuck ? ' is-stuck' : '')} id="site-nav">
+      <header className={'nav nav--site' + (stuck ? ' is-stuck' : '')} id="site-nav">
         <div className="nav-shell">
           <Link
             className="brand"

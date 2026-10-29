@@ -81,7 +81,13 @@ def _assets(invitation: Invitation | None) -> list[dict]:
         rows = Asset.objects.filter(invitation__isnull=True)
     # الفيديو المنقول للافتتاحيات بيظهر هناك بس (معرض الافتتاحيات فوق شبكة الفيديو)
     rows = rows.filter(is_intro=False)
-    assets = list(rows.order_by("-id")[:ASSET_LIMIT])
+    # الحد لكل نوع لوحده: القوالب المستوردة بتنزّل مئات الصور، ولو الحد على
+    # الكل الفيديوهات الأقدم (المستوردة) بتطلع برّه آخر ٣٠٠ وماتظهرش في
+    # اختيار فيديو الافتتاحية رغم إنها موجودة في صفحة الفيديوهات.
+    assets = []
+    for kind in ("image", "video", "audio", "other"):
+        assets += rows.filter(kind=kind).order_by("-id")[:ASSET_LIMIT]
+    assets.sort(key=lambda a: -a.pk)
     usage = services._asset_usage_map(assets)  # noqa: SLF001
     return [
         {"id": a.pk, "url": a.url, "thumb": a.thumb_url, "source": a.source_url,

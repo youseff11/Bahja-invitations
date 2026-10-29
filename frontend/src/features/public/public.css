@@ -1635,3 +1635,111 @@ html[dir="rtl"] .art-map-pin { margin: -34px -17px 0 0; }
   .art-rsvp-row i::after { transform: rotate(45deg) scale(1); }
   .art-plane { opacity: 0; }
 }
+
+/* ======== صقل الترويسة العامة ========
+   محصور في ‎.nav--site‎ عشان ترويسة لوحة التحكم (‎.dash-root .nav‎) ما تتأثرش.
+   الارتفاعات والـbreakpoints الأصلية فوق ما اتغيّرتش — ده طبقة شكل بس. */
+.nav--site .nav-shell {
+  border-radius: 20px;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--surface) 90%, transparent),
+    color-mix(in srgb, var(--surface) 74%, transparent)
+  );
+  border-color: color-mix(in srgb, var(--line) 75%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #fff 60%, transparent),
+    0 1px 2px rgba(60, 20, 32, .05),
+    0 14px 30px -22px rgba(60, 20, 32, .35);
+  backdrop-filter: blur(22px) saturate(1.6);
+  -webkit-backdrop-filter: blur(22px) saturate(1.6);
+}
+[data-theme="dark"] .nav--site .nav-shell {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .05),
+    0 14px 34px -22px rgba(0, 0, 0, .9);
+}
+.nav--site.is-stuck .nav-shell {
+  border-color: var(--line);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #fff 60%, transparent),
+    var(--shadow-nav);
+}
+[data-theme="dark"] .nav--site.is-stuck .nav-shell {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .05), var(--shadow-nav);
+}
+
+/* أزرار الأدوات: بلا إطار، خلفية ناعمة، وتتلوّن عند المرور */
+.nav--site .lang-btn,
+.nav--site .icon-btn {
+  border-color: transparent;
+  background: color-mix(in srgb, var(--text) 5%, transparent);
+  color: color-mix(in srgb, var(--text) 70%, transparent);
+}
+.nav--site .lang-btn:hover,
+.nav--site .icon-btn:hover {
+  border-color: transparent;
+  background: var(--accent-soft);
+  color: var(--accent);
+  transform: none;
+}
+.nav--site .lang-btn:focus-visible,
+.nav--site .icon-btn:focus-visible,
+.nav--site .nav-burger:focus-visible { outline-offset: 2px; }
+.nav--site .nav-burger { border-color: transparent; background: color-mix(in srgb, var(--text) 5%, transparent); }
+
+/* زر الطلب: كبسولة بتدرّج خفيف وظل بلون الهوية */
+.nav--site .nav-cta {
+  border-radius: 999px; font-weight: 600; letter-spacing: .01em;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 86%, #fff), var(--accent));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .2),
+    0 8px 18px -10px color-mix(in srgb, var(--accent) 85%, transparent);
+  transition: transform .18s, box-shadow .18s, filter .18s;
+}
+.nav--site .nav-cta:hover {
+  transform: translateY(-1px); filter: brightness(1.06);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .24),
+    0 12px 22px -10px color-mix(in srgb, var(--accent) 90%, transparent);
+}
+.nav--site .nav-cta:active { transform: translateY(0); }
+
+@media (min-width: 781px) {
+  /* الروابط: كبسولة ناعمة عند المرور، والقسم الحالي بنقطة تحته */
+  .nav--site .nav-links { gap: 4px; }
+  .nav--site .nav-links a:not(.btn) {
+    position: relative; font-weight: 500;
+    color: color-mix(in srgb, var(--text) 68%, transparent);
+    border-radius: 999px;
+  }
+  .nav--site .nav-links a:not(.btn):hover {
+    color: var(--text);
+    background: color-mix(in srgb, var(--text) 5%, transparent);
+  }
+  .nav--site .nav-links a:not(.btn).is-active {
+    color: var(--accent); background: var(--accent-soft); font-weight: 600;
+  }
+  .nav--site .nav-links a:not(.btn).is-active::after {
+    content: ""; position: absolute; inset-inline: 0; bottom: 3px; margin-inline: auto;
+    width: 4px; height: 4px; border-radius: 50%; background: var(--accent);
+  }
+  .nav--site .nav-tools { gap: 6px; }
+}
+@media (min-width: 981px) {
+  .nav--site .nav-cta { padding: 10px 22px; font-size: 13.5px; }
+}
+
+/* شاشات واسعة: الروابط في منتصف الشريط بالظبط، اللوجو والأدوات على الطرفين */
+@media (min-width: 1151px) {
+  .nav--site .nav-shell {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    padding-inline: 12px;
+  }
+  .nav--site .brand { justify-self: start; }
+  .nav--site .nav-links { margin-inline: 0; justify-self: center; }
+  .nav--site .nav-tools { margin-inline-start: 0; justify-self: end; gap: 8px; }
+}
+
+/* زر الطلب جوه قايمة الموبايل: قاعدة ‎.nav-links a‎ القديمة كانت بتبهّت نصه */
+.nav--site .nav-links a.btn { color: var(--on-accent); }
