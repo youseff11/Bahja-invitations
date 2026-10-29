@@ -2086,6 +2086,14 @@ a.lb-social:hover { transform: translateY(-2px); opacity: .85; }
   overflow: visible;
   isolation: auto;
 }
+/* Tilda بتضيف ‎t-records__overflow-hidden‎ بعد ما سكربتها يتحمّل. قبلها عناصر
+   الـZero (بالبكسل، لحد ‎744px‎ على موبايل ‎390px‎) بتوسّع الصفحة أفقياً، فمتصفح
+   الموبايل بيكبّر الـlayout viewport والافتتاحية ‎position:fixed‎ بتتعرض مكبّرة
+   ومزاحة لحد ما السكربت يخلص وترجع. القص هنا من أول رسمة. ‎clip‎ مش ‎hidden‎
+   عشان مايبقاش scroll container (الـsticky بتاع Tilda يفضل شغّال). */
+.lb-doc:not(.lb-doc--editing) .lb-stage--runtime {
+  overflow-x: clip;
+}
 .lb-stage--runtime > .lb {
   margin: 0;
   padding-inline: 0;
