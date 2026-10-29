@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from 'react'
+import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
@@ -21,6 +21,9 @@ import { useLabels } from '../ui/labels'
 import { PageHead, Pill, usePageTitle } from '../ui/page'
 import { QueryState } from '../ui/table'
 import { useToast } from '../ui/Toast'
+
+const VISIBILITY_FILTERS = ['all', 'shown', 'hidden'] as const
+type VisibilityFilter = (typeof VISIBILITY_FILTERS)[number]
 
 /** قايمة «الإجراءات» بتاعة كارت القالب — بتتقفل بالضغط بره أو Escape أو اختيار رابط. */
 function TemplateActionMenu({ template }: { template: TemplateRow }) {
@@ -189,6 +192,22 @@ export function TemplatesPage() {
   const importer = useImportTemplate()
   const update = useUpdateTemplate()
   usePageTitle(t('dashboard.templates.pageTitle'))
+  const [visibility, setVisibility] = useState<VisibilityFilter>('all')
+
+  const rows = data?.results
+  const counts = useMemo(
+    () => ({
+      all: rows?.length ?? 0,
+      shown: rows?.filter((row) => row.isActive).length ?? 0,
+      hidden: rows?.filter((row) => !row.isActive).length ?? 0,
+    }),
+    [rows],
+  )
+  const shown = useMemo(
+    () =>
+      (rows ?? []).filter((row) => visibility === 'all' || (visibility === 'shown' ? row.isActive : !row.isActive)),
+    [rows, visibility],
+  )
 
   /** حفظ الاسم أو الوصف أو التصنيف من الكارت — الرفض بيتعرض توست والمحرر بيفضل مفتوح. */
   async function saveText(template: TemplateRow, body: { name?: string; description?: string; category?: string }) {
@@ -279,10 +298,27 @@ export function TemplatesPage() {
         </form>
       </div>
 
+      <div className="toolbar" style={{ alignItems: 'center' }}>
+        <div className="image-filters" role="group" aria-label={t('dashboard.templates.filtersLabel')}>
+          {VISIBILITY_FILTERS.map((value) => (
+            <button
+              key={value}
+              type="button"
+              className={visibility === value ? 'btn btn--sm btn--gold' : 'btn btn--sm btn--ghost'}
+              aria-pressed={visibility === value}
+              onClick={() => setVisibility(value)}
+            >
+              {t(`dashboard.templates.filters.${value}`)}
+              {data && ` (${counts[value]})`}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <QueryState loading={isPending} error={isError} />
       {data && (
         <div className="grid grid--4 grid--gallery">
-          {data.results.map((template) => (
+          {shown.map((template) => (
             <article className="tpl-card" key={template.id}>
               <div
                 className="tpl-cover"
@@ -334,7 +370,11 @@ export function TemplatesPage() {
               </div>
             </article>
           ))}
-          {data.results.length === 0 && <p className="empty">{t('dashboard.templates.none')}</p>}
+          {shown.length === 0 && (
+            <p className="empty">
+              {data.results.length === 0 ? t('dashboard.templates.none') : t('dashboard.templates.noneFiltered')}
+            </p>
+          )}
         </div>
       )}
     </>

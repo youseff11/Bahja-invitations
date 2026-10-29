@@ -50,6 +50,7 @@ describe('dashboard locales', () => {
       ...['invitations', 'published', 'ordersNew', 'customers', 'templates', 'guests', 'attending', 'views'].map((v) => `home.stats.${v}`),
       ...['fonts', 'music', 'intros'].flatMap((kind) => ['confirmDelete', 'deleted', 'shownDone', 'hiddenDone'].map((v) => `${kind}.${v}`)),
       ...['all', 'dups', 'unused', 'used'].map((v) => `images.filters.${v}`),
+      ...['all', 'shown', 'hidden'].map((v) => `templates.filters.${v}`),
       ...['name', 'category', 'collection', 'slug', 'description', 'coverImage', 'coverUrl'].map((v) => `templateNew.fields.${v}`),
       ...['templates.shown', 'templates.hiddenDone', 'plans.addonSaved', 'plans.addonAdded', 'plans.enabled', 'plans.disabled'],
     ]

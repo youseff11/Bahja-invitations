@@ -208,6 +208,13 @@
     "meta": "{{blocks}} sections · used {{uses}} times",
     "empty": "Empty",
     "none": "No templates yet.",
+    "noneFiltered": "No templates match this filter.",
+    "filtersLabel": "Filter templates by visibility",
+    "filters": {
+      "all": "All",
+      "shown": "Visible",
+      "hidden": "Hidden"
+    },
     "actions": "Actions",
     "edit": "Edit template",
     "editData": "Edit data",
