@@ -197,6 +197,32 @@ export interface VideoRow {
   createdAt: string
 }
 
+/** صورة في مكتبة الصور العامة (أصل ‎kind=image‎) — ‎dupGroup‎ فاضي لو مش مكررة. */
+export interface ImageRow {
+  id: number
+  name: string
+  url: string
+  thumbUrl: string
+  width: number
+  height: number
+  sizeBytes: number
+  sizeLabel: string
+  owner: string
+  ownerKind: 'invitation' | 'template' | ''
+  createdAt: string
+  /** مستخدمة في قالب أو دعوة — مابتتمسحش يدوياً. */
+  used: boolean
+  /** بصمة مجموعة الصور المتطابقة بايت ببايت (فاضية لو مفيش نسخة تانية). */
+  dupGroup: string
+  dupCount: number
+}
+
+export interface ImagesResponse {
+  results: ImageRow[]
+  /** عدد النسخ الزيادة المتطابقة — اللي هيمسحها «مسح المكرر». */
+  duplicateExtra: number
+}
+
 export interface PlanRow {
   id: number
   name: string

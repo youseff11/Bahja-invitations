@@ -1576,6 +1576,14 @@ class VideoBlockSourceTests(BaseAppTest):
         ]})
         self.assertEqual(doc["blocks"][0]["props"]["poster"], tiny)
 
+    def test_large_inline_image_is_not_truncated(self):
+        """غلاف فريم الفيديو مئات الكيلوبايت — القص لـ٥٠٠٠ حرف كان بيخرّب الـJPEG."""
+        big = "data:image/jpeg;base64," + "A" * 300_000
+        doc = B.normalize_document({"blocks": [
+            {"type": "video", "id": "v-1", "props": {"url": "/x.mp4", "poster": big}},
+        ]})
+        self.assertEqual(doc["blocks"][0]["props"]["poster"], big)
+
     def test_non_image_data_url_is_dropped(self):
         doc = B.normalize_document({"blocks": [
             {"type": "video", "id": "v-1",

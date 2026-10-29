@@ -1842,3 +1842,146 @@ html[lang='en'] .dash-root .tpl-meta {
     width: 120px;
   }
 }
+
+/* ---------------------------------------------------------- مكتبة الصور */
+.dash-root .image-toolbar input[type="search"] {
+  min-width: 200px;
+  flex: 0 1 260px;
+}
+.dash-root .image-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.dash-root .image-toolbar-spacer {
+  flex: 1 1 0;
+}
+.dash-root .image-selection {
+  position: sticky;
+  top: 100px;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: 0 10px 24px -16px rgba(0, 0, 0, 0.4);
+}
+.dash-root .image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.dash-root .image-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+.dash-root .image-card.is-selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.dash-root .image-card-frame {
+  position: relative;
+}
+.dash-root .image-card-thumb {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  background: repeating-conic-gradient(var(--line) 0% 25%, transparent 0% 50%) 50% / 16px 16px;
+  cursor: zoom-in;
+}
+.dash-root .image-card-thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.dash-root .image-card-check {
+  position: absolute;
+  inset-block-start: 8px;
+  inset-inline-start: 8px;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+.dash-root .image-card-check:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+.dash-root .image-card-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px 12px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.dash-root .image-card-meta {
+  font-size: 12px;
+}
+.dash-root .image-card-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 22px;
+}
+.dash-root .image-card-delete {
+  margin-top: auto;
+}
+.dash-root .image-card-delete:not(:disabled) {
+  color: var(--danger);
+}
+.dash-dialog.image-dialog {
+  width: min(760px, 100%);
+  max-height: calc(100vh - 36px);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+}
+.image-dialog-img {
+  display: block;
+  width: 100%;
+  min-height: 0;
+  max-height: calc(100vh - 150px);
+  object-fit: contain;
+  border-radius: 10px;
+  background: repeating-conic-gradient(rgba(128, 128, 128, 0.18) 0% 25%, transparent 0% 50%) 50% / 16px 16px;
+}
+.image-dialog-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.image-dialog-foot strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 14px;
+}
+@media (max-width: 560px) {
+  .dash-root .image-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .dash-root .image-selection {
+    top: 70px;
+  }
+}

@@ -4,7 +4,7 @@ import type { RouteObject } from 'react-router-dom'
 /**
  * صاحب الملف: B4 (لوحة التحكم).
  * أبناء ‎/dashboard‎ (تحت DashboardLayout): الدعوات، القوالب، الطلبات، الباقات،
- * الخطوط، الموسيقى، الافتتاحيات، الإعدادات، الإحصائيات…
+ * الخطوط، الموسيقى، الصور، الافتتاحيات، الإعدادات، الإحصائيات…
  * صفحات الضيوف والـcheck-in بتاعة B2 في ‎features/guests/routes.tsx‎.
  * الرئيسية (‎/dashboard‎ نفسه) بتتعرض من ‎pages/DashboardPage.tsx‎ اللي بتعيد تصدير ‎HomePage‎.
  * كل صفحة في chunk لوحدها عشان زائر الموقع العام مايحمّلش كود اللوحة.
@@ -18,6 +18,7 @@ const TemplateNewPage = lazy(() => import('./pages/TemplateNewPage').then((m) =>
 const FontsPage = lazy(() => import('./pages/FontsPage').then((m) => ({ default: m.FontsPage })))
 const MusicPage = lazy(() => import('./pages/MusicPage').then((m) => ({ default: m.MusicPage })))
 const VideosPage = lazy(() => import('./pages/VideosPage').then((m) => ({ default: m.VideosPage })))
+const ImagesPage = lazy(() => import('./pages/ImagesPage').then((m) => ({ default: m.ImagesPage })))
 const IntrosPage = lazy(() => import('./pages/IntrosPage').then((m) => ({ default: m.IntrosPage })))
 const OrdersPage = lazy(() => import('./pages/OrdersPage').then((m) => ({ default: m.OrdersPage })))
 const PlansPage = lazy(() => import('./pages/PlansPage').then((m) => ({ default: m.PlansPage })))
@@ -32,6 +33,7 @@ export const dashboardRoutes: RouteObject[] = [
   { path: 'fonts', element: <FontsPage /> },
   { path: 'music', element: <MusicPage /> },
   { path: 'videos', element: <VideosPage /> },
+  { path: 'images', element: <ImagesPage /> },
   { path: 'intros', element: <IntrosPage /> },
   { path: 'orders', element: <OrdersPage /> },
   { path: 'plans', element: <PlansPage /> },

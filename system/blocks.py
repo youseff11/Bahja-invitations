@@ -1615,6 +1615,7 @@ def empty_document() -> dict:
 
 # تمثيل بايثون لـdict بمفتاح واحد — أثر باج قديم في ترس الخط، اتسرّب
 # لخانات النص واتخزّن. مافيش نص حقيقي بيبقى بالشكل ده.
+_MAX_INLINE_IMAGE = 4_000_000
 _PY_REPR_RE = re.compile(r"\{'[A-Za-z_][A-Za-z0-9_]*':\s*'[^']*'\}")
 
 
@@ -1716,10 +1717,13 @@ def _coerce(value: Any, spec: dict) -> Any:
         if re.match(r"^\s*(javascript|vbscript)\s*:", val, re.I):
             return ""
         # data: مسموح للصور المضمّنة بس (المحرر بيولّدها عند القص)
-        if re.match(r"^\s*data\s*:", val, re.I) and not re.match(
-            r"^\s*data:image/(png|jpeg|webp|gif);base64,", val, re.I
-        ):
-            return ""
+        if re.match(r"^\s*data\s*:", val, re.I):
+            if not re.match(r"^\s*data:image/(png|jpeg|webp|gif);base64,", val, re.I):
+                return ""
+            # الصورة المضمّنة (غلاف فيديو الافتتاحية أو ناتج القص) أكبر بكتير من
+            # ٥٠٠٠ حرف — القص كان بيسيب JPEG تالف والغلاف بيظهر فاضي.
+            # الأكبر من الحد يتشال خالص: القص بيسيب صورة تالفة أسوأ من مفيش صورة.
+            return val if len(val) <= _MAX_INLINE_IMAGE else ""
         return val[:5000]
 
     # text / textarea / date / datetime / icon / gradient

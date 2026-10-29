@@ -193,6 +193,15 @@ export function PreviewPane({ onKey }: Props) {
     sendToFrame(frame.current, { type: 'lb-editor:patch', id: lastText.id, key: lastText.key, value: lastText.value })
   }, [lastText, ready])
 
+  // خط/لون/حجم/نص عنصر «فوق القسم» اتغيّر في اللوحة → يظهر على عقدته في نفس اللحظة (نفس قاعدة النص فوق)
+  const lastOverlays = useEditor((s) => s.lastOverlays)
+  useEffect(() => {
+    if (!lastOverlays || !ready) return
+    const { doc, renderedLang } = useEditor.getState()
+    if (renderedLang && renderedLang !== baseLangOf(doc)) return
+    sendToFrame(frame.current, { type: 'lb-editor:overlays', id: lastOverlays.id, items: lastOverlays.items })
+  }, [lastOverlays, ready])
+
   // تعديل من لوحة العنصر → يتطبّق على العقدة الحية لحظياً (الرسمة الجاية من السيرفر بتأكّده)
   const lastEdit = useEditor((s) => s.lastEdit)
   useEffect(() => {

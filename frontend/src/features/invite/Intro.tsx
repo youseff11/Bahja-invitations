@@ -200,6 +200,20 @@ export function Intro({ data, lockSkip = false }: { data: IntroData; lockSkip?: 
         }
       }
 
+      if (manual && data.poster) {
+        // الفيديو المستني ضغطة بيعرض الغلاف بس؛ لو الغلاف تالف أو مابيتحمّلش بيظهر فاضي.
+        // الـseek الصغير بيخلّي المتصفح يرسم أول فريم تحته.
+        const paintFirstFrame = () => {
+          try {
+            if (vid.currentTime === 0) vid.currentTime = 0.01
+          } catch {
+            /* مش حرج */
+          }
+        }
+        if (vid.readyState >= 1) paintFirstFrame()
+        else vid.addEventListener('loadedmetadata', paintFirstFrame, { once: true })
+      }
+
       const wantsSound = data.audio === 'sound'
       if (manual && playBtn.current) {
         let announced = false

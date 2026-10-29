@@ -39,12 +39,12 @@ beforeAll(() => {
 })
 
 describe('DashboardHeader library dropdown', () => {
-  it('groups fonts, music, videos and intros under one button that starts closed', () => {
+  it('groups fonts, music, images, videos and intros under one button that starts closed', () => {
     const { button } = setup()
     expect(button).toHaveAttribute('aria-expanded', 'false')
     expect(button.closest('.nav-group')).not.toHaveClass('is-open')
     // الروابط التلاتة جوّه القايمة المنسدلة مش في صف الشريط الأساسي
-    for (const name of ['الخطوط', 'الموسيقى', 'الفيديوهات', 'الافتتاحيات']) {
+    for (const name of ['الخطوط', 'الموسيقى', 'الصور', 'الفيديوهات', 'الافتتاحيات']) {
       expect(screen.getByRole('link', { name }).closest('.nav-sub')).not.toBeNull()
     }
     expect(screen.getByRole('link', { name: 'الدعوات' }).closest('.nav-sub')).toBeNull()

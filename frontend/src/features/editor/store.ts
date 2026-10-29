@@ -79,6 +79,8 @@ interface Data {
   renderedLang: string
   /** آخر نص اتكتب في خانة باللوحة: المعاينة بتحطه لحظياً قبل رد السيرفر */
   lastText: { seq: number; id: string; key: string; value: string } | null
+  /** آخر تعديل في عناصر «فوق القسم»: المعاينة بتطبّق الستايل والنص على عقدها لحظياً قبل رد السيرفر */
+  lastOverlays: { seq: number; id: string; items: unknown[] } | null
 
   history: EditorDocument[]
   future: EditorDocument[]
@@ -199,6 +201,7 @@ const initial = (): Data => ({
   previewLang: '',
   renderedLang: '',
   lastText: null,
+  lastOverlays: null,
   history: [],
   future: [],
   coalesce: null,
@@ -500,6 +503,8 @@ export const useEditor = create<EditorState>()((set, get) => ({
   setProp: (id, key, value) => {
     get().commit((d) => ops.setBlockProp(d, id, key, value), { coalesce: `prop:${id}:${key}` })
     if (typeof value === 'string') set((s) => ({ lastText: { seq: (s.lastText?.seq ?? 0) + 1, id, key, value } }))
+    else if (key === 'text_overlays' && Array.isArray(value))
+      set((s) => ({ lastOverlays: { seq: (s.lastOverlays?.seq ?? 0) + 1, id, items: value } }))
   },
   setProps: (id, patch, coalesce) =>
     get().commit((d) => ops.setBlockProps(d, id, patch), coalesce ? { coalesce } : undefined),

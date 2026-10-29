@@ -18,11 +18,13 @@ interface FrameProps {
 
 /** عناصر «فوق القسم» و«كود متقدّم»: بيتحقنوا آخر حاجة في القسم (زي ‎render_document‎). */
 export function Tail({ block }: { block: BlockData }) {
-  // كل واحد في ‎Raw‎ لوحده: تغيير عنصر فوق القسم (إضافة/سحب) ماينفعش يعيد بناء صندوق الكود وسكربته (وإلا الأنيميشن بتبدأ من الأول)
+  // كل واحد في ‎Raw‎ لوحده: تغيير عنصر فوق القسم (إضافة/سحب) ماينفعش يعيد بناء صندوق الكود وسكربته (وإلا الأنيميشن بتبدأ من الأول).
+  // المحرر (‎demo‎) بيطبّق الفرق في مكانه: تعديل خط/نص/ستايل ماينقلبش إعادة رسم من الأول
+  const { demo } = useInvite()
   return (
     <>
-      <Raw html={block.overlays} />
-      <Raw html={block.code} />
+      <Raw html={block.overlays} morph={demo} />
+      <Raw html={block.code} morph={demo} />
     </>
   )
 }

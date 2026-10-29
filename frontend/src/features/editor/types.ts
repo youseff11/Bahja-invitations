@@ -266,6 +266,7 @@ export type ToFrame =
   | { type: 'lb-editor:render'; payload: unknown; selected: string | null; force?: boolean }
   /** نص اتكتب في خانة باللوحة: يتحط في المعاينة لحظياً قبل ما رد السيرفر يوصل */
   | { type: 'lb-editor:patch'; id: string; key: string; value: string }
+  | { type: 'lb-editor:overlays'; id: string; items: unknown[] }
   /** العنصر المحدَّد جوّه قسم مستورد (للعلامة ‎.lb-el-picked‎) */
   | { type: 'lb-editor:element'; id: string | null; slot: string | null }
   /** العنصر فوق القسم المحدَّد (للعلامة ‎.lb-ovl-picked‎) */

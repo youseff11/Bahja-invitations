@@ -17,6 +17,7 @@ from django.urls import path, reverse
 
 from ..models import Customer, Guest, Invitation, Order, RSVPResponse, Template
 from . import (
+    dashboard_images,
     dashboard_invitations,
     dashboard_library,
     dashboard_music_dedupe,
@@ -157,5 +158,6 @@ urlpatterns += dashboard_invitations.urlpatterns
 urlpatterns += dashboard_templates.urlpatterns
 urlpatterns += dashboard_library.urlpatterns
 urlpatterns += dashboard_videos.urlpatterns
+urlpatterns += dashboard_images.urlpatterns
 urlpatterns += dashboard_music_dedupe.urlpatterns
 urlpatterns += dashboard_plans.urlpatterns

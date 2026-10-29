@@ -15,6 +15,7 @@ import { installIntroClicks } from './introClicks'
 import { clearBounds, showBounds, type Bounds } from './sectionBounds'
 import { clearDragVars, editingNode, installInteractions, markEditable, patchText } from './interactions'
 import { installNoHover, stripHover } from './noHover'
+import { patchOverlays } from './overlayStyle'
 import { installReveal, keepRevealed } from './reveal'
 import { restartTemplateRuntime, stopTemplateRuntime } from './templateRuntime'
 
@@ -126,6 +127,8 @@ export function FrameApp() {
         patchNode(message.id, message.slot, message.edit)
       } else if (message.type === 'lb-editor:patch') {
         patchText(message.id, message.key, message.value)
+      } else if (message.type === 'lb-editor:overlays') {
+        patchOverlays(message.id, message.items)
       } else if (message.type === 'lb-editor:intro') {
         setIntroClosedAt(null)
         setIntroRun((n) => n + 1)

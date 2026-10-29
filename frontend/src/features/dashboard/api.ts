@@ -7,6 +7,8 @@ import type {
   AnalyticsResponse,
   ClipRow,
   FontRow,
+  ImageRow,
+  ImagesResponse,
   InvitationCreateBody,
   InvitationFilters,
   InvitationOptions,
@@ -37,6 +39,7 @@ export const dashKeys = {
   templates: [...ROOT, 'templates'] as const,
   library: (kind: LibraryKind) => [...ROOT, 'library', kind] as const,
   videos: [...ROOT, 'videos'] as const,
+  images: [...ROOT, 'images'] as const,
   plans: [...ROOT, 'plans'] as const,
   site: [...ROOT, 'site'] as const,
 }
@@ -77,6 +80,7 @@ export const dashQueries = {
   site: () => queryOptions({ queryKey: dashKeys.site, queryFn: () => api<SiteResponse>('/dashboard/site/') }),
   videos: () =>
     queryOptions({ queryKey: dashKeys.videos, queryFn: () => api<{ results: VideoRow[] }>('/dashboard/videos/') }),
+  images: () => queryOptions({ queryKey: dashKeys.images, queryFn: () => api<ImagesResponse>('/dashboard/images/') }),
   library: <K extends LibraryKind>(kind: K) =>
     queryOptions({
       queryKey: dashKeys.library(kind),
@@ -241,6 +245,25 @@ export function useVideos() {
     api<ClipRow>(`/dashboard/videos/${id}/to-intro/`, { method: 'POST' }),
   )
   return { list, create, rename, toIntro }
+}
+
+/** مكتبة الصور العامة: القايمة والرفع وتسمية وحذف (واحدة أو مجموعة) ومسح المتطابق. */
+export function useImages() {
+  const list = useQuery(dashQueries.images())
+  const create = useInvalidatingMutation((body: FormData) => api<ImageRow>('/dashboard/images/', { method: 'POST', body }))
+  const rename = useInvalidatingMutation(({ id, name }: { id: number; name: string }) =>
+    api<ImageRow>(`/dashboard/images/${id}/`, { method: 'PATCH', body: { name } }),
+  )
+  const remove = useInvalidatingMutation((id: number) =>
+    api<{ deleted: number }>(`/dashboard/images/${id}/`, { method: 'DELETE' }),
+  )
+  const removeMany = useInvalidatingMutation((ids: number[]) =>
+    api<{ deleted: number[] }>('/dashboard/images/bulk-delete/', { method: 'POST', body: { ids } }),
+  )
+  const dedupe = useInvalidatingMutation((dryRun: boolean) =>
+    api<DedupeResult>('/dashboard/images/dedupe/', { method: 'POST', body: { dryRun } }),
+  )
+  return { list, create, rename, remove, removeMany, dedupe }
 }
 
 /** مسح المقطوعات المكررة: ‎dryRun=true‎ بيرجّع الخطة من غير تغيير، وبعده التنفيذ الفعلي. */
