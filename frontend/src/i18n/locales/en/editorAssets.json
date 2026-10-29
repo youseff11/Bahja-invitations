@@ -90,6 +90,8 @@
     "hint": "Pick a saved item to add it to the current document. A new editable copy is created.",
     "loading": "Loading favorites…",
     "empty": "The favorites library is empty. Select a section and press “Save as favorite”.",
+    "previewTitle": "Favorite section preview",
+    "previewFailed": "Preview unavailable",
     "use": "Use",
     "delete": "Delete",
     "added": "A copy of the favorite was added.",

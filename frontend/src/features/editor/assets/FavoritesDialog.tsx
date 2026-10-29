@@ -7,6 +7,7 @@ import { useEditorUi } from '../ui'
 import { createFavorite, deleteFavorite, fetchFavorites } from './api'
 import { addFavoriteToDocument } from './favorites'
 import { errorText } from './errors'
+import { FavoritePreview } from './FavoritePreview'
 import { Modal } from './Modal'
 
 const KEY = ['editor', 'favorites']
@@ -63,6 +64,7 @@ export function FavoritesDialog({ schema, onClose }: { schema: EditorSchema; onC
         {query.isSuccess && rows.length === 0 && <p className="ed-empty">{t('editorAssets.favorites.empty')}</p>}
         {rows.map((favorite) => (
           <div className="ed-favorite-row" key={favorite.id}>
+            <FavoritePreview block={schema.blocks[favorite.blockType] ? favorite.block : null} />
             <div className="ed-favorite-info">
               <strong>{favorite.name}</strong>
               <small className="ed-hint">{schema.blocks[favorite.blockType]?.label ?? favorite.blockType}</small>
