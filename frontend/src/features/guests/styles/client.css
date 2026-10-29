@@ -176,6 +176,44 @@
   .client-followup-stat { min-height: 108px; padding: 13px; }
   .client-followup-section-head { padding: 16px; }
   .client-followup-table { min-width: 650px; }
+
+  /* الجداول بتتحوّل لكروت: كل صف كارت وكل خلية سطر "عنوان: قيمة" */
+  .client-followup-table-wrap { overflow-x: visible; }
+  .client-followup-table--stack { min-width: 0; }
+  .client-followup-table--stack thead {
+    position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);
+  }
+  .client-followup-table--stack,
+  .client-followup-table--stack tbody { display: block; }
+  .client-followup-table--stack tbody { padding: 12px; }
+  .client-followup-table--stack tr {
+    display: block; margin-bottom: 10px; padding: 6px 14px;
+    border: 1px solid var(--line); border-radius: 14px; background: var(--surface-2);
+  }
+  .client-followup-table--stack tbody tr:last-child { margin-bottom: 0; }
+  .client-followup-table--stack tbody tr:hover { background: var(--surface-2); }
+  .client-followup-table--stack td {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 14px;
+    padding: 9px 0; min-width: 0; white-space: normal; overflow-wrap: anywhere;
+    border-bottom: 1px dashed var(--line);
+  }
+  .client-followup-table--stack tbody tr:last-child td { border-bottom: 1px dashed var(--line); }
+  .client-followup-table--stack td:last-child,
+  .client-followup-table--stack tbody tr:last-child td:last-child { border-bottom: 0; }
+  .client-followup-table--stack td[data-label]::before {
+    content: attr(data-label); flex: none; color: var(--muted); font-size: 12px;
+  }
+  .client-followup-table--stack td:first-child { min-width: 0; }
+  .client-followup-table--stack td.client-followup-cell-name {
+    font-size: 15px; justify-content: flex-start;
+  }
+  .client-followup-table--stack td.client-followup-cell-name::before { display: none; }
+  .client-followup-table--stack .client-followup-message,
+  .client-followup-table--stack .client-followup-answers { max-width: none; text-align: end; }
+  .client-followup-table--stack .client-followup-cell-date { direction: ltr; }
+  .client-followup-table--stack td.client-followup-actions { justify-content: flex-end; }
+  .client-followup-table--stack td.client-followup-empty { display: block; text-align: center; }
+  .client-followup-table--stack tr:has(> .client-followup-empty) { border: 0; background: none; }
 }
 
 .client-followup-qr { background: #fff; padding: 4px; border-radius: 6px; object-fit: contain; }

@@ -161,7 +161,7 @@ export function ClientFollowupPage() {
               <span className="client-followup-count">{t('guests.client.repliesCount', { n: stats.rsvpTotal })}</span>
             </div>
             <div className="client-followup-table-wrap">
-              <table className="client-followup-table">
+              <table className="client-followup-table client-followup-table--stack">
                 <thead>
                   <tr>
                     <th>{t('guests.rsvp.name')}</th>
@@ -175,18 +175,18 @@ export function ClientFollowupPage() {
                 <tbody>
                   {rsvpRows.map((row) => (
                     <tr key={row.id}>
-                      <td>
+                      <td data-label={t('guests.rsvp.name')} className="client-followup-cell-name">
                         <strong>{row.name}</strong>
                       </td>
-                      <td>
+                      <td data-label={t('guests.rsvp.status')}>
                         <span className={`client-followup-pill client-followup-pill--${row.status}`}>
                           {rsvpLabel(t, row.status)}
                         </span>
                       </td>
-                      <td>{row.companions}</td>
-                      <td className="client-followup-message">{row.message || '—'}</td>
+                      <td data-label={t('guests.client.companions')}>{row.companions}</td>
+                      <td className="client-followup-message" data-label={t('guests.client.comment')}>{row.message || '—'}</td>
                       {hasAnswers && (
-                        <td className="client-followup-answers">
+                        <td className="client-followup-answers" data-label={t('guests.client.answers')}>
                           {row.answers.length
                             ? row.answers.map((answer, index) => (
                                 <span className="client-followup-answer" key={index}>
@@ -197,7 +197,7 @@ export function ClientFollowupPage() {
                             : '—'}
                         </td>
                       )}
-                      <td>{row.createdAt}</td>
+                      <td data-label={t('guests.rsvp.date')} className="client-followup-cell-date">{row.createdAt}</td>
                     </tr>
                   ))}
                   {rsvpRows.length === 0 && (
@@ -223,7 +223,7 @@ export function ClientFollowupPage() {
               <span className="client-followup-count">{t('guests.client.guestsCount', { n: stats.guests })}</span>
             </div>
             <div className="client-followup-table-wrap">
-              <table className="client-followup-table">
+              <table className="client-followup-table client-followup-table--stack">
                 <thead>
                   <tr>
                     <th>{t('guests.rsvp.name')}</th>
@@ -236,16 +236,16 @@ export function ClientFollowupPage() {
                 <tbody>
                   {qrRows.map((row) => (
                     <tr key={row.id}>
-                      <td>
+                      <td data-label={t('guests.rsvp.name')} className="client-followup-cell-name">
                         <strong>{row.name}</strong>
                       </td>
-                      <td>
+                      <td data-label={t('guests.client.passCode')}>
                         <b className="client-followup-code">{row.passCode}</b>
                       </td>
-                      <td>
+                      <td data-label={t('guests.client.entries')}>
                         {row.entriesUsed} / {row.entriesAllowed}
                       </td>
-                      <td>
+                      <td data-label={t('guests.client.symbol')}>
                         <img className="client-followup-qr" src={qrSvgUrl(invitation.slug, row.token)} alt={`QR ${row.name}`} />
                       </td>
                       <td className="client-followup-actions">
