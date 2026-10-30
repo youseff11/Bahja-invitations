@@ -43,3 +43,13 @@
 /* رفع الخط جنب القايمة */
 .ed-font-tools--compact { margin-top: 6px; }
 .ed-font-tools--compact .ed-btn { width: auto; }
+
+/* ---- مكتبة المفضلة: اختيار التصنيف قبل عرض العناصر */
+.ed-favorite-cats { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.ed-favorite-cat {
+  display: grid; gap: 2px; padding: 14px 12px; text-align: start; font: inherit; color: inherit; cursor: pointer;
+  border: 1px solid var(--e-line); border-radius: 10px; background: var(--e-panel-2);
+}
+.ed-favorite-cat:hover, .ed-favorite-cat:focus-visible { border-color: var(--e-accent); outline: none; }
+.ed-favorite-cat strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ed-favorite-crumb { display: flex; align-items: center; gap: 10px; }

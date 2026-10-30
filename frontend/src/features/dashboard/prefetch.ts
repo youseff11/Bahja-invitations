@@ -33,6 +33,7 @@ const TARGETS: Record<string, Target> = {
   '/dashboard/music': library('music', () => import('./pages/MusicPage')),
   '/dashboard/videos': { chunk: () => import('./pages/VideosPage'), data: (c) => c.prefetchQuery(dashQueries.videos()) },
   '/dashboard/images': { chunk: () => import('./pages/ImagesPage'), data: (c) => c.prefetchQuery(dashQueries.images()) },
+  '/dashboard/favorites': { chunk: () => import('./pages/FavoritesPage') },
   '/dashboard/intros': library('intros', () => import('./pages/IntrosPage')),
   '/dashboard/data': { chunk: () => import('../dataadmin/DataHomePage'), data: (c) => c.prefetchQuery(catalogQuery()) },
 }

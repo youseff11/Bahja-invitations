@@ -175,7 +175,15 @@ export interface FavoriteRow {
   id: number
   name: string
   blockType: string
+  /** ‎null‎ = بدون تصنيف */
+  categoryId: number | null
   block: DocBlock
+}
+
+/** تصنيف في مكتبة المفضلة (بيعمله المستخدم، مثلاً «برنامج اليوم»). */
+export interface FavoriteCategory {
+  id: number
+  name: string
 }
 
 export interface IntroRow {

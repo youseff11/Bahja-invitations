@@ -17,7 +17,7 @@ from PIL import Image
 
 from system.data import golden_classic
 from system.forms import CustomFontForm
-from system.models import Asset, Customer, CustomFont, FavoriteBlock, Invitation, Plan, Template
+from system.models import Asset, Customer, CustomFont, FavoriteBlock, FavoriteCategory, Invitation, Plan, Template
 
 BASE = "/api/v1/editor"
 
@@ -104,7 +104,7 @@ class AssetsApiCase(TestCase):
         owner.save()
 
 
-def _endpoints(inv, tpl, fav):
+def _endpoints(inv, tpl, fav, cat):
     inv_base = f"{BASE}/invitations/{inv}/assets/"
     tpl_base = f"{BASE}/templates/{tpl}/assets/"
     return [
@@ -113,7 +113,10 @@ def _endpoints(inv, tpl, fav):
         ("GET", tpl_base), ("POST", tpl_base + "upload/"), ("POST", tpl_base + "crop/"),
         ("POST", tpl_base + "delete/"), ("POST", tpl_base + "bulk-delete/"),
         ("GET", f"{BASE}/favorites/"), ("POST", f"{BASE}/favorites/"),
-        ("DELETE", f"{BASE}/favorites/{fav}/"), ("POST", f"{BASE}/fonts/"),
+        ("PATCH", f"{BASE}/favorites/{fav}/"), ("DELETE", f"{BASE}/favorites/{fav}/"),
+        ("POST", f"{BASE}/favorites/preview/"), ("POST", f"{BASE}/favorite-categories/"),
+        ("PATCH", f"{BASE}/favorite-categories/{cat}/"), ("DELETE", f"{BASE}/favorite-categories/{cat}/"),
+        ("POST", f"{BASE}/fonts/"),
     ]
 
 
@@ -124,11 +127,14 @@ class GuardTests(AssetsApiCase):
             return self.client.get(path)
         if method == "DELETE":
             return self.client.delete(path, **self.csrf())
+        if method == "PATCH":
+            return self.client.patch(path, data="{}", content_type="application/json", **self.csrf())
         return self.post(path, {})
 
     def endpoints(self):
         fav = FavoriteBlock.objects.create(name="x", block_type="hero", block_data={})
-        return _endpoints(self.inv.pk, self.template.pk, fav.pk)
+        cat = FavoriteCategory.objects.create(name="تصنيف")
+        return _endpoints(self.inv.pk, self.template.pk, fav.pk, cat.pk)
 
     def test_anonymous_gets_401(self):
         endpoints = self.endpoints()
@@ -477,6 +483,98 @@ class FavoritesTests(AssetsApiCase):
 
     def test_delete_unknown_is_404(self):
         self.assertError(self.client.delete(f"{self.url}999999/", **self.csrf()), 404, "not_found")
+
+    def patch(self, path, data):
+        return self.client.patch(path, data=json.dumps(data), content_type="application/json",
+                                 **self.csrf())
+
+    def test_list_carries_categories_and_category_id(self):
+        category = FavoriteCategory.objects.create(name="برنامج اليوم")
+        self.post(self.url, {"name": "أ", "block": self.block(), "categoryId": category.pk})
+        self.post(self.url, {"name": "ب", "block": self.block()})
+        data = self.client.get(self.url).json()
+        self.assertEqual(data["categories"], [{"id": category.pk, "name": "برنامج اليوم"}])
+        self.assertEqual({f["name"]: f["categoryId"] for f in data["favorites"]},
+                         {"أ": category.pk, "ب": None})
+
+    def test_create_with_unknown_category_is_rejected(self):
+        response = self.post(self.url, {"name": "x", "block": self.block(), "categoryId": 999999})
+        self.assertError(response, 400, "validation_error")
+        self.assertIn("categoryId", response.json()["error"]["fields"])
+
+    def test_patch_renames_and_moves_between_categories(self):
+        category = FavoriteCategory.objects.create(name="العد التنازلي")
+        favorite = self.post(self.url, {"name": "قديم", "block": self.block()}).json()["favorite"]
+        url = f"{self.url}{favorite['id']}/"
+
+        response = self.patch(url, {"name": "  جديد  "})
+        self.assertEqual(response.status_code, 200, response.content[:300])
+        self.assertEqual(response.json()["favorite"]["name"], "جديد")
+        self.assertIsNone(response.json()["favorite"]["categoryId"])
+
+        response = self.patch(url, {"categoryId": category.pk})
+        self.assertEqual(response.json()["favorite"]["categoryId"], category.pk)
+        self.assertEqual(response.json()["favorite"]["name"], "جديد")  # ما اتغيّرش
+
+        response = self.patch(url, {"categoryId": None})
+        self.assertIsNone(response.json()["favorite"]["categoryId"])
+
+    def test_patch_validates(self):
+        favorite = self.post(self.url, {"name": "x", "block": self.block()}).json()["favorite"]
+        url = f"{self.url}{favorite['id']}/"
+        self.assertError(self.patch(url, {"name": "  "}), 400, "validation_error")
+        self.assertError(self.patch(url, {"categoryId": 999999}), 400, "validation_error")
+        self.assertError(self.patch(f"{self.url}999999/", {"name": "x"}), 404, "not_found")
+
+    def test_preview_renders_a_single_block_without_a_document(self):
+        response = self.post(f"{self.url}preview/", {"block": self.block(), "lang": "ar"})
+        self.assertEqual(response.status_code, 200, response.content[:300])
+        self.assertTrue(response.json()["editable"])
+        response = self.post(f"{self.url}preview/", {"block": {"type": "no-such-block"}})
+        self.assertError(response, 400, "validation_error")
+
+
+class FavoriteCategoryTests(AssetsApiCase):
+    url = f"{BASE}/favorite-categories/"
+
+    def patch(self, path, data):
+        return self.client.patch(path, data=json.dumps(data), content_type="application/json",
+                                 **self.csrf())
+
+    def test_create_rename_and_delete_keeps_the_favorites(self):
+        response = self.post(self.url, {"name": "  برنامج   اليوم "})
+        self.assertEqual(response.status_code, 201, response.content[:300])
+        category = response.json()["category"]
+        self.assertEqual(category["name"], "برنامج اليوم")
+
+        favorite = FavoriteBlock.objects.create(
+            name="ف", block_type="hero", block_data={}, category_id=category["id"])
+
+        response = self.patch(f"{self.url}{category['id']}/", {"name": "العد التنازلي"})
+        self.assertEqual(response.json()["category"]["name"], "العد التنازلي")
+
+        response = self.client.delete(f"{self.url}{category['id']}/", **self.csrf())
+        self.assertEqual(response.json(), {"deleted": category["id"]})
+        favorite.refresh_from_db()
+        self.assertIsNone(favorite.category_id)
+
+    def test_get_lists_categories_in_creation_order(self):
+        self.post(self.url, {"name": "ب"})
+        self.post(self.url, {"name": "أ"})
+        self.assertEqual([c["name"] for c in self.client.get(self.url).json()["categories"]],
+                         ["ب", "أ"])
+
+    def test_name_is_required_and_unique(self):
+        self.assertError(self.post(self.url, {"name": "  "}), 400, "validation_error")
+        self.post(self.url, {"name": "العد التنازلي"})
+        response = self.post(self.url, {"name": "العد التنازلي"})
+        self.assertError(response, 400, "validation_error")
+        self.assertIn("name", response.json()["error"]["fields"])
+        other = FavoriteCategory.objects.create(name="آخر")
+        self.assertError(self.patch(f"{self.url}{other.pk}/", {"name": "العد التنازلي"}),
+                         400, "validation_error")
+        # إعادة حفظ نفس الاسم لنفس التصنيف مسموحة
+        self.assertEqual(self.patch(f"{self.url}{other.pk}/", {"name": "آخر"}).status_code, 200)
 
 
 # ---------------------------------------------------------------- الخطوط

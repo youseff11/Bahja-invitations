@@ -5,12 +5,23 @@ import { fetchPreview } from '../api'
 import { parseMessage, sendToFrame } from '../frame/bridge'
 import { useEditor } from '../store'
 import type { DocBlock, FromFrame, PreviewPayload } from '../types'
+import { fetchFavoritePreview } from './api'
 
 /**
  * معاينة صغيرة للقسم المفضّل: نفس إطار المعاينة (‎/editor-frame/‎) بس بقسم واحد، بثيم المستند الحالي،
  * ومصغّر. الحمولة بتتجاب من السيرفر لما الصف يظهر على الشاشة بس (القايمة ممكن تكون طويلة).
+ *
+ * ‎standalone‎ (صفحة المكتبة في اللوحة): مفيش مستند مفتوح، فالقسم بيتعرض لوحده بالثيم الافتراضي.
  */
-export function FavoritePreview({ block }: { block: DocBlock | null }) {
+export function FavoritePreview({
+  block,
+  standalone = false,
+  className = 'ed-favorite-preview',
+}: {
+  block: DocBlock | null
+  standalone?: boolean
+  className?: string
+}) {
   const { t } = useTranslation()
   const box = useRef<HTMLDivElement>(null)
   const frame = useRef<HTMLIFrameElement>(null)
@@ -32,13 +43,18 @@ export function FavoritePreview({ block }: { block: DocBlock | null }) {
   useEffect(() => {
     if (!visible || !block) return
     const controller = new AbortController()
-    const { mode, id, doc, fields, previewLang } = useEditor.getState()
-    const single = { ...doc, blocks: [JSON.parse(JSON.stringify(block)) as DocBlock] }
-    fetchPreview(mode, id, single, previewLang, controller.signal, fields)
+    const request = standalone
+      ? fetchFavoritePreview(block, '', controller.signal)
+      : (() => {
+          const { mode, id, doc, fields, previewLang } = useEditor.getState()
+          const single = { ...doc, blocks: [JSON.parse(JSON.stringify(block)) as DocBlock] }
+          return fetchPreview(mode, id, single, previewLang, controller.signal, fields)
+        })()
+    request
       .then((next) => setPayload({ ...next, intro: null, showBranding: false }))
       .catch(() => !controller.signal.aborted && setFailed(true))
     return () => controller.abort()
-  }, [visible, block])
+  }, [visible, block, standalone])
 
   useEffect(() => {
     const onMessage = (event: MessageEvent) => {
@@ -55,7 +71,7 @@ export function FavoritePreview({ block }: { block: DocBlock | null }) {
 
   const shown = ready && payload !== null
   return (
-    <div className="ed-favorite-preview" ref={box} data-state={failed ? 'failed' : shown ? 'ready' : 'loading'} aria-hidden="true">
+    <div className={className} ref={box} data-state={failed ? 'failed' : shown ? 'ready' : 'loading'} aria-hidden="true">
       {visible && block && <iframe ref={frame} src="/editor-frame/" title={t('editorAssets.favorites.previewTitle')} tabIndex={-1} scrolling="no" />}
       {failed && <span>{t('editorAssets.favorites.previewFailed')}</span>}
     </div>

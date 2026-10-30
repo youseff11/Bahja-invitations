@@ -1,6 +1,6 @@
 import { api, ApiError, getCookie } from '@/api/client'
 
-import type { AssetKind, AssetRow, DocBlock, EditorMode, FavoriteRow, FontRow } from '../types'
+import type { AssetKind, AssetRow, DocBlock, EditorMode, FavoriteCategory, FavoriteRow, FontRow, PreviewPayload } from '../types'
 
 /** ‎/api/v1/editor/…‎ — ‎system/api/editor_assets.py‎ */
 const library = (mode: EditorMode, id: number) => `/editor/${mode === 'invitation' ? 'invitations' : 'templates'}/${id}/assets`
@@ -27,12 +27,37 @@ export const bulkDeleteAssets = (mode: EditorMode, id: number, assets: number[],
   api<{ deleted: number[] }>(`${library(mode, id)}/bulk-delete/`, { method: 'POST', body: { assets, kind } })
 
 // ---------------------------------------------------------------- المفضلة
-export const fetchFavorites = () => api<{ favorites: FavoriteRow[] }>('/editor/favorites/')
+export interface FavoritesResponse {
+  favorites: FavoriteRow[]
+  categories: FavoriteCategory[]
+}
 
-export const createFavorite = (name: string, block: DocBlock) =>
-  api<{ favorite: FavoriteRow }>('/editor/favorites/', { method: 'POST', body: { name, block } })
+export const fetchFavorites = () => api<FavoritesResponse>('/editor/favorites/')
+
+export const createFavorite = (name: string, block: DocBlock, categoryId: number | null = null) =>
+  api<{ favorite: FavoriteRow }>('/editor/favorites/', { method: 'POST', body: { name, block, categoryId } })
+
+/** ‎name‎ و/أو ‎categoryId‎ (‎null‎ = بدون تصنيف) — اللي مش مبعوت ما بيتغيّرش. */
+export const updateFavorite = (id: number, patch: { name?: string; categoryId?: number | null }) =>
+  api<{ favorite: FavoriteRow }>(`/editor/favorites/${id}/`, { method: 'PATCH', body: patch })
 
 export const deleteFavorite = (id: number) => api<{ deleted: number }>(`/editor/favorites/${id}/`, { method: 'DELETE' })
+
+/** معاينة قسم مفضّل لوحده من غير مستند (صفحة المكتبة في اللوحة). */
+export const fetchFavoritePreview = (block: DocBlock, lang: string, signal?: AbortSignal) =>
+  api<PreviewPayload>('/editor/favorites/preview/', { method: 'POST', body: { block, lang }, signal })
+
+export const fetchFavoriteCategories = () => api<{ categories: FavoriteCategory[] }>('/editor/favorite-categories/')
+
+export const createFavoriteCategory = (name: string) =>
+  api<{ category: FavoriteCategory }>('/editor/favorite-categories/', { method: 'POST', body: { name } })
+
+export const renameFavoriteCategory = (id: number, name: string) =>
+  api<{ category: FavoriteCategory }>(`/editor/favorite-categories/${id}/`, { method: 'PATCH', body: { name } })
+
+/** عناصر التصنيف بترجع «بدون تصنيف» (مابتتمسحش). */
+export const deleteFavoriteCategory = (id: number) =>
+  api<{ deleted: number }>(`/editor/favorite-categories/${id}/`, { method: 'DELETE' })
 
 // ---------------------------------------------------------------- الخطوط
 /** اسم عائلة CSS صالح من اسم الملف (السيرفر بيشترط يبدأ بحرف إنجليزي) — زي ‎uploadedFontFamily‎ القديمة. */

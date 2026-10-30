@@ -23,7 +23,7 @@ from django.http import JsonResponse
 from django.urls import reverse
 from django.utils import timezone
 from . import blocks as blocks_engine
-from .models import Asset, CustomFont, FavoriteBlock, Invitation, SiteSetting, Template
+from .models import Asset, CustomFont, FavoriteBlock, FavoriteCategory, Invitation, SiteSetting, Template
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.db.models.fields.files import FieldFile
@@ -376,12 +376,17 @@ def _favorite_payload(favorite):
         "id": favorite.pk,
         "name": favorite.name,
         "blockType": favorite.block_type,
+        "categoryId": favorite.category_id,
         "block": block,
     }
 
 
 def _favorites_json():
     return [_favorite_payload(item) for item in FavoriteBlock.objects.all()]
+
+
+def _favorite_categories_json():
+    return [{"id": item.pk, "name": item.name} for item in FavoriteCategory.objects.all()]
 
 
 _EDITOR_BLOB_CACHE: dict = {}

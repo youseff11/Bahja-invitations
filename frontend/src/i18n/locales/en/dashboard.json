@@ -46,7 +46,8 @@
     "logout": "Sign out",
     "theme": "Switch between light and dark mode",
     "openMenu": "Open menu",
-    "closeMenu": "Close menu"
+    "closeMenu": "Close menu",
+    "favorites": "Favorites"
   },
   "status": {
     "draft": "Draft",
@@ -559,7 +560,10 @@
     },
     "whatsappNumberHelp": "With the country code, e.g. +201559403203",
     "templatesMobileColumnsHelp": "Only affects the templates section of the home page on phone screens.",
-    "templatesMobileColumnsOptions": { "one": "One template per row", "two": "Two templates per row" },
+    "templatesMobileColumnsOptions": {
+      "one": "One template per row",
+      "two": "Two templates per row"
+    },
     "whatsappCtaMessageHelp": "The ready message typed for the visitor when they tap the icon. It's different from the “Like the template?” bar message, which contains {template}.",
     "whatsappMessageHelp": "{template} is replaced with the name of the template the visitor is viewing.",
     "tryTitle": "Try it",
@@ -604,5 +608,39 @@
     },
     "none": "No data.",
     "noChart": "No data yet."
+  },
+  "favorites": {
+    "pageTitle": "Favorites library",
+    "title": "Favorites library",
+    "how": "These are the sections you saved as favorites from the editor (the <strong>☆ Save as favorite</strong> button). Click an item's name to rename it, move it to a category from the list under it (for example “Schedule” or “Countdown”), or delete it. When you use a favorite in the editor it asks for the category first.",
+    "listTitle": "Items ({{n}})",
+    "filtersLabel": "Filter by category",
+    "all": "All",
+    "uncategorized": "Uncategorized",
+    "none": "Nothing here yet. Open any invitation or template, pick a section and press “Save as favorite”.",
+    "noneInCategory": "There are no items in this category.",
+    "loading": "Loading favorites…",
+    "editName": "Edit item name",
+    "renamed": "Renamed to “{{name}}”.",
+    "moveLabel": "Category",
+    "moved": "Moved “{{name}}” to “{{category}}”.",
+    "movedNone": "Removed “{{name}}” from its category.",
+    "delete": "Delete",
+    "confirmDelete": "Delete “{{name}}” from favorites? This can't be undone.",
+    "deleted": "Deleted “{{name}}”.",
+    "invalidType": "This section type is no longer supported",
+    "categoriesTitle": "Categories",
+    "categoriesHint": "Create categories named after the sections you use most, and sort your favorites into them.",
+    "categoryName": "New category name",
+    "categoryPlaceholder": "e.g. Schedule",
+    "addCategory": "Add category",
+    "categoryAdded": "Added the category “{{name}}”.",
+    "categoryRenamed": "Category renamed to “{{name}}”.",
+    "editCategory": "Edit category name",
+    "deleteCategory": "Delete category",
+    "confirmDeleteCategory": "Delete the category “{{name}}”? Its items stay in the library under “Uncategorized”.",
+    "categoryDeleted": "Deleted the category “{{name}}”.",
+    "noCategories": "No categories yet.",
+    "previewTitle": "Section preview"
   }
 }

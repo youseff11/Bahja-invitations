@@ -614,10 +614,28 @@ class CustomFont(TimeStampedModel):
 
 
 # --------------------------------------------------------------------------
+class FavoriteCategory(TimeStampedModel):
+    """تصنيف في مكتبة المفضلة (مثلاً «برنامج اليوم» أو «العد التنازلي»)."""
+
+    name = models.CharField("اسم التصنيف", max_length=80, unique=True)
+
+    class Meta:
+        ordering = ["id"]
+        verbose_name = "تصنيف مفضلة"
+        verbose_name_plural = "تصنيفات المفضلة"
+
+    def __str__(self):
+        return self.name
+
+
 class FavoriteBlock(TimeStampedModel):
     """قسم محفوظ في مكتبة المفضلة لإعادة استخدامه في أي مستند."""
 
     name = models.CharField("اسم المفضلة", max_length=120)
+    category = models.ForeignKey(
+        FavoriteCategory, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name="favorites", verbose_name="التصنيف",
+    )
     block_type = models.CharField("نوع القسم", max_length=60)
     block_data = models.JSONField("بيانات القسم", default=dict)
     created_by = models.ForeignKey(

@@ -103,7 +103,16 @@
     "saveTitle": "Save section as favorite",
     "nameLabel": "Name this favorite",
     "saveConfirm": "Save",
-    "saved": "Saved to the favorites library."
+    "saved": "Saved to the favorites library.",
+    "pickCategory": "Pick a category first, then its items will show.",
+    "all": "All favorites",
+    "uncategorized": "Uncategorized",
+    "count": "{{n}} items",
+    "back": "‹ Categories",
+    "emptyCategory": "There are no items in this category.",
+    "categoryLabel": "Category",
+    "newCategory": "＋ New category…",
+    "newCategoryName": "New category name"
   },
   "font": {
     "upload": "＋ Upload a new font",

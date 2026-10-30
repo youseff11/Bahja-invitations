@@ -25,7 +25,7 @@ interface NavGroupDef {
 
 const under = (prefix: string) => (path: string) => path === prefix || path.startsWith(`${prefix}/`)
 
-/** مكتبة الوسائط: الخطوط والموسيقى والصور والفيديوهات والافتتاحيات — بتتجمّع تحت زرار «المكتبة». */
+/** مكتبة الوسائط: الخطوط والموسيقى والصور والفيديوهات والافتتاحيات والمفضلة — بتتجمّع تحت زرار «المكتبة». */
 const LIBRARY: NavGroupDef = {
   group: 'library',
   items: [
@@ -34,6 +34,7 @@ const LIBRARY: NavGroupDef = {
     { to: '/dashboard/images', label: 'images', active: under('/dashboard/images') },
     { to: '/dashboard/videos', label: 'videos', active: under('/dashboard/videos') },
     { to: '/dashboard/intros', label: 'intros', active: under('/dashboard/intros') },
+    { to: '/dashboard/favorites', label: 'favorites', active: under('/dashboard/favorites') },
   ],
 }
 
