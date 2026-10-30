@@ -1,0 +1,1 @@
+import{n as e}from"./client-Dsk9EHAb.js";function t(t,n){return t.kind===`template`?e(`/templates/${encodeURIComponent(t.slug)}/preview/`,{query:{lang:n}}):e(`/invitations/${encodeURIComponent(t.slug)}/render/`,{query:{lang:n,guest:t.guestToken}})}function n(t,n){return e(`/invitations/${encodeURIComponent(t)}/unlock/`,{method:`POST`,body:{password:n}})}export{n,t};

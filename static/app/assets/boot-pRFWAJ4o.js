@@ -1,0 +1,1 @@
+var e={basename:``,lang:`ar`,dir:`rtl`,user:null,site:null,debug:!1};function t(){let t=document.getElementById(`boot-data`);if(!t?.textContent)return e;try{return{...e,...JSON.parse(t.textContent)}}catch{return e}}var n=t();export{n as t};

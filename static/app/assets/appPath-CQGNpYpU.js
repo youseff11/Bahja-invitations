@@ -1,0 +1,1 @@
+import{t as e}from"./boot-pRFWAJ4o.js";function t(t){let n=e.basename;return n&&t.startsWith(`${n}/`)?t.slice(n.length):t}export{t};

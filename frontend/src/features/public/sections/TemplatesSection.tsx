@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 
 import { ApiError } from '@/api/client'
+import { warmPreview } from '@/features/invite/previewPrefetch'
 import { useGallery } from '../hooks'
 import { firstChar, pick, truncateChars, useLang } from '../text'
 import type { PublicTemplate } from '../types'
@@ -37,6 +38,13 @@ function Meta({ template }: { template: PublicTemplate }) {
 
 const previewPath = (template: PublicTemplate) => `/templates/${template.slug}/preview/`
 
+/** المعاينة بتتفتح جوّه التطبيق؛ التسخين على أول اقتراب بيخلّيها فورية. */
+const warmProps = (template: PublicTemplate) => ({
+  onPointerEnter: () => warmPreview(template.slug),
+  onFocus: () => warmPreview(template.slug),
+  onTouchStart: () => warmPreview(template.slug),
+})
+
 /** كارت القالب في الرئيسية: زرار واحد بيفتح معاينة القالب. */
 export function HomeTemplateCard({ template }: { template: PublicTemplate }) {
   const { t } = useTranslation()
@@ -52,7 +60,7 @@ export function HomeTemplateCard({ template }: { template: PublicTemplate }) {
         <span className="tpl-orn" aria-hidden="true"><i /></span>
         {hasDescription && <p className="tpl-desc">{pick(lang, template.description, template.descriptionEn)}</p>}
         <div className="tpl-actions">
-          <Link className="btn btn--gold btn--sm" to={previewPath(template)} target="_blank" rel="noopener">
+          <Link className="btn btn--gold btn--sm" to={previewPath(template)} {...warmProps(template)}>
             {t('public.templates.preview')}
           </Link>
         </div>
@@ -79,7 +87,7 @@ export function GalleryTemplateCard({ template }: { template: PublicTemplate }) 
           </p>
         )}
         <div className="tpl-actions">
-          <Link className="btn btn--ghost btn--sm" to={previewPath(template)} target="_blank" rel="noopener">
+          <Link className="btn btn--ghost btn--sm" to={previewPath(template)} {...warmProps(template)}>
             {t('public.gallery.live')}
           </Link>
           <Link className="btn btn--gold btn--sm" to={{ pathname: '/', hash: '#order' }}>

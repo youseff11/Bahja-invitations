@@ -65,7 +65,7 @@ function sourceOf(payload: RenderPayload): Source {
   return { kind: payload.kind, slug: payload.slug, guestToken: payload.guest?.token }
 }
 
-function Viewer({ initial }: { initial: RenderPayload }) {
+export function Viewer({ initial }: { initial: RenderPayload }) {
   const [payload, setPayload] = useState(initial)
   const [busy, setBusy] = useState(false)
   const cache = useRef(new Map<InviteLang, RenderPayload>([[initial.lang, initial]]))
@@ -153,7 +153,7 @@ function Viewer({ initial }: { initial: RenderPayload }) {
         if (next.css) syncHeadStyles(next.css)
         applyPageMeta(next)
         try {
-          window.history.replaceState({}, '', url.toString())
+          window.history.replaceState(window.history.state, '', url.toString())
         } catch {
           /* مش حرج */
         }

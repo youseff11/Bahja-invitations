@@ -79,7 +79,7 @@ export function HeroSection({ hero }: { hero?: HeroInfo }) {
           </h1>
           <p className="hero-sub">{text(custom?.sub, 'sub')}</p>
           <div className="hero-actions">
-            <Link className="btn btn--gold btn--lg btn--shine" to="/templates">
+            <Link className="btn btn--gold btn--lg btn--shine" to={{ pathname: '/', hash: '#templates' }}>
               <span>{text(custom?.cta, 'templates')}</span>
               <svg className="btn-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                 <path d="M5 12h13m0 0-5-5m5 5-5 5" />
