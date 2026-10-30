@@ -65,6 +65,18 @@ describe('FrameApp intro screen', () => {
     expect(container.querySelector('[data-block="q1"]')).not.toBeNull()
   })
 
+  it('edits to the intro code HTML apply in place: the intro and its code nodes are not rebuilt', () => {
+    const { container } = render(<FrameApp />)
+    const code = (html: string) => intro({ code: { css: '', html, js: '' } })
+    render_(code('<p data-move="ce-1">زين</p>'))
+    const shell = introEl(container)
+    const node = container.querySelector('[data-move="ce-1"]')
+    render_(code('<p data-move="ce-1">زين يارا</p>'))
+    expect(introEl(container)).toBe(shell)
+    expect(container.querySelector('[data-move="ce-1"]')).toBe(node)
+    expect(node?.textContent).toBe('زين يارا')
+  })
+
   it('follows edits to the intro while it is still showing', () => {
     const { container } = render(<FrameApp />)
     render_(intro({ text: 'أول نص' }))

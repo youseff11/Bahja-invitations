@@ -222,7 +222,12 @@ export function FrameApp() {
   }, [])
 
   const payload = state?.payload
-  const introJson = useMemo(() => (payload?.intro ? JSON.stringify(payload.intro) : ''), [payload])
+  // مفتاح تركيب الافتتاحية: HTML وستايل الكود مش فيه — تعديلهم بيتطبّق في مكانه (Raw morph) من غير ما الافتتاحية تتعاد من الأول.
+  // سكربت الكود فيه، لأنه لو اتغيّر لازم يتشغّل من جديد
+  const introJson = useMemo(() => {
+    const intro = payload?.intro
+    return intro ? JSON.stringify({ ...intro, code: intro.code ? { js: intro.code.js } : null }) : ''
+  }, [payload])
 
   // الافتتاحية اتفتحت (لمسة، زرار، عدّاد، نهاية الفيديو): نفتكر محتواها عشان مانركّبهاش تاني
   useEffect(() => {

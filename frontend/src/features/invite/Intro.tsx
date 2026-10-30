@@ -46,7 +46,7 @@ interface MusicHandle {
  * على الزرار) هو اللي بيحدد مين يفتح الدعوة.
  */
 export function Intro({ data, lockSkip = false }: { data: IntroData; lockSkip?: boolean }) {
-  const { t } = useInvite()
+  const { t, demo } = useInvite()
   const root = useRef<HTMLDivElement>(null)
   const video = useRef<HTMLVideoElement>(null)
   const playBtn = useRef<HTMLButtonElement>(null)
@@ -456,7 +456,7 @@ export function Intro({ data, lockSkip = false }: { data: IntroData; lockSkip?: 
             {data.button}
           </button>
         )}
-        <Raw html={codeHtml(data)} />
+        <Raw html={codeHtml(data)} morph={demo} />
       </div>
     </div>
   )
