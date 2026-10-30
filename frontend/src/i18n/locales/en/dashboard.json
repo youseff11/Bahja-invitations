@@ -543,6 +543,7 @@
     "barBody": "It appears at the bottom of the <strong>template preview</strong> only — not in a client invitation. The visitor taps WhatsApp and you receive a ready message with <strong>the name of the template they're looking at</strong>, so they don't need to describe anything.",
     "fields": {
       "plansPublic": "Show plans and prices on the site",
+      "templatesMobileColumns": "Templates per row on mobile",
       "ordersEnabled": "“Order your invitation” form on the site",
       "whatsappEnabled": "Show WhatsApp",
       "whatsappNumber": "WhatsApp number",
@@ -557,6 +558,8 @@
       "instagramUrl": "Instagram link"
     },
     "whatsappNumberHelp": "With the country code, e.g. +201559403203",
+    "templatesMobileColumnsHelp": "Only affects the templates section of the home page on phone screens.",
+    "templatesMobileColumnsOptions": { "one": "One template per row", "two": "Two templates per row" },
     "whatsappCtaMessageHelp": "The ready message typed for the visitor when they tap the icon. It's different from the “Like the template?” bar message, which contains {template}.",
     "whatsappMessageHelp": "{template} is replaced with the name of the template the visitor is viewing.",
     "tryTitle": "Try it",

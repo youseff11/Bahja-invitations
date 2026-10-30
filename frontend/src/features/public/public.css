@@ -1813,3 +1813,34 @@ html[dir="rtl"] .art-map-pin { margin: -34px -17px 0 0; }
 
 /* زر الطلب جوه قايمة الموبايل: قاعدة ‎.nav-links a‎ القديمة كانت بتبهّت نصه */
 .nav--site .nav-links a.btn { color: var(--on-accent); }
+
+/* ---------------------------------------------------------- 8-ج) قالبين في الصف على التلفون
+   اختيار من إعدادات الموقع (‎templatesMobileColumns‎ → ‎data-mobile-cols="2"‎).
+   الافتراضي (قالب في الصف) ماتلمسش. هنا الكارت بيتصغّر: حشو وخطوط أقل، من
+   غير الوصف والفاصل الزخرفي، وزر بعرض الكارت. */
+@media (max-width: 600px) {
+  #templates .grid--4[data-mobile-cols="2"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    padding-inline: 0;
+  }
+  #templates .grid--4[data-mobile-cols="2"] .tpl-card {
+    padding: 8px 8px 6px; border-radius: 20px;
+  }
+  #templates .grid--4[data-mobile-cols="2"] .tpl-card::before { inset: 4px; border-radius: 16px; }
+  #templates .grid--4[data-mobile-cols="2"] .tpl-cover { border-radius: 13px; }
+  #templates .grid--4[data-mobile-cols="2"] .tpl-body {
+    min-height: 0; padding: 12px 4px 6px; gap: 4px;
+  }
+  #templates .grid--4[data-mobile-cols="2"] .tpl-body h3 { font-size: 15px; }
+  #templates .grid--4[data-mobile-cols="2"] .tpl-meta {
+    max-width: 100%; padding: 2px 8px; font-size: 11px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  #templates .grid--4[data-mobile-cols="2"] .tpl-desc,
+  #templates .grid--4[data-mobile-cols="2"] .tpl-body > .tpl-orn { display: none; }
+  #templates .grid--4[data-mobile-cols="2"] .tpl-actions { padding-top: 8px; width: 100%; }
+  #templates .grid--4[data-mobile-cols="2"] .tpl-actions .btn {
+    width: 100%; padding: 8px 10px; font-size: 13px; gap: 6px; justify-content: center;
+  }
+}

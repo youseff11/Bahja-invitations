@@ -95,9 +95,11 @@ interface Props {
   templates: PublicTemplate[] | undefined
   categories: { value: string; label: string }[] | undefined
   error: unknown
+  /** عدد القوالب في الصف على التلفون (من إعدادات الموقع) */
+  mobileColumns?: 1 | 2
 }
 
-export function TemplatesSection({ templates, categories, error }: Props) {
+export function TemplatesSection({ templates, categories, error, mobileColumns = 1 }: Props) {
   const { t } = useTranslation()
   const [category, setCategory] = useState('')
   // الرئيسية بتجيب أول ١٢ قالب بس؛ لما التصنيف يتحدد بنجيب كل قوالبه من المعرض
@@ -135,7 +137,7 @@ export function TemplatesSection({ templates, categories, error }: Props) {
             ))}
           </div>
         )}
-        <div className="grid grid--4 grid--gallery">
+        <div className="grid grid--4 grid--gallery" data-mobile-cols={mobileColumns}>
           {shown?.map((template) => <HomeTemplateCard key={template.id} template={template} />)}
           {shown?.length === 0 && <p className="empty">{t('public.templates.empty')}</p>}
           {!!failure && (

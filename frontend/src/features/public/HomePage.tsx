@@ -59,6 +59,7 @@ export function HomePage() {
         templates={home.data?.templates}
         categories={home.data?.categories}
         error={home.error}
+        mobileColumns={site.templatesMobileColumns}
       />
       <FeaturesSection />
       {site.plansPublic && <PlansSection site={site} plans={home.data?.plans} />}

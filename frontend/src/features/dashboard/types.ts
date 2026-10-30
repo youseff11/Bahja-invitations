@@ -275,6 +275,7 @@ export interface PlanQuickBody {
 
 export interface SiteValues {
   plansPublic: boolean
+  templatesMobileColumns: 1 | 2
   ordersEnabled: boolean
   whatsappEnabled: boolean
   whatsappNumber: string

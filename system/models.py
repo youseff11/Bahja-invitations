@@ -998,6 +998,14 @@ class SiteSetting(models.Model):
                   "دي غير رسالة شريط «عجبك القالب؟» اللي فيها {template}.",
     )
 
+    # ---- عرض القوالب في الصفحة الرئيسية
+    templates_mobile_columns = models.PositiveSmallIntegerField(
+        "عدد القوالب في الصف على التلفون",
+        choices=[(1, "قالب واحد في الصف"), (2, "قالبين في الصف")],
+        default=1,
+        help_text="بيأثّر على قسم القوالب في الصفحة الرئيسية على شاشة التلفون بس.",
+    )
+
     class Meta:
         verbose_name = "إعدادات الموقع"
         verbose_name_plural = "إعدادات الموقع"

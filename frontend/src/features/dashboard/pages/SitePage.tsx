@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 
 import { useSaveSiteSettings, useSiteSettings } from '../api'
 import type { SiteValues } from '../types'
-import { CheckField, ErrorList, TextField, useFormErrors } from '../ui/forms'
+import { CheckField, ErrorList, SelectField, TextField, useFormErrors } from '../ui/forms'
 import { PageHead, usePageTitle } from '../ui/page'
 import { QueryState } from '../ui/table'
 import { useToast } from '../ui/Toast'
@@ -26,6 +26,7 @@ export function SitePage() {
     const flag = (key: keyof SiteValues) => values.has(key)
     const body: SiteValues = {
       plansPublic: flag('plansPublic'),
+      templatesMobileColumns: str(values, 'templatesMobileColumns') === '2' ? 2 : 1,
       ordersEnabled: flag('ordersEnabled'),
       whatsappEnabled: flag('whatsappEnabled'),
       whatsappNumber: str(values, 'whatsappNumber'),
@@ -90,6 +91,17 @@ export function SitePage() {
               <form className="form" key={JSON.stringify(values)} onSubmit={onSubmit}>
                 <ErrorList message={errors.formError} nonField />
                 <CheckField name="plansPublic" label={t('dashboard.site.fields.plansPublic')} defaultChecked={values.plansPublic} />
+                <SelectField
+                  name="templatesMobileColumns"
+                  label={t('dashboard.site.fields.templatesMobileColumns')}
+                  defaultValue={String(values.templatesMobileColumns)}
+                  help={t('dashboard.site.templatesMobileColumnsHelp')}
+                  helpSmall
+                  error={errors.fields.templatesMobileColumns}
+                >
+                  <option value="1">{t('dashboard.site.templatesMobileColumnsOptions.one')}</option>
+                  <option value="2">{t('dashboard.site.templatesMobileColumnsOptions.two')}</option>
+                </SelectField>
                 <CheckField name="ordersEnabled" label={t('dashboard.site.fields.ordersEnabled')} defaultChecked={values.ordersEnabled} />
                 <CheckField name="whatsappEnabled" label={t('dashboard.site.fields.whatsappEnabled')} defaultChecked={values.whatsappEnabled} />
                 <TextField

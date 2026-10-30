@@ -543,6 +543,7 @@
     "barBody": "بيظهر تحت في <strong>معاينة القالب</strong> بس — مش في دعوة عميل. الزائر يدوس على واتساب فتوصلك رسالة جاهزة فيها <strong>اسم القالب اللي هو شايفه</strong>، فمش محتاج يوصف لك حاجة.",
     "fields": {
       "plansPublic": "إظهار الباقات والأسعار في الموقع",
+      "templatesMobileColumns": "عدد القوالب في الصف على التلفون",
       "ordersEnabled": "نموذج «اطلب دعوتك» في الموقع",
       "whatsappEnabled": "إظهار واتساب",
       "whatsappNumber": "رقم الواتساب",
@@ -557,6 +558,8 @@
       "instagramUrl": "رابط إنستجرام"
     },
     "whatsappNumberHelp": "بالكود الدولي، مثال: +201559403203",
+    "templatesMobileColumnsHelp": "بيأثّر على قسم القوالب في الصفحة الرئيسية على شاشة التلفون بس.",
+    "templatesMobileColumnsOptions": { "one": "قالب واحد في الصف", "two": "قالبين في الصف" },
     "whatsappCtaMessageHelp": "الرسالة الجاهزة اللي هتتكتب للزائر لما يدوس الأيقونة. دي غير رسالة شريط «عجبك القالب؟» اللي فيها {template}.",
     "whatsappMessageHelp": "{template} بتتبدّل باسم القالب اللي الزائر شايفه.",
     "tryTitle": "جرّبه",

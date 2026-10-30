@@ -887,7 +887,7 @@ class PlanTests(DashboardApiCase):
 class SiteTests(DashboardApiCase):
     def body(self, **extra):
         body = {
-            "plansPublic": True, "ordersEnabled": True,
+            "plansPublic": True, "templatesMobileColumns": 1, "ordersEnabled": True,
             "whatsappEnabled": True, "whatsappNumber": "+201000000000",
             "whatsappFloatEnabled": True, "whatsappCtaMessage": "أهلاً",
             "previewCtaEnabled": True, "previewCtaText": "عجبك القالب؟",
@@ -922,6 +922,15 @@ class SiteTests(DashboardApiCase):
         self.send("PUT", f"{BASE}/site/", body)
         cfg = SiteSetting.load()
         self.assertEqual((cfg.plans_public, cfg.orders_enabled), (False, False))
+
+    def test_templates_mobile_columns(self):
+        self.send("PUT", f"{BASE}/site/", self.body(templatesMobileColumns=2))
+        self.assertEqual(SiteSetting.load().templates_mobile_columns, 2)
+        self.assertEqual(self.get(f"{BASE}/site/").json()["values"]["templatesMobileColumns"], 2)
+        response = self.send("PUT", f"{BASE}/site/", self.body(templatesMobileColumns=5))
+        self.assertError(response, 400, "validation_error")
+        self.assertEqual(SiteSetting.load().templates_mobile_columns, 2)
+
 
     def test_cta_enabled_without_contact_is_not_ready(self):
         response = self.send("PUT", f"{BASE}/site/", self.body(
