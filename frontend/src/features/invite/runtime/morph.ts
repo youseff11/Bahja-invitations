@@ -88,9 +88,69 @@ export function morphInto(root: Element, prevHtml: string, nextHtml: string): bo
     const probe = root.cloneNode(true) as Element
     morphChildren(probe, prev, next)
   } catch (error) {
-    if (error instanceof Unsafe) return false
+    if (error instanceof Unsafe) return patchBySlot(root, prev, next)
     throw error
   }
   morphChildren(root, prev, next)
+  return true
+}
+
+const SLOT = 'data-move'
+/** نص حقيقي مباشر (مش مسافات التنسيق بين الوسوم) */
+const hasText = (node: Node) => Array.from(node.childNodes).some((c) => c.nodeType === Node.TEXT_NODE && (c.nodeValue ?? '').trim() !== '')
+/** العنصر الحي برقمه (‎data-move‎) جوّه ‎scope‎ — الأرقام ثابتة حتى لو سكربت المصمّم لفّ حروف أو زوّد عقد. */
+function liveBySlot(scope: Element, slot: string): Element | null {
+  return Array.from(scope.querySelectorAll(`[${SLOT}]`)).find((n) => n.getAttribute(SLOT) === slot) ?? null
+}
+
+/**
+ * الدالة التقليدية (‎morphChildren‎) بتفترض إن الـDOM الحي لسه على شكل النسخة المعروضة. لو سكربت المصمّم غيّره
+ * (لفّ حروف الاسم في ‎<span>‎ لأنيميشن مثلاً) ماينفعش، وكنا نبني الكود كله من جديد فالأنيميشن يتعاد مع كل حرف.
+ * هنا بنقارن النسختين (المعروضة والجديدة) وبنطبّق الفرق على العناصر الحية برقمها: اللي ماتغيّرش ماتتلمسش، ووحدة النص
+ * اللي اتغيّرت بس بيتبدّل محتواها. بترجّع ‎false‎ ومايتلمسش حاجة لو ماقدرناش نحدّد العناصر.
+ */
+function patchBySlot(root: Element, prev: ParentNode, next: ParentNode): boolean {
+  const ops: (() => void)[] = []
+
+  function plan(live: Element, p: Node, n: Node): boolean {
+    if (p.isEqualNode(n)) return true
+    if (p.nodeType !== n.nodeType || p.nodeName !== n.nodeName) return false
+    if (!(p instanceof Element) || !(n instanceof Element)) return false
+    if (hasScript(p) || hasScript(n)) return false
+    ops.push(() => syncAttributes(live, p, n))
+    const pe = Array.from(p.children)
+    const ne = Array.from(n.children)
+    const container =
+      pe.length === ne.length &&
+      !hasText(p) &&
+      !hasText(n) &&
+      pe.every((e, i) => e.nodeName === ne[i].nodeName)
+    if (container) {
+      const mark = ops.length
+      const done = pe.every((e, i) => {
+        const slot = ne[i].getAttribute(SLOT) ?? e.getAttribute(SLOT)
+        const child = slot ? liveBySlot(live, slot) : null
+        return child !== null && plan(child, e, ne[i])
+      })
+      if (done) return true
+      ops.length = mark
+    }
+    // وحدة نص (أو بنية اتغيّرت): بنبدّل محتواها هي بس
+    if (p.innerHTML !== n.innerHTML) {
+      ops.push(() => live.replaceChildren(...Array.from(n.childNodes).map((c) => document.importNode(c, true))))
+    }
+    return true
+  }
+
+  const liveKids = kids(root, true)
+  const prevKids = kids(prev)
+  const nextKids = kids(next)
+  if (liveKids.length !== prevKids.length || prevKids.length !== nextKids.length) return false
+  for (let i = 0; i < prevKids.length; i++) {
+    const [live, p, n] = [liveKids[i], prevKids[i], nextKids[i]]
+    if (p.isEqualNode(n)) continue
+    if (!(live instanceof Element) || !plan(live, p, n)) return false
+  }
+  ops.forEach((op) => op())
   return true
 }

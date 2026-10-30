@@ -77,6 +77,20 @@ describe('FrameApp intro screen', () => {
     expect(node?.textContent).toBe('زين يارا')
   })
 
+  it('typing in intro code whose script rewrapped the name keeps the intro and its animated nodes', () => {
+    const { container } = render(<FrameApp />)
+    const code = (name: string) =>
+      intro({ code: { css: '', html: `<div data-move="ce-5"><h1 data-move="ce-6">${name}</h1></div>`, js: '0' } })
+    render_(code('زين'))
+    const box = container.querySelector('[data-move="ce-5"]')
+    const name = container.querySelector('[data-move="ce-6"]')!
+    name.innerHTML = '<span>ز</span><span>ي</span><span>ن</span>' // أنيميشن الاسم بيلفّ الحروف
+    render_(code('زين ي'))
+    expect(container.querySelector('[data-move="ce-5"]')).toBe(box)
+    expect(container.querySelector('[data-move="ce-6"]')).toBe(name)
+    expect(name.textContent).toBe('زين ي')
+  })
+
   it('follows edits to the intro while it is still showing', () => {
     const { container } = render(<FrameApp />)
     render_(intro({ text: 'أول نص' }))

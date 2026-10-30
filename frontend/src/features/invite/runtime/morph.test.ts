@@ -86,4 +86,28 @@ describe('morphInto with editor-injected nodes', () => {
     expect(div.getAttribute('style')).toBe('--f:b')
     expect(div.querySelectorAll('.lb-section-text__grip')).toHaveLength(2)
   })
+  it('a script that rewrapped a text unit: only that unit changes, the rest of the live DOM is kept', () => {
+    const before = '<div data-move="ce-1"><h1 data-move="ce-2">زين</h1><p data-move="ce-3">x</p></div>'
+    const after = '<div data-move="ce-1"><h1 data-move="ce-2">زين ي</h1><p data-move="ce-3">x</p></div>'
+    const root = mount(before)
+    const box = root.firstElementChild!
+    const h1 = box.querySelector('h1')!
+    const p = box.querySelector('p')!
+    h1.innerHTML = '<span>ز</span><span>ي</span><span>ن</span>' // سكربت الأنيميشن
+    p.classList.add('is-in')
+    expect(morphInto(root, before, after)).toBe(true)
+    expect(root.firstElementChild).toBe(box)
+    expect(box.querySelector('h1')).toBe(h1)
+    expect(h1.textContent).toBe('زين ي')
+    expect(box.querySelector('p')).toBe(p)
+    expect(p.classList.contains('is-in')).toBe(true)
+  })
+
+  it('gives up (rebuild) when the live root children no longer match even by position', () => {
+    const before = '<div data-move="ce-1"><h1 data-move="ce-2">a</h1></div>'
+    const root = mount(before)
+    root.querySelector('h1')!.innerHTML = '<i>a</i>'
+    root.appendChild(document.createElement('u')) // سكربت زوّد عقدة على مستوى الجذر
+    expect(morphInto(root, before, '<div data-move="ce-1"><h1 data-move="ce-2">ab</h1></div>')).toBe(false)
+  })
 })
