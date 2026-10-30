@@ -1464,17 +1464,29 @@ main { display: block; }
 }
 .plan-addons .plan-addons-list li { margin-bottom: 6px; }
 .toolbar--center { justify-content: center; }
-/* تصنيفات القوالب على الموبايل: صف واحد بيتسحب أفقيًا بدل ما الأزرار تلف على سطرين أو تلاتة */
+/* تصنيفات القوالب: صف واحد بيتسحب أفقيًا وبسهمين تقليب لما مايتّسعش (ScrollChips) */
+.chips { position: relative; margin-bottom: 16px; }
+.chips-track {
+  overflow-x: auto; overscroll-behavior-x: contain; padding: 4px 2px 8px;
+  scroll-snap-type: x proximity; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+}
+.chips-track::-webkit-scrollbar { display: none; }
+.chips-row { display: flex; gap: 10px; width: max-content; min-width: 100%; justify-content: center; }
+.chips-row > .btn { flex: 0 0 auto; white-space: nowrap; scroll-snap-align: start; }
+.chips-arrow {
+  position: absolute; top: 4px; bottom: 8px; z-index: 2; width: 38px;
+  display: grid; place-items: center; padding: 0; cursor: pointer;
+  border: 1px solid var(--line); border-radius: 999px; color: var(--accent);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  box-shadow: 0 6px 16px -8px rgba(0, 0, 0, .35);
+  transition: transform .18s, background .18s;
+}
+.chips-arrow:hover { background: var(--surface); transform: scale(1.06); }
+.chips-arrow svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.chips-arrow--left { left: 0; }
+.chips-arrow--right { right: 0; }
 @media (max-width: 600px) {
-  .toolbar--center {
-    flex-wrap: nowrap; justify-content: flex-start;
-    overflow-x: auto; overscroll-behavior-x: contain;
-    margin-inline: -18px; padding: 4px 18px 8px;
-    scroll-snap-type: x proximity; scroll-padding-inline: 18px;
-    scrollbar-width: none; -webkit-overflow-scrolling: touch;
-  }
-  .toolbar--center::-webkit-scrollbar { display: none; }
-  .toolbar--center > .btn { flex: 0 0 auto; white-space: nowrap; scroll-snap-align: start; }
+  .chips-arrow { width: 32px; }
 }
 .tpl-body .tpl-desc--sm { font-size: 13px; }
 .login-card .brand--stacked { margin-bottom: 22px; }

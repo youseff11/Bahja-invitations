@@ -44,6 +44,8 @@
     "sub": "A set of elegant templates to start from, then make entirely yours.",
     "empty": "No designs have been added yet.",
     "categories": "Design categories",
+    "scrollLeft": "Scroll categories left",
+    "scrollRight": "Scroll categories right",
     "preview": "Preview design"
   },
   "features": {

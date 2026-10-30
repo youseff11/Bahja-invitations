@@ -39,9 +39,24 @@ describe('Music مع الافتتاحية', () => {
     expect(play).toHaveBeenCalledTimes(1)
   })
 
-  it('مع duringIntro: تبدأ فوراً والافتتاحية لسه مقفولة', () => {
+  it('مع duringIntro ومفيش زر بدء: تبدأ فوراً والافتتاحية لسه مقفولة', () => {
     mount({ ...base, duringIntro: true })
     expect(play).toHaveBeenCalledTimes(1)
+  })
+
+  it('مع duringIntro وزر بدء الافتتاحية: تستنى الضغطة ومابتبدأش قبلها', () => {
+    document.querySelector('.lb-intro')!.classList.add('is-awaiting-play')
+    mount({ ...base, duringIntro: true })
+    expect(play).not.toHaveBeenCalled()
+    document.dispatchEvent(new CustomEvent('lb:intro-start'))
+    expect(play).toHaveBeenCalledTimes(1)
+  })
+
+  it('من غير duringIntro: ضغطة البدء لوحدها ماتشغّلش الموسيقى', () => {
+    document.querySelector('.lb-intro')!.classList.add('is-awaiting-play')
+    mount(base)
+    document.dispatchEvent(new CustomEvent('lb:intro-start'))
+    expect(play).not.toHaveBeenCalled()
   })
 
   it('مع duringIntro لو المتصفح رفض: ضغطة تشغيل الفيديو تعيد المحاولة', async () => {

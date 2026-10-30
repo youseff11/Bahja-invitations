@@ -82,9 +82,14 @@ export function Music({ config }: { config: MusicConfig }) {
 
     if (config.autoplay) {
       const pendingIntro = document.querySelector('.lb-intro:not(.is-open)')
-      if (pendingIntro && config.duringIntro) {
-        // الإعداد مفعّل: الموسيقى تبدأ مع الافتتاحية. لو المتصفح رفض، ضغطة
-        // تشغيل الفيديو الصامت (أول لمسة) بتعيد المحاولة
+      // افتتاحية مستنية ضغطة بدء (زر تشغيل الفيديو أو غطا الكود): الموسيقى
+      // مابتبدأش قبل الضغطة دي، حتى مع duringIntro
+      const waitsForPress =
+        pendingIntro &&
+        (pendingIntro.classList.contains('is-awaiting-play') || Boolean(pendingIntro.querySelector('.lb-intro-extra')))
+      if (pendingIntro && config.duringIntro && !waitsForPress) {
+        // الإعداد مفعّل ومفيش زر بدء: الموسيقى تبدأ مع الافتتاحية. لو المتصفح
+        // رفض، ضغطة تشغيل الفيديو الصامت (أول لمسة) بتعيد المحاولة
         beginAutoplay()
         introOpenStart = () => {
           document.removeEventListener('lb:intro-play', introOpenStart!)
@@ -93,16 +98,18 @@ export function Music({ config }: { config: MusicConfig }) {
         }
         document.addEventListener('lb:intro-play', introOpenStart)
       } else if (pendingIntro) {
-        // إشارتين، اللي يوصل الأول بيشغّل: lb:intro-play (ضغطة تشغيل الفيديو
-        // الصامت) و lb:intro-open (الافتتاحية خلصت أو اتفتحت)
+        // اللي يوصل الأول بيشغّل: lb:intro-start (ضغطة زر بدء الافتتاحية، مع
+        // duringIntro بس)، lb:intro-play (ضغطة تشغيل الفيديو الصامت)، و
+        // lb:intro-open (الافتتاحية خلصت أو اتفتحت)
+        const events = config.duringIntro
+          ? ['lb:intro-start', 'lb:intro-play', 'lb:intro-open']
+          : ['lb:intro-play', 'lb:intro-open']
         introOpenStart = () => {
-          document.removeEventListener('lb:intro-play', introOpenStart!)
-          document.removeEventListener('lb:intro-open', introOpenStart!)
+          events.forEach((name) => document.removeEventListener(name, introOpenStart!))
           introOpenStart = null
           beginAutoplay()
         }
-        document.addEventListener('lb:intro-play', introOpenStart)
-        document.addEventListener('lb:intro-open', introOpenStart)
+        events.forEach((name) => document.addEventListener(name, introOpenStart!))
       } else {
         beginAutoplay()
       }
@@ -121,6 +128,7 @@ export function Music({ config }: { config: MusicConfig }) {
           autoplayOnce = null
         }
         if (introOpenStart) {
+          document.removeEventListener('lb:intro-start', introOpenStart)
           document.removeEventListener('lb:intro-play', introOpenStart)
           document.removeEventListener('lb:intro-open', introOpenStart)
           introOpenStart = null

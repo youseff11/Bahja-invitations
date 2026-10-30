@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import { ApiError } from '@/api/client'
 import { warmPreview } from '@/features/invite/previewPrefetch'
 import { useGallery } from '../hooks'
+import { ScrollChips } from '../ScrollChips'
 import { firstChar, pick, truncateChars, useLang } from '../text'
 import type { PublicTemplate } from '../types'
 
@@ -123,7 +124,7 @@ export function TemplatesSection({ templates, categories, error, mobileColumns =
           <p>{t('public.templates.sub')}</p>
         </div>
         {!!categories?.length && (
-          <div className="toolbar toolbar--center" role="group" aria-label={t('public.templates.categories')}>
+          <ScrollChips label={t('public.templates.categories')}>
             <button
               type="button"
               className={'btn btn--sm ' + (category ? 'btn--ghost' : 'btn--gold')}
@@ -143,7 +144,7 @@ export function TemplatesSection({ templates, categories, error, mobileColumns =
                 {label}
               </button>
             ))}
-          </div>
+          </ScrollChips>
         )}
         <div className="grid grid--4 grid--gallery" data-mobile-cols={mobileColumns}>
           {shown?.map((template) => <HomeTemplateCard key={template.id} template={template} />)}

@@ -226,6 +226,8 @@ export function Intro({ data, lockSkip = false }: { data: IntroData; lockSkip?: 
           if (!isAwaiting) return
           isAwaiting = false
           setAwaiting(false)
+          // الموسيقى (duringIntro) بتبدأ مع ضغطة البدء حتى لو الفيديو بصوت
+          document.dispatchEvent(new CustomEvent('lb:intro-start'))
           vid.muted = !wantsSound
           if (vid.muted) announcePlay()
           const play = vid.play()

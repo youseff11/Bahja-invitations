@@ -5,6 +5,7 @@ import { useSite } from '@/api/hooks'
 import { ApiError } from '@/api/client'
 import { useDocumentTitle } from '@/lib/useDocumentTitle'
 import { useGallery } from './hooks'
+import { ScrollChips } from './ScrollChips'
 import { GalleryFooter } from './sections/SiteFooter'
 import { GalleryTemplateCard } from './sections/TemplatesSection'
 import { pick, useLang } from './text'
@@ -29,7 +30,7 @@ export function GalleryPage() {
             <p className="eyebrow">{t('public.gallery.eyebrow')}</p>
             <h2>{t('public.gallery.title')}</h2>
           </div>
-          <div className="toolbar toolbar--center">
+          <ScrollChips label={t('public.templates.categories')}>
             <Link className={'btn btn--sm ' + (category ? 'btn--ghost' : 'btn--gold')} to="/templates">
               {t('public.gallery.all')}
             </Link>
@@ -42,7 +43,7 @@ export function GalleryPage() {
                 {label}
               </Link>
             ))}
-          </div>
+          </ScrollChips>
           <div className="grid grid--4 grid--gallery">
             {results?.map((template) => <GalleryTemplateCard key={template.id} template={template} />)}
             {results?.length === 0 && <p className="empty">{t('public.gallery.empty')}</p>}
