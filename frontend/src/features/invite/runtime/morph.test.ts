@@ -110,4 +110,17 @@ describe('morphInto with editor-injected nodes', () => {
     root.appendChild(document.createElement('u')) // سكربت زوّد عقدة على مستوى الجذر
     expect(morphInto(root, before, '<div data-move="ce-1"><h1 data-move="ce-2">ab</h1></div>')).toBe(false)
   })
+  it('live numbering that lags the text (spans got the numbers, not the heading): matches by position and keeps siblings', () => {
+    const before = '<div data-move="ce-1"><h1>زين</h1><p>x</p></div>'
+    const after = '<div data-move="ce-1"><h1 data-move="ce-2">زين ab</h1><p data-move="ce-3">x</p></div>'
+    const root = mount(before)
+    const box = root.firstElementChild!
+    const h1 = box.querySelector('h1')!
+    const p = box.querySelector('p')!
+    h1.innerHTML = '<span data-move="ce-2">ز</span><span data-move="ce-3">ي</span>'
+    expect(morphInto(root, before, after)).toBe(true)
+    expect(box.querySelector('h1')).toBe(h1)
+    expect(box.querySelector('p')).toBe(p)
+    expect(h1.textContent).toBe('زين ab')
+  })
 })

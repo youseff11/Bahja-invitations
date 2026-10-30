@@ -127,9 +127,13 @@ function patchBySlot(root: Element, prev: ParentNode, next: ParentNode): boolean
       pe.every((e, i) => e.nodeName === ne[i].nodeName)
     if (container) {
       const mark = ops.length
+      const liveKidsHere = Array.from(live.children)
+      const samePlace = liveKidsHere.length === pe.length && liveKidsHere.every((c, i) => c.nodeName === pe[i].nodeName)
       const done = pe.every((e, i) => {
+        // برقمه (لو لسه موجود)، وإلا بمكانه لما أبناء العنصر الحي لسه بنفس العدد والوسوم (الترقيم الحي ممكن يتأخر عن اللي في النص)
         const slot = ne[i].getAttribute(SLOT) ?? e.getAttribute(SLOT)
-        const child = slot ? liveBySlot(live, slot) : null
+        const bySlot = slot ? liveBySlot(live, slot) : null
+        const child = (bySlot?.nodeName === e.nodeName ? bySlot : null) ?? (samePlace ? liveKidsHere[i] : null)
         return child !== null && plan(child, e, ne[i])
       })
       if (done) return true
