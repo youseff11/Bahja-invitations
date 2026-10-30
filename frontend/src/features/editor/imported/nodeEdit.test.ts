@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { cssNumber, fontKey, lineRatio, toHex } from './css'
 import { parse } from './dom'
-import { applyNodeEdit, readNode, styleTarget, textUnitIn } from './nodeEdit'
+import { applyNodeEdit, keepsShape, normalizeText, readNode, styleTarget, textUnitIn } from './nodeEdit'
 import { editOf, nodeInfo } from './ops'
 
 const HTML =
@@ -64,8 +64,26 @@ describe('applyNodeEdit', () => {
   it('replaces text as plain text (markup in the value stays text)', () => {
     const root = dom()
     applyNodeEdit(root, 'el-2', { kind: 'text', value: 'a <b>x</b>\nb' })
-    expect(node(root, 'el-2').children).toHaveLength(0)
-    expect(node(root, 'el-2').textContent).toBe('a <b>x</b>\nb')
+    expect(node(root, 'el-2').querySelectorAll('b')).toHaveLength(0)
+    expect(node(root, 'el-2').textContent).toBe('a <b>x</b>b')
+  })
+
+  it('writes a new line as <br> so it survives the read back, and Enter/space at the end are not lost', () => {
+    const root = dom()
+    applyNodeEdit(root, 'el-2', { kind: 'text', value: 'a\n\nb\n' })
+    expect(node(root, 'el-2').innerHTML).toBe('a<br><br>b<br>')
+    expect(readNode(root, 'el-2')!.text).toBe('a\n\nb\n')
+    expect(normalizeText('a  \n b \n')).toBe(readNode(root, 'el-2')!.text === 'a\n\nb\n' ? 'a\nb\n' : '')
+    applyNodeEdit(root, 'el-2', { kind: 'text', value: 'a b ' })
+    expect(readNode(root, 'el-2')!.text).toBe(normalizeText('a b '))
+  })
+
+  it('keepsShape: only a text-only edit of a single text node keeps the live children count', () => {
+    const root = dom()
+    const unit = node(root, 'el-2')
+    unit.textContent = 'x'
+    expect(keepsShape(unit, 'y z')).toBe(true)
+    expect(keepsShape(unit, 'y\nz')).toBe(false)
   })
 
   it('swaps the image source and drops srcset (it beats src)', () => {

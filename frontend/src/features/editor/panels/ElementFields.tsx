@@ -7,7 +7,7 @@ import { useSchema } from '../hooks'
 import { cssNumber, fontKey, lineRatio, toHex } from '../imported/css'
 import { computedValue } from '../imported/live'
 import { mapEmbedUrl } from '../imported/map'
-import type { NodeInfo, StyleProp } from '../imported/nodeEdit'
+import { normalizeText, type NodeInfo, type StyleProp } from '../imported/nodeEdit'
 import { useElementActions } from '../imported/useElementActions'
 import { useEditor } from '../store'
 import type { FieldSpec, FieldType } from '../types'
@@ -162,6 +162,9 @@ export function ElementFields({ blockId, slot, info }: Props) {
   const actions = useElementActions()
   const textId = useId()
   const [gear, setGear] = useState(false)
+  // اللي اتكتب بالظبط (مسافة/سطر في الآخر): النص المقري من العنصر بيتقصّ، فلو رجّعناه للخانة المسافة تختفي
+  const [typedAt, setTyped] = useState<{ slot: string; text: string } | null>(null)
+  const typed = typedAt?.slot === slot ? typedAt.text : null
   const { data: schema } = useSchema()
   const library = useEditor((s) => s.lib.fonts)
   const all = useMemo(() => styleFields(t, info.kind), [t, info.kind])
@@ -244,9 +247,12 @@ export function ElementFields({ blockId, slot, info }: Props) {
               id={textId}
               className="ed-input"
               rows={4}
-              value={info.text}
+              value={typed !== null && normalizeText(typed) === info.text ? typed : info.text}
               placeholder={t('editorInline.element.fields.textPlaceholder')}
-              onChange={(e) => actions.edit({ kind: 'text', value: e.target.value }, `el-text:${slot}`)}
+              onChange={(e) => {
+                setTyped({ slot, text: e.target.value })
+                actions.edit({ kind: 'text', value: e.target.value }, `el-text:${slot}`)
+              }}
             />
             {gearButton}
           </div>

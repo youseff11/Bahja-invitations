@@ -1,5 +1,5 @@
 import type { FromFrame, PreviewPayload } from '../types'
-import { applyNodeEdit, videoIn, type NodeEdit } from './nodeEdit'
+import { applyNodeEdit, keepsShape, textUnitIn, videoIn, type NodeEdit } from './nodeEdit'
 import { numberElements } from './numbering'
 import { upgradeLazyImages, savedSrc } from './lazyImages'
 import { pointTarget } from '../frame/pointTarget'
@@ -170,7 +170,15 @@ export function markPicked(picked: { id: string; slot: string } | null, root: Pa
 export function patchNode(id: string, slot: string, edit: NodeEdit, root: ParentNode = document) {
   const node = findNode(id, slot, root)
   const parent = rootAt(node)
-  if (!node || !parent || !applyNodeEdit(parent, slot, edit)) return
+  if (!node || !parent) return
+  // نص بيغيّر عدد أبناء الوحدة (سطر جديد، وسم اتشال): الرسمة الجاية بتطبّقه بالفرق على العقد الحية —
+  // لو غيّرناه هنا الأول هتحس إن الـDOM الحي مختلف عن المعروض وتبني القسم من جديد (إعادة تحميل)
+  const unit = edit.kind === 'text' ? textUnitIn(node) : null
+  if (edit.kind === 'text' && unit && !keepsShape(unit, edit.value)) {
+    mirror(parent, slot, edit)
+    return
+  }
+  if (!applyNodeEdit(parent, slot, edit)) return
   mirror(parent, slot, edit)
   // فيديو بمصدر جديد: المتصفح مابيعيدش التحميل لوحده من غير ‎load()‎
   if (edit.kind === 'video-src') {

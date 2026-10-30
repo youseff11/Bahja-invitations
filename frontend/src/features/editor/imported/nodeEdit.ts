@@ -72,6 +72,24 @@ function resizeMap(node: Element, frame: Element, prop: 'width' | 'height', valu
   if (frame !== box) setProp(frame, prop, '100%', 'important')
 }
 
+/** نص وحدة النص كنص عادي (الوسوم اللي فيه تفضل نص) — السطر الجديد بيتكتب ‎<br>‎ عشان يتحفظ ويبان زي ما اتكتب. */
+export function setUnitText(unit: Element, value: string) {
+  const doc = unit.ownerDocument
+  unit.replaceChildren(
+    ...value.split('\n').flatMap((line, i) => [
+      ...(i > 0 ? [doc.createElement('br')] : []),
+      ...(line ? [doc.createTextNode(line)] : []),
+    ]),
+  )
+}
+
+/** هل كتابة ‎value‎ في وحدة النص هتسيب عدد أبنائها زي ما هو؟ (غير كده التحديث الموضعي بيعتبر الـDOM الحي مختلف وبيبنيه من جديد) */
+export function keepsShape(unit: Element, value: string): boolean {
+  const probe = unit.cloneNode(false) as Element
+  setUnitText(probe, value)
+  return probe.childNodes.length === unit.childNodes.length
+}
+
 /** بيطبّق تعديل على العنصر برقمه جوّه ‎root‎. بيرجّع ‎false‎ لو العنصر مش موجود أو مالوش الجزء المطلوب. */
 export function applyNodeEdit(root: Element, slot: string, edit: NodeEdit): boolean {
   const node = findSlot(root, slot)
@@ -86,7 +104,7 @@ export function applyNodeEdit(root: Element, slot: string, edit: NodeEdit): bool
     case 'text': {
       const unit = textUnitIn(node)
       if (!unit) return false
-      unit.textContent = edit.value
+      setUnitText(unit, edit.value)
       return true
     }
     case 'inner':
@@ -174,6 +192,10 @@ function plainText(unit: Element): string {
   clone.querySelectorAll('br').forEach((br) => br.replaceWith(BREAK))
   return (clone.textContent ?? '').replace(/\s+/g, ' ').trim().replace(new RegExp(` ?${BREAK} ?`, 'g'), '\n')
 }
+
+/** النص بعد ما يتكتب ويتقرا تاني (‎plainText‎): المسافات المتكررة بتتلم والمسافات حوالين السطر وفي الأطراف بتتشال. */
+export const normalizeText = (value: string): string =>
+  value.replace(/[^\S\n]+/g, ' ').replace(/ ?\n ?/g, '\n').replace(/^ | $/g, '')
 
 function mapSize(node: Element, prop: 'width' | 'height'): number {
   const box = mapBoxOf(node)
