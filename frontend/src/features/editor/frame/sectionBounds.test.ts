@@ -43,6 +43,16 @@ describe('section bounds overlay', () => {
     expect(document.querySelector('[data-block="b2"] .lb-section-bounds')).toBeNull()
   })
 
+  it('on a code-only section (empty .lb-custom) the height goes on the section, not on .lb-inner, so the code box is not pushed below it', () => {
+    document.body.innerHTML = '<section data-block="c1"><div class="lb-inner"><div class="lb-custom"></div></div><div class="lb-extra-html"></div></section>'
+    showBounds({ ...bounds, id: 'c1' }, send)
+    handle().dispatchEvent(mouse('pointerdown', { clientY: 500 }))
+    handle().dispatchEvent(mouse('pointermove', { clientY: 700 })) // 100 + 200 = 300
+    expect(document.querySelector<HTMLElement>('[data-block="c1"]')!.style.getPropertyValue('height')).toBe('300px')
+    expect(document.querySelector<HTMLElement>('.lb-inner')!.style.getPropertyValue('height')).toBe('')
+    expect(document.querySelector<HTMLElement>('.lb-custom')!.style.getPropertyValue('height')).toBe('')
+  })
+
   it('shows the stored height instead when there is one; null or another call clears the old frame', () => {
     showBounds({ ...bounds, stored: 640 }, send)
     expect(document.querySelector('.lb-section-bounds__label')?.textContent).toContain('640px')

@@ -62,7 +62,12 @@ export function showBounds(bounds: Bounds | null, send: Send, root: ParentNode =
   }
   paint(bounds.stored > 0 ? bounds.stored : Math.round(artboard.getBoundingClientRect().height))
 
-  const layers = () => [target, ...SELECTORS.flatMap((sel) => Array.from(target.querySelectorAll<HTMLElement>(sel)))]
+  // قسم كله «كود متقدّم» (‎.lb-custom‎ فاضي): الارتفاع على القسم بس — لو ‎.lb-inner‎ خده الكود (أخوه) بيتزق تحت القسم ويختفي
+  const layers = () => {
+    const codeOnly = target.querySelector(':scope > .lb-inner > .lb-custom:empty') !== null
+    const inner = SELECTORS.flatMap((sel) => Array.from(target.querySelectorAll<HTMLElement>(sel)))
+    return [target, ...(codeOnly ? inner.filter((n) => !n.matches('.lb-inner, .lb-custom')) : inner)]
+  }
   const setHeight = (value: number) => {
     const next = snapHeight(value)
     // min-height كمان: ‎.lb‎ عندها min-height من الحقل القديم، ومن غير كتابة فوقها القسم مابيصغّرش تحتها

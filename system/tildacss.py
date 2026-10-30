@@ -544,6 +544,17 @@ def section_surface_css(block_id: str, style: dict, imported: bool = True) -> st
             f"{clip_target}{{overflow:hidden!important;overflow:clip!important}}}}"
         )
 
+    # قسم كله «كود متقدّم» (‎.lb-custom‎ فاضي): صندوق الكود أخو ‎.lb-inner‎
+    # وبيجي بعده في التدفّق، فلو ‎.lb-inner‎ خد ارتفاع القسم كله الكود
+    # بيتزق تحت حدّ القسم ويختفي ورا القسم اللي بعده. الارتفاع على
+    # القسم نفسه بس.
+    if out:
+        out.append(
+            f"#{block_id} > .lb-inner:has(> .lb-custom:empty),"
+            f"#{block_id} > .lb-inner > .lb-custom:empty"
+            "{min-height:0!important;height:auto!important}"
+        )
+
     # خلفية Tilda بتتشال للأقسام المستوردة بس. القسم العادي بيرسم
     # خلفيته على ‎#{block_id}‎ نفسه، فتصفيرها هنا كان هيمسح لون
     # الخلفية اللي المستخدم اختاره.

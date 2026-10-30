@@ -3200,6 +3200,13 @@ class SectionHeightSnapsToWholePixelsTests(TestCase):
         visible = re.search(r"([^{}]+)\{overflow:visible!important\}", css).group(1)
         self.assertNotIn("> .lb-custom", visible)
 
+    def test_code_only_sections_keep_the_height_on_the_section_itself(self):
+        """صندوق الكود أخو ‎.lb-inner‎؛ لو الأخير خد الارتفاع الكود بيتزق تحت القسم."""
+        css = self._rules({"section_height_mobile": 950})
+        self.assertIn("#sec-1 > .lb-inner:has(> .lb-custom:empty),#sec-1 > .lb-inner > .lb-custom:empty"
+                      "{min-height:0!important;height:auto!important}", css)
+        self.assertEqual(tildacss.section_surface_css("sec-1", {}), "")
+
     def test_pixel_heights_are_left_alone(self):
         """التابلت والديسكتوب بالبكسل أصلاً — مافيش حاجة تتقرّب."""
         css = self._rules({"section_height_tablet": 900})
