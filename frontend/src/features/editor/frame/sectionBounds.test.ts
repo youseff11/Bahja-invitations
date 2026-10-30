@@ -56,6 +56,7 @@ describe('section bounds overlay', () => {
     showBounds(bounds, send)
     handle().dispatchEvent(mouse('pointerdown', { clientY: 500 }))
     handle().dispatchEvent(mouse('pointermove', { clientY: 612 })) // 783 + 112 = 895 ← 900
+    expect(document.querySelector<HTMLElement>('.lb-custom')!.style.getPropertyValue('overflow')).toBe('clip')
     const artboard = document.querySelector<HTMLElement>('.t396__artboard')!
     const section = document.querySelector<HTMLElement>('[data-block="b1"]')!
     for (const node of [section, artboard, document.querySelector<HTMLElement>('.lb-inner')!, document.querySelector<HTMLElement>('.lb-custom')!]) {

@@ -1,0 +1,151 @@
+.ar-wrap {
+  padding: 28px 16px;
+  display: flex;
+  justify-content: center;
+}
+
+.ar-card {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  padding: 3px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, #fff1b8 0%, #d4a73c 28%, #8a6416 52%, #f3d675 76%, #b8892a 100%);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, .45), 0 0 40px rgba(212, 167, 60, .18);
+  overflow: hidden;
+}
+
+/* لمعة تعدّي على الإطار الذهبي */
+.ar-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 38%, rgba(255, 255, 255, .55) 50%, transparent 62%);
+  background-size: 250% 100%;
+  background-position: 160% 0;
+  animation: ar-shine 6s ease-in-out infinite;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+
+@keyframes ar-shine {
+  0%, 55% { background-position: 160% 0; }
+  100% { background-position: -60% 0; }
+}
+
+.ar-inner {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 46px 34px 38px;
+  border-radius: 19px;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(212, 167, 60, .16), transparent 60%),
+    radial-gradient(ellipse at 50% 100%, rgba(212, 167, 60, .10), transparent 60%),
+    linear-gradient(160deg, #14110a 0%, #0b0a07 55%, #17120a 100%);
+}
+
+.ar-glow {
+  position: absolute;
+  z-index: 2;
+  inset: -40%;
+  background: radial-gradient(circle, rgba(243, 214, 117, .10), transparent 55%);
+  mix-blend-mode: screen;
+  animation: ar-breathe 7s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes ar-breathe {
+  0%, 100% { opacity: .5; transform: scale(.96); }
+  50% { opacity: 1; transform: scale(1.04); }
+}
+
+/* زخارف الأركان */
+.ar-corner {
+  position: absolute;
+  z-index: 2;
+  width: 54px;
+  height: 54px;
+  pointer-events: none;
+}
+.ar-c1 { top: 12px; right: 12px; }
+.ar-c2 { top: 12px; left: 12px; transform: scaleX(-1); }
+.ar-c3 { bottom: 12px; right: 12px; transform: scaleY(-1); }
+.ar-c4 { bottom: 12px; left: 12px; transform: scale(-1, -1); }
+
+.ar-star {
+  display: block;
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 6px;
+  filter: drop-shadow(0 0 8px rgba(243, 214, 117, .55));
+  animation: ar-spin 40s linear infinite;
+}
+@keyframes ar-spin { to { transform: rotate(360deg); } }
+
+.ar-eyebrow {
+  margin: 0 0 14px;
+  font-family: 'Amiri', serif;
+  font-size: 30px;
+  line-height: 1.4;
+  color: #d4a73c;
+  text-shadow: 0 0 14px rgba(212, 167, 60, .45);
+}
+
+/* الآية بخط ذهبي متدرّج */
+.ar-verse {
+  margin: 0;
+  font-family: 'Amiri', 'Aref Ruqaa', serif;
+  font-weight: 700;
+  font-size: 27px;
+  line-height: 2.25;
+  background: linear-gradient(180deg, #fff6cf 0%, #f3d675 30%, #d4a73c 62%, #a87a1e 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #e9c658;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, .6));
+}
+.ar-mark { font-size: 1.15em; }
+
+/* فاصل ذهبي */
+.ar-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 22px auto 16px;
+  width: min(300px, 80%);
+}
+.ar-divider i {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #d4a73c, transparent);
+}
+.ar-divider b {
+  width: 9px;
+  height: 9px;
+  transform: rotate(45deg);
+  background: linear-gradient(135deg, #fff1b8, #b8892a);
+  box-shadow: 0 0 10px rgba(243, 214, 117, .8);
+}
+
+.ar-source {
+  margin: 0;
+  font-family: 'Reem Kufi', 'Cairo', sans-serif;
+  font-size: 17px;
+  letter-spacing: .08em;
+  color: #e9c658;
+  opacity: .95;
+}
+
+@media (max-width: 480px) {
+  .ar-inner { padding: 42px 22px 32px; }
+  .ar-verse { font-size: 22px; line-height: 2.15; }
+  .ar-eyebrow { font-size: 26px; }
+  .ar-corner { width: 42px; height: 42px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ar-card::after, .ar-glow, .ar-star { animation: none; }
+}

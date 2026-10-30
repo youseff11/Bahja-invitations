@@ -518,9 +518,13 @@ def section_surface_css(block_id: str, style: dict, imported: bool = True) -> st
     overflow_targets = ",".join([
         f"#{block_id}",
         f"#{block_id} > .lb-inner",
-        f"#{block_id} > .lb-inner > .lb-custom",
         f"#{block_id} .lb-custom .t396__artboard",
     ])
+    # غلاف المحتوى المستورد بيقص عند حدّ القسم الجديد: صور وعناصر أطول
+    # من الارتفاع اللي المستخدم سحبه كانت بتنزل فوق القسم اللي بعده.
+    # العناصر اللي فوق القسم (‎lb-section-text‎) أخوات ‎.lb-inner‎ مش
+    # جوّاه، فمابتتقصّش. ‎hidden‎ الأول احتياطي لمتصفح مايعرفش ‎clip‎.
+    clip_target = f"#{block_id} > .lb-inner > .lb-custom"
     out: list[str] = []
     for key, query, frame in _SECTION_HEIGHT_MEDIA:
         value, frame = _section_height_for(style, key, frame,
@@ -536,7 +540,8 @@ def section_surface_css(block_id: str, style: dict, imported: bool = True) -> st
         out.append(
             f"{query}{{{targets}"
             f"{{{_section_height_decls(size)}}}"
-            f"{overflow_targets}{{overflow:visible!important}}}}"
+            f"{overflow_targets}{{overflow:visible!important}}"
+            f"{clip_target}{{overflow:hidden!important;overflow:clip!important}}}}"
         )
 
     # خلفية Tilda بتتشال للأقسام المستوردة بس. القسم العادي بيرسم

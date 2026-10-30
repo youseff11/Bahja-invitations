@@ -35,7 +35,9 @@ export function InspectorPanel({ schema }: { schema: EditorSchema }) {
   if (selected === INTRO_ID) {
     return (
       <>
-        <CollapseAllButton />
+        <div className="ed-top-tools">
+          <CollapseAllButton />
+        </div>
         <div className="ed-section-head">
           <div>
             <p className="ed-kicker">{t('editor.inspector.selected')}</p>

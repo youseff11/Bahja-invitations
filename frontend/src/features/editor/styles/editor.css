@@ -240,7 +240,13 @@
 }
 .ed-collapse-all { margin-bottom: 10px; }
 /* «طيّ كل القوايم» و«إظهار حدود القسم» جنب بعض فوق اللوحة */
-.ed-top-tools { display: flex; gap: 8px; margin-bottom: 10px; }
+/* مثبّتان فوق اللوحة: لا ينزلان مع التمرير (‎.ed-tabpane‎ عليها حشو ١٤px فنسحب الشريط لحافتها) */
+.ed-top-tools {
+  display: flex; gap: 8px;
+  position: sticky; top: 0; z-index: 5;
+  margin: -14px -14px 10px; padding: 10px 14px;
+  background: var(--e-panel); border-bottom: 1px solid var(--e-line);
+}
 .ed-top-tools .ed-btn { flex: 1; width: auto; margin: 0; }
 /* اسم القسم بيتعدّل في مكانه: شكله عنوان، وبيتحوّل لخانة لما تدوس عليه */
 .ed-section-name { flex: 1; min-width: 0; }

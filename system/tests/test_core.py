@@ -3193,6 +3193,13 @@ class SectionHeightSnapsToWholePixelsTests(TestCase):
         self.assertEqual(tildacss._section_height_value(950, 390),
                          "calc(100cqw*2.4359)")
 
+    def test_imported_content_is_clipped_at_the_new_section_edge(self):
+        """صور أطول من الارتفاع المسحوب ماتنزلش على القسم اللي بعده."""
+        css = self._rules({"section_height_mobile": 950})
+        self.assertIn("#sec-1 > .lb-inner > .lb-custom{overflow:hidden!important;overflow:clip!important}", css)
+        visible = re.search(r"([^{}]+)\{overflow:visible!important\}", css).group(1)
+        self.assertNotIn("> .lb-custom", visible)
+
     def test_pixel_heights_are_left_alone(self):
         """التابلت والديسكتوب بالبكسل أصلاً — مافيش حاجة تتقرّب."""
         css = self._rules({"section_height_tablet": 900})

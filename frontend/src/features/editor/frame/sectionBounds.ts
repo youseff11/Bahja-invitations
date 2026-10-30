@@ -70,6 +70,8 @@ export function showBounds(bounds: Bounds | null, send: Send, root: ParentNode =
       node.style.setProperty('height', `${next}px`, 'important')
       node.style.setProperty('min-height', `${next}px`, 'important')
     }
+    // نفس قاعدة السيرفر: محتوى القسم المستورد بيتقص عند الحد الجديد، فصور أطول منه ماتنزلش على القسم اللي بعده
+    for (const node of target.querySelectorAll<HTMLElement>('.lb-custom')) node.style.setProperty('overflow', 'clip', 'important')
     paint(next)
     return next
   }

@@ -1042,6 +1042,16 @@ a.lb-social:hover { transform: translateY(-2px); opacity: .85; }
 .lb-video-wrap--9x16, .lb-video--9x16 { --ar: 9 / 16; }
 .lb-video-wrap--auto, .lb-video--auto { --ar: var(--vid-ratio, 16 / 9); }
 .lb-video iframe, .lb-video video { width: 100%; height: 100%; border: 0; display: block; }
+/* لمسة الفيديو ماتزرّقش الشاشة: لا وميض اللمس (‎tap-highlight‎) ولا تحديد
+   (‎selection‎) ولا إطار تركيز. */
+.lb-video-wrap, .lb-video, .lb-video video, .lb-video-play, .lb-intro-video {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  outline: none;
+}
+.lb-video video::selection, .lb-video-wrap ::selection { background: transparent; }
 /* نسبة العرض للارتفاع — اختيار من المحرر. القيمة متغيّر واحد عشان
    ‎aspect-ratio‎ و‎max-width‎ ما يفترقوش أبداً. */
 .lb-video--16x9 { --ar: 16 / 9; }
