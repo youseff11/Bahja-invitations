@@ -29,8 +29,13 @@ export type NodeEdit =
 
 const tagOf = (n: Element) => n.tagName.toUpperCase()
 
-export const imageIn = (node: Element): Element | null => (tagOf(node) === 'IMG' ? node : node.querySelector('img'))
-export const videoIn = (node: Element): Element | null => (tagOf(node) === 'VIDEO' ? node : node.querySelector('video'))
+/** جوّه صندوق كود المصمّم العنصر المحدَّد هو نفسه بس: كارت فيه صورة مش «صورة» (الحتة اللي اتضغطت هي اللي بتتعدّل) */
+const inCode = (node: Element) => !!node.closest(CODE_ROOTS)
+
+export const imageIn = (node: Element): Element | null =>
+  tagOf(node) === 'IMG' ? node : inCode(node) ? null : node.querySelector('img')
+export const videoIn = (node: Element): Element | null =>
+  tagOf(node) === 'VIDEO' ? node : inCode(node) ? null : node.querySelector('video')
 
 /** ‎<iframe>‎ الخريطة: العنصر نفسه أو اللي جواه، لو ده رابط جوجل (أو العنصر معلّم ‎data-map="1"‎). */
 export function mapFrameIn(node: Element): Element | null {
@@ -57,6 +62,7 @@ const isEmptyCodeLeaf = (node: Element): boolean =>
 /** وحدة النص اللي العنصر هو نفسه أو أول واحدة جواه (من غير حد المقاس — مفيش layout في المستند الخامل). */
 export function textUnitIn(node: Element): Element | null {
   if (isTextual(node) || isEmptyCodeLeaf(node)) return node
+  if (inCode(node)) return null // حاوية (كارت/برواز): مالهاش نص، النص بتاع اللي جواها لما تتضغط هي
   return Array.from(node.querySelectorAll('*')).find(isTextual) ?? null
 }
 
@@ -67,7 +73,7 @@ export function textUnitIn(node: Element): Element | null {
 export function styleTarget(node: Element): Element {
   const media = imageIn(node) ?? videoIn(node)
   if (media) return media
-  return node.closest(CODE_ROOTS) ? node : (textUnitIn(node) ?? node)
+  return inCode(node) ? node : (textUnitIn(node) ?? node)
 }
 
 function setProp(node: Element, prop: string, value: string, priority = '') {

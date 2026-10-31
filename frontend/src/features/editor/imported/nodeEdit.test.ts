@@ -66,8 +66,8 @@ describe('empty element in a code box', () => {
   })
 
   it('does not turn containers or imported-section shapes into text units', () => {
-    expect(nodeInfo(code, 'ce-3')?.text).toBe('x')
-    expect(nodeInfo(code, 'ce-1')?.text).toBe('x')
+    expect(nodeInfo(code, 'ce-3')?.text).toBeNull() // div فيه <b> بس: حاوية، والـ<b> ليه رقمه ونصه
+    expect(nodeInfo(code, 'ce-1')?.text).toBeNull() // الحاوية مالهاش نص: نص اللي جواها بيتعدّل لما يتضغط هو
     expect(nodeInfo(HTML, 'el-5')?.text).toBeNull()
   })
 })
