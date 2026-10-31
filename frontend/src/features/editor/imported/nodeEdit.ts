@@ -12,7 +12,7 @@ export type NodeEdit =
   /** ‎style‎ على «عقدة التنسيق»: الصورة/الفيديو لو فيه، وإلا وحدة النص اللي جوّه، وإلا العنصر نفسه */
   | { kind: 'style'; prop: string; value: string }
   /** ‎style‎ على العنصر المحدَّد نفسه (الإخفاء ‎display:none‎) */
-  | { kind: 'self'; prop: string; value: string }
+  | { kind: 'self'; prop: string; value: string; important?: boolean }
   | { kind: 'text'; value: string }
   /** محتوى العنصر نفسه (‎innerHTML‎) — كتابة وحدة نص في صندوق الكود من المعاينة (بتحافظ على الوسوم السطرية اللي فيها) */
   | { kind: 'inner'; html: string }
@@ -112,7 +112,7 @@ export function applyNodeEdit(root: Element, slot: string, edit: NodeEdit): bool
       setProp(styleTarget(node), edit.prop, edit.value)
       return true
     case 'self':
-      setProp(node, edit.prop, edit.value)
+      setProp(node, edit.prop, edit.value, edit.important ? 'important' : '')
       return true
     case 'text': {
       const unit = textUnitIn(node)
@@ -173,6 +173,13 @@ export const STYLE_PROPS = [
 ] as const
 export type StyleProp = (typeof STYLE_PROPS)[number]
 
+/**
+ * خصائص العنصر المحدَّد نفسه (مش وحدة النص اللي جواه): خلفيته وإطاره وشفافيته وألوان الأيقونات SVG.
+ * بتتكتب ‎!important‎ عشان تكسب على ‎!important‎ جوّه كود المصمّم (وعلى سكربتات الظهور اللي بتكتب ‎opacity‎).
+ */
+export const SELF_PROPS = ['background-color', 'border-color', 'color', 'fill', 'stroke', 'opacity'] as const
+export type SelfProp = (typeof SELF_PROPS)[number]
+
 export type NodeKind = 'image' | 'video' | 'map' | 'text' | 'shape'
 
 export interface NodeInfo {
@@ -192,6 +199,12 @@ export interface NodeInfo {
   hidden: boolean
   /** القيم المضمّنة على عقدة التنسيق (فاضية = مفيش قيمة مضمّنة) */
   styles: Record<StyleProp, string>
+  /** عقدة التنسيق هي العنصر نفسه (يعني حقول اللون/الخلفية فوق بتكتب عليه هو) */
+  ownTarget: boolean
+  /** العنصر أيقونة/رسمة SVG أو فيه واحدة — حقلا الملء والخط */
+  svg: boolean
+  /** القيم المضمّنة على العنصر المحدَّد نفسه */
+  self: Record<SelfProp, string>
 }
 
 const OWN_CLASSES = new Set(['lb-el-picked', 'lb-el-typing', 'lb-dragging', 'lb-el-swap'])
@@ -240,5 +253,11 @@ export function readNode(root: Element, slot: string): NodeInfo | null {
     countdown: isImportedCountdownPart(node),
     hidden: (node as HTMLElement).style?.display === 'none',
     styles,
+    ownTarget: target === node,
+    svg: tagOf(node) === 'SVG' || !!node.querySelector('svg'),
+    self: Object.fromEntries(SELF_PROPS.map((prop) => [prop, (node as HTMLElement).style?.getPropertyValue(prop) ?? ''])) as Record<
+      SelfProp,
+      string
+    >,
   }
 }

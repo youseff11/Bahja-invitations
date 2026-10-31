@@ -7,7 +7,7 @@ import { useSchema } from '../hooks'
 import { cssNumber, fontKey, lineRatio, toHex } from '../imported/css'
 import { computedValue } from '../imported/live'
 import { mapEmbedUrl } from '../imported/map'
-import { normalizeText, type NodeInfo, type StyleProp } from '../imported/nodeEdit'
+import { normalizeText, type NodeInfo, type SelfProp, type StyleProp } from '../imported/nodeEdit'
 import { useElementActions } from '../imported/useElementActions'
 import { useEditor } from '../store'
 import type { FieldSpec, FieldType } from '../types'
@@ -71,6 +71,30 @@ function styleFields(t: (key: string) => string, kind: NodeInfo['kind']): StyleF
     color('background-color', k('background')),
     range('letter-spacing', k('letter'), -3, 16, 0.5, 'px'),
     range('line-height', k('line'), 0.8, 3.2, 0.05, ''),
+  ]
+}
+
+interface SelfField {
+  prop: SelfProp
+  spec: FieldSpec
+}
+
+/**
+ * ألوان وشفافية العنصر المحدَّد نفسه (برواز، كارت، أيقونة…) مش النص اللي جواه: الخلفية والإطار وشفافية العنصر كله،
+ * ولون النص الموروث (أيقونات currentColor) لو عقدة التنسيق نص جواه، وملء/خط الـSVG.
+ * اللي بيكتب أصلاً على العنصر نفسه (عقدة التنسيق = هو) مش بيتكرر هنا.
+ */
+function selfFields(t: (key: string) => string, info: NodeInfo): SelfField[] {
+  const k = (key: string) => t(`editorInline.element.fields.${key}`)
+  const color = (prop: SelfProp, label: string): SelfField => ({ prop, spec: field(prop, 'color', label, { clearable: true }) })
+  if (info.kind === 'map') return []
+  const textual = info.kind === 'text' || info.kind === 'shape'
+  return [
+    ...(info.ownTarget ? [] : [color('background-color', k('selfBackground'))]),
+    color('border-color', k('selfBorder')),
+    ...(info.ownTarget || !textual ? [] : [color('color', k('selfColor'))]),
+    ...(info.svg ? [color('fill', k('selfFill')), color('stroke', k('selfStroke'))] : []),
+    { prop: 'opacity', spec: field('opacity', 'range', k('selfOpacity'), { min: 0, max: 100, step: 1, unit: '%' }) },
   ]
 }
 
@@ -171,6 +195,7 @@ export function ElementFields({ blockId, slot, info }: Props) {
   // الألوان قدّام طول الوقت (حدّد عنصر وغيّر لونه)، وباقي التنسيق ورا الترس
   const colors = all.filter((item) => item.spec.type === 'color')
   const fields = all.filter((item) => item.spec.type !== 'color')
+  const own = useMemo(() => selfFields(t, info), [t, info])
 
   const computed = (prop: string) => computedValue(blockId, slot, prop)
   const number = (prop: StyleProp): number => {
@@ -211,6 +236,17 @@ export function ElementFields({ blockId, slot, info }: Props) {
   const write = (item: StyleField, next: unknown) => {
     const css = next === '' || next == null ? '' : `${next}${item.spec.type === 'range' ? item.unit : ''}`
     actions.edit({ kind: 'style', prop: item.prop, value: css }, `el-style:${slot}:${item.prop}`)
+  }
+
+  const ownValue = ({ prop }: SelfField): unknown => {
+    if (prop !== 'opacity') return toHex(info.self[prop])
+    const inline = cssNumber(info.self.opacity)
+    return Math.round((inline ?? cssNumber(computedValue(blockId, slot, 'opacity', true)) ?? 1) * 100)
+  }
+
+  const ownWrite = ({ prop }: SelfField, next: unknown) => {
+    const raw = next === '' || next == null ? '' : prop === 'opacity' ? String(Math.min(100, Math.max(0, Number(next) || 0)) / 100) : String(next)
+    actions.edit({ kind: 'self', prop, value: raw, important: true }, `el-self:${slot}:${prop}`)
   }
 
   const panel = gear && (
@@ -274,6 +310,15 @@ export function ElementFields({ blockId, slot, info }: Props) {
         <div data-field-key="element-colors">
           {colors.map((item) => (
             <FieldRenderer key={item.prop} spec={item.spec} value={value(item)} onChange={(next) => write(item, next)} />
+          ))}
+        </div>
+      )}
+
+      {own.length > 0 && (
+        <div data-field-key="element-self">
+          <p className="ed-hint">{t('editorInline.element.fields.selfHint')}</p>
+          {own.map((item) => (
+            <FieldRenderer key={item.prop} spec={item.spec} value={ownValue(item)} onChange={(next) => ownWrite(item, next)} />
           ))}
         </div>
       )}

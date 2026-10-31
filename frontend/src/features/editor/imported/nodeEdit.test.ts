@@ -77,6 +77,20 @@ describe('applyNodeEdit', () => {
     expect(node(root, 'el-1').hasAttribute('style')).toBe(false)
   })
 
+  it('self edits can be !important so they beat the designer code and reveal scripts', () => {
+    const root = dom()
+    applyNodeEdit(root, 'el-1', { kind: 'self', prop: 'border-color', value: '#c1272d', important: true })
+    applyNodeEdit(root, 'el-1', { kind: 'self', prop: 'opacity', value: '0.4', important: true })
+    const box = node(root, 'el-1')
+    expect(box.style.getPropertyValue('border-color')).toBe('rgb(193, 39, 45)')
+    expect(box.style.getPropertyPriority('opacity')).toBe('important')
+    expect(readNode(root, 'el-1')?.self.opacity).toBe('0.4')
+    expect(readNode(root, 'el-3')?.self.opacity).toBe('')
+    applyNodeEdit(root, 'el-1', { kind: 'self', prop: 'opacity', value: '', important: true })
+    applyNodeEdit(root, 'el-1', { kind: 'self', prop: 'border-color', value: '', important: true })
+    expect(readNode(root, 'el-1')?.self).toMatchObject({ opacity: '', 'border-color': '' })
+  })
+
   it('replaces text as plain text (markup in the value stays text)', () => {
     const root = dom()
     applyNodeEdit(root, 'el-2', { kind: 'text', value: 'a <b>x</b>\nb' })
