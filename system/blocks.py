@@ -806,6 +806,29 @@ register(
     ],
 )
 
+# ---- فيديو غلاف ------------------------------------------------------------
+register(
+    "cover_video", "فيديو غلاف", icon="▶", category="أساسي", feature="video",
+    singleton=True, place_first=True,
+    description="فيديو بياخد القسم كله بيشتغل لوحده من غير صوت — بيتحط أول الدعوة",
+    props=[
+        field("url", "الفيديو", "media", "", media_kind="video",
+              help_text="ارفع ملف من جهازك أو اختار من المكتبة. بيشتغل صامت "
+                        "ومتكرر لما القسم يظهر. الأفضل ملف خفيف (٥-٧ ثواني)."),
+        field("poster", "صورة قبل التشغيل", "image", "",
+              help_text="بتظهر لحد ما الفيديو يحمّل."),
+        field("height", "ارتفاع القسم", "select", "full", options=[
+            opt("full", "ملء الشاشة"), opt("tall", "طويل"),
+            opt("medium", "متوسط"), opt("short", "قصير"),
+            opt("auto", "على حجم الفيديو"),
+        ]),
+        field("position", "جزء الفيديو الظاهر", "select", "center", options=[
+            opt("center", "الوسط"), opt("top", "الأعلى"), opt("bottom", "الأسفل"),
+        ], help_text="لما الفيديو يتقص عشان يملا القسم، ده الجزء اللي يفضل ظاهر."),
+        field("loop", "تكرار", "toggle", True),
+    ],
+)
+
 # ---- نص عام -------------------------------------------------------------
 register(
     "text", "قسم نصي", icon="¶", category="أساسي",

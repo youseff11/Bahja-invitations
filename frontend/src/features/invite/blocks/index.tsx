@@ -2,6 +2,7 @@ import { lazy, Suspense, type ComponentType } from 'react'
 
 import type { BlockData } from '../types'
 import { Countdown } from './Countdown'
+import { CoverVideo } from './CoverVideo'
 import {
   Agenda,
   Branding,
@@ -39,6 +40,7 @@ function Placeholder({ block }: { block: BlockData }) {
 const REGISTRY: Record<string, BlockComponent> = {
   hero: Hero,
   cover_image: CoverImage,
+  cover_video: CoverVideo,
   text: TextBlock,
   quote: Quote,
   hosts: Hosts,

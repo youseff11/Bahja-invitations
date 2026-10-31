@@ -47,6 +47,7 @@ _PROP_KEYS: dict[str, tuple[str, ...]] = {
              "height", "name_font", "name_size", "name_size_mobile",
              "name_spacing"),
     "cover_image": ("src", "alt", "height", "position"),
+    "cover_video": ("url", "poster", "height", "position", "loop"),
     "text": ("eyebrow", "heading", "heading_font", "heading_size", "body_size",
              "body_line_height"),
     "quote": ("text", "source", "frame", "quote_font", "quote_size"),
@@ -214,7 +215,7 @@ def _block_payload(block: dict, ctx: dict, extras: dict, *, invitation, guest,
         attrs["className"] = f"{attrs['className']} lb--branding"
     elif btype == "hero":
         attrs["className"] = f"{attrs['className']} lb-hero--{props.get('height')}"
-    elif btype == "cover_image":
+    elif btype in ("cover_image", "cover_video"):
         attrs["className"] = f"{attrs['className']} lb-cover--{props.get('height')}"
     elif btype == "spacer":
         attrs["style"] = ""

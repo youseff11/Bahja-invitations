@@ -399,6 +399,18 @@ class RenderApiTests(InviteBase):
         self.assertIn("lb-cover--tall", block["attrs"]["className"])
         self.assertTrue(B.BLOCK_REGISTRY["cover_image"]["place_first"])
 
+    def test_cover_video_is_sent_with_height_class_and_loops_by_default(self):
+        doc = self.inv.get_document()
+        doc["blocks"] = [B.make_block("cover_video", props={"url": "/media/c.mp4", "height": "medium"})]
+        self.inv.document = doc
+        self.inv.save()
+        block = self.client.get(f"/api/v1/invitations/{self.inv.slug}/render/").json()["blocks"][0]
+        self.assertEqual(block["type"], "cover_video")
+        self.assertEqual(block["props"]["url"], "/media/c.mp4")
+        self.assertTrue(block["props"]["loop"])
+        self.assertIn("lb-cover--medium", block["attrs"]["className"])
+        self.assertTrue(B.BLOCK_REGISTRY["cover_video"]["place_first"])
+
     def test_custom_html_is_sanitized_and_scoped_on_server(self):
         doc = self.inv.get_document()
         block = B.make_block("custom_html", props={

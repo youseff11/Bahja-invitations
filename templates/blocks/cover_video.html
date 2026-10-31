@@ -1,0 +1,6 @@
+{% load invite l10n %}{% localize off %}<section id="{{ block.id }}" class="{{ classes }} lb-cover--{{ props.height }}{% if hidden %} lb--hidden{% endif %}" style="{{ css }}" data-block="{{ block.id }}" data-block-type="{{ block.type }}"{% if editable %} data-editable="1"{% endif %}>
+  <div class="lb-cover" style="--cover-pos:{{ props.position|default:'center' }}">
+    {% if props.url %}<video src="{{ props.url }}"{% if props.poster %} poster="{{ props.poster }}"{% endif %} muted autoplay playsinline{% if props.loop %} loop{% endif %}></video>{% else %}<div class="lb-gempty">ارفع فيديو الغلاف من المحرر</div>{% endif %}
+  </div>
+  {% if editable and gated %}<div class="lb-gate">هذا القسم غير متاح في باقة العميل الحالية</div>{% endif %}
+</section>{% endlocalize %}

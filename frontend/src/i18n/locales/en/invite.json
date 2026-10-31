@@ -10,6 +10,7 @@
     "gallery": "Add photos from the editor",
     "image": "Choose an image from the editor",
     "cover": "Choose the cover image from the editor",
+    "coverVideo": "Upload the cover video from the editor",
     "video": "Upload a video or paste its link from the editor",
     "qr": "The code appears once the invitation is published"
   },
