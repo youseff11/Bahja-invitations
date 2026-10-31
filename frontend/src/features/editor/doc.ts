@@ -50,9 +50,14 @@ function mapBlock(doc: EditorDocument, id: string, change: (block: DocBlock) => 
 }
 
 /** يضيف القسم بعد القسم المحدد (أو في الآخر لو مفيش تحديد) — زي ‎addBlock‎ القديمة. */
-export function insertBlock(doc: EditorDocument, block: DocBlock, afterId?: string | null): EditorDocument {
+export function insertBlock(
+  doc: EditorDocument,
+  block: DocBlock,
+  afterId?: string | null,
+  first = false,
+): EditorDocument {
   const after = afterId ? blockIndex(doc, afterId) : -1
-  const at = after >= 0 ? after + 1 : doc.blocks.length
+  const at = first ? 0 : after >= 0 ? after + 1 : doc.blocks.length
   const blocks = doc.blocks.slice()
   blocks.splice(at, 0, block)
   return withBlocks(doc, blocks)

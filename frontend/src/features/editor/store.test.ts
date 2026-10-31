@@ -63,6 +63,13 @@ describe('structure edits', () => {
     expect(s().saveStatus).toBe('dirty')
   })
 
+  it('puts a place_first section at the top whatever is selected', () => {
+    s().select('b', 'preview')
+    expect(s().addBlock({ ...spec('cover_image', true), place_first: true })).toBe(true)
+    expect(ids()[0]).toMatch(/^cover_image-/)
+    expect(s().selected).toBe(ids()[0])
+  })
+
   it('refuses a second singleton', () => {
     expect(s().addBlock(spec('hero', true))).toBe(true)
     expect(s().addBlock(spec('hero', true))).toBe(false)

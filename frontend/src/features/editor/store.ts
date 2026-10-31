@@ -479,7 +479,7 @@ export const useEditor = create<EditorState>()((set, get) => ({
     const { doc, selected, commit } = get()
     if (spec.singleton && doc.blocks.some((b) => b.type === spec.type)) return false
     const block = ops.makeBlock(spec)
-    commit((d) => ops.insertBlock(d, block, selected))
+    commit((d) => ops.insertBlock(d, block, selected, spec.place_first))
     set({ selected: block.id, selectSource: 'list', tab: 'inspector' })
     return true
   },

@@ -842,6 +842,28 @@
   font-size: 0.88em;
 }
 
+/* صورة الغلاف: الصورة هي القسم كله. .lb.lb--cover_image مكرّرة عن قصد
+   عشان تكسب padding-inline بتاع الموبايل (نفس سبب .lb.lb--w-screen). */
+.lb.lb--cover_image { padding: 0; }
+.lb-cover { position: relative; width: 100%; max-width: none; }
+.lb-cover img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center var(--cover-pos, center);
+}
+.lb-cover--full { min-height: 100svh; }
+.lb-cover--tall { min-height: 78svh; }
+.lb-cover--medium { min-height: 58svh; }
+.lb-cover--short { min-height: 40svh; }
+.lb-cover--full .lb-cover,
+.lb-cover--tall .lb-cover,
+.lb-cover--medium .lb-cover,
+.lb-cover--short .lb-cover { position: absolute; inset: 0; }
+.lb-cover--auto .lb-cover img { height: auto; }
+.lb-cover .lb-gempty { height: 100%; display: grid; place-items: center; border-radius: 0; }
+
 .lb-figure { margin: 0; width: 100%; }
 .lb-figure img { width: 100%; border-radius: var(--radius); }
 .lb-figure--arch img { border-radius: 999px 999px var(--radius) var(--radius); }

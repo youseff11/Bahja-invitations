@@ -418,6 +418,23 @@ export function ImageBlock({ block }: { block: BlockData }) {
   )
 }
 
+// ---------------------------------------------------------------- صورة غلاف
+interface CoverImageProps {
+  src?: string
+  alt?: string
+  position?: string
+}
+
+export function CoverImage({ block }: { block: BlockData }) {
+  const { t } = useInvite()
+  const p = props<CoverImageProps>(block)
+  return (
+    <Frame block={block} ornaments={false} innerClass="lb-cover" style={CssVars({ '--cover-pos': text(p.position) || 'center' })}>
+      {on(p.src) ? <img src={p.src} alt={p.alt || ''} /> : <div className="lb-gempty">{t('empty.cover')}</div>}
+    </Frame>
+  )
+}
+
 // ---------------------------------------------------------------- فاصل ومسافة
 export function Divider({ block }: { block: BlockData }) {
   const p = props<{ variant?: string; size?: number }>(block)

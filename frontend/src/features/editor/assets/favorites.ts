@@ -18,7 +18,7 @@ export function addFavoriteToDocument(favorite: FavoriteRow, schema: EditorSchem
 
   const copy = JSON.parse(JSON.stringify(source)) as DocBlock
   const block: DocBlock = { ...copy, id: newBlockId(source.type), props: copy.props ?? {}, style: copy.style ?? {} }
-  commit((d) => insertBlock(d, block, selected))
+  commit((d) => insertBlock(d, block, selected, spec.place_first))
   useEditor.setState({ selected: block.id, selectSource: 'list', tab: 'inspector' })
   return 'added'
 }

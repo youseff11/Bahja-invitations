@@ -387,6 +387,18 @@ class RenderApiTests(InviteBase):
         # «الدعاية» لما تكون فاضية بتتشال عند الضيف زي القديم؛ والباقي كله بيوصل
         self.assertEqual(set(B.BLOCK_REGISTRY) - sent - {"branding"}, set())
 
+    def test_cover_image_is_sent_with_height_class(self):
+        doc = self.inv.get_document()
+        doc["blocks"] = [B.make_block("cover_image", props={"src": "/media/c.jpg", "height": "tall"})]
+        self.inv.document = doc
+        self.inv.save()
+        data = self.client.get(f"/api/v1/invitations/{self.inv.slug}/render/").json()
+        block = data["blocks"][0]
+        self.assertEqual(block["type"], "cover_image")
+        self.assertEqual(block["props"]["src"], "/media/c.jpg")
+        self.assertIn("lb-cover--tall", block["attrs"]["className"])
+        self.assertTrue(B.BLOCK_REGISTRY["cover_image"]["place_first"])
+
     def test_custom_html_is_sanitized_and_scoped_on_server(self):
         doc = self.inv.get_document()
         block = B.make_block("custom_html", props={

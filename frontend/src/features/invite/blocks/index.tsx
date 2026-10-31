@@ -6,6 +6,7 @@ import {
   Agenda,
   Branding,
   Buttons,
+  CoverImage,
   CustomHtml,
   Details,
   Divider,
@@ -37,6 +38,7 @@ function Placeholder({ block }: { block: BlockData }) {
 /** نوع البلوك → المكوّن. نوع مش معروف بيتخطّى (زي ‎render_document‎ لما مفيش spec). */
 const REGISTRY: Record<string, BlockComponent> = {
   hero: Hero,
+  cover_image: CoverImage,
   text: TextBlock,
   quote: Quote,
   hosts: Hosts,

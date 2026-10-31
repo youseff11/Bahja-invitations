@@ -721,6 +721,7 @@ def register(
     singleton: bool = False,
     category: str = "عام",
     supports_style: bool = True,
+    place_first: bool = False,
 ) -> None:
     block_props = list(props)
     if supports_style and not any(f.get("key") == "text_overlays" for f in block_props):
@@ -747,6 +748,8 @@ def register(
         "style": style_fields() if supports_style else [],
         "feature": feature,
         "singleton": singleton,
+        # المحرر بيحطه أول قسم في الدعوة بدل بعد القسم المحدد
+        "place_first": place_first,
     }
 
 
@@ -781,6 +784,25 @@ register(
               minimum=-4, maximum=24, step=1, unit="px"),
         field("buttons", "الأزرار", "list", [], group="الأزرار",
               fields=BUTTON_SUBFIELDS, add_label="إضافة زر"),
+    ],
+)
+
+# ---- صورة غلاف ------------------------------------------------------------
+register(
+    "cover_image", "صورة غلاف", icon="▨", category="أساسي", singleton=True,
+    place_first=True,
+    description="صورة بتاخد القسم كله — بتتحط أول الدعوة",
+    props=[
+        field("src", "الصورة", "image", ""),
+        field("alt", "وصف الصورة", "text", "", translate=False),
+        field("height", "ارتفاع القسم", "select", "full", options=[
+            opt("full", "ملء الشاشة"), opt("tall", "طويل"),
+            opt("medium", "متوسط"), opt("short", "قصير"),
+            opt("auto", "على حجم الصورة"),
+        ]),
+        field("position", "جزء الصورة الظاهر", "select", "center", options=[
+            opt("center", "الوسط"), opt("top", "الأعلى"), opt("bottom", "الأسفل"),
+        ], help_text="لما الصورة تتقص عشان تملا القسم، ده الجزء اللي يفضل ظاهر."),
     ],
 )
 

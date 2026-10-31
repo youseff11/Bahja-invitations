@@ -85,6 +85,8 @@ export interface BlockSpec {
   style: FieldSpec[]
   feature: string
   singleton: boolean
+  /** القسم ده بيتحط أول الدعوة مش بعد القسم المحدد (صورة الغلاف) */
+  place_first?: boolean
 }
 
 export interface EditorSchema {
