@@ -98,6 +98,8 @@ export function Header() {
   const plansPublic = !!site?.plansPublic
   const whatsappUrl = site?.whatsapp.url ?? ''
   const siteName = site ? pick(lang, site.name.ar, site.name.en) : ''
+  // علامة الترويسة: أول كلمة من الاسم الإنجليزي بحروف كبيرة (BAHJA) + شعار الحرف B بالتاج (صورة)
+  const wordmark = (site?.name.en.trim().split(/\s+/)[0] || 'Bahja').toUpperCase()
 
   const spyIds = ['templates', 'how', ...(plansPublic ? ['plans'] : []), 'faq']
   const active = useScrollSpy(spyIds, pathname === '/')
@@ -146,7 +148,7 @@ export function Header() {
       <header className={'nav nav--site' + (stuck ? ' is-stuck' : '')} id="site-nav">
         <div className="nav-shell">
           <Link
-            className="brand"
+            className="brand brand--word"
             to="/"
             onClick={(event) => {
               // ثلاث ضغطات متتالية على الأيقونة = باب خلفي لصفحة تسجيل الدخول (‎detail‎ = عدد الضغطات المتتالية)
@@ -156,6 +158,10 @@ export function Header() {
             }}
           >
             <span className="sr-only">{siteName}</span>
+            <span className="brand-word" aria-hidden="true">
+              {wordmark}
+            </span>
+            <span className="brand-mono" aria-hidden="true" />
           </Link>
 
           <nav

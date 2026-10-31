@@ -76,7 +76,7 @@ def site_settings(request):
         # معاينة المشاركة: روابط مطلقة من عنوان الطلب نفسه (مش دومين ثابت) عشان تشتغل
         # على أي استضافة، وصورة الموقع بحجم 1200×630 المطلوب لواتساب وفيسبوك.
         "SEO_CANONICAL": request.build_absolute_uri(request.path),
-        "SEO_IMAGE": request.build_absolute_uri(static("images/share-card.jpg")),
+        "SEO_IMAGE": request.build_absolute_uri(static("images/share-card-light.jpg")),
         "SEO_DESC": (settings.SEO_DESCRIPTION_EN if en
                      else settings.SEO_DESCRIPTION_AR),
         "SEO_DESC_AR": settings.SEO_DESCRIPTION_AR,

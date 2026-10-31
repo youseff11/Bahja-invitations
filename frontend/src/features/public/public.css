@@ -1912,3 +1912,25 @@ html[lang="en"] .nav--site .nav-cta { letter-spacing: .08em; font-size: 12.5px; 
   .nav--site .lang-btn span { display: none; }
   .nav--site .lang-btn { padding: 0; width: 36px; justify-content: center; }
 }
+
+
+/* ---- علامة الترويسة: كلمة Bahja بحروف متباعدة + مونوجرام ذهبي بخط مخطوط (بدل صورة اللوجو الكاملة) ---- */
+.nav--site .brand.brand--word {
+  display: inline-flex; align-items: center; gap: 12px; height: auto; aspect-ratio: auto;
+  background: none; margin-inline-start: 14px;
+}
+.nav--site .brand-word {
+  font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 600; font-size: 21px;
+  letter-spacing: .3em; margin-inline-end: -.3em; line-height: 1; color: var(--text); direction: ltr;
+}
+.nav--site .brand-mono {
+  display: block; width: 52px; height: 62px; flex: none; margin-block: -4px;
+  background: url("/static/images/bahja-mark.webp") center / contain no-repeat;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, .25));
+}
+.nav--site.is-stuck .brand-mono { width: 46px; height: 55px; }
+@media (max-width: 780px) {
+  .nav--site .brand.brand--word, .nav--site.is-stuck .brand.brand--word { height: auto; margin-inline-start: 8px; gap: 8px; }
+  .nav--site .brand-word { font-size: 16px; }
+  .nav--site .brand-mono, .nav--site.is-stuck .brand-mono { width: 38px; height: 45px; }
+}
