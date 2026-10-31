@@ -26,15 +26,16 @@
 }
 
 [data-theme='dark'] {
-  --bg: #0f0d0e;
-  --surface: #171314;
-  --surface-2: #1f1a1b;
-  --text: #eee8e3;
-  --muted: #a39a94;
+  /* أخضر غلاف الهيرو الغامق (حرير زمردي + خلفية زيتونية) بدل درجات البني */
+  --bg: #161d18;
+  --surface: #1d261f;
+  --surface-2: #242f27;
+  --text: #ece9df;
+  --muted: #a4ada3;
   --accent: #d6b98c;
   --accent-soft: rgba(214, 185, 140, 0.13);
-  --on-accent: #1d1610;
-  --line: #2d2729;
+  --on-accent: #17160f;
+  --line: #313e35;
   --ok: #5cb075;
   --shadow: 0 24px 60px -34px #000;
   --shadow-nav: 0 16px 40px -22px rgba(0, 0, 0, 0.9);

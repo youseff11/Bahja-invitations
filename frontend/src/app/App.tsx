@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 
 import { ApiError } from '@/api/client'
+import { installScrollMemory } from '@/lib/scrollMemory'
 import { boot } from './boot'
 import { routes } from './routes'
 
@@ -22,6 +23,7 @@ function makeQueryClient() {
 
 // basename فاضي = الجذر. React Router بيرفض '' فبنمرّر undefined.
 const router = createBrowserRouter(routes, { basename: boot.basename || undefined })
+installScrollMemory()
 
 export function App() {
   const [queryClient] = useState(makeQueryClient)

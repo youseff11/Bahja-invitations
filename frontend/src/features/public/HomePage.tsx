@@ -1,8 +1,9 @@
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigationType } from 'react-router-dom'
 
 import { useSite } from '@/api/hooks'
+import { savedScroll } from '@/lib/scrollMemory'
 import { useDocumentTitle } from '@/lib/useDocumentTitle'
 import { FxSky } from './fx'
 import { usePublicHome } from './hooks'
@@ -31,10 +32,13 @@ const SHOW_ORDER_FORM = false
 /** لما الرابط فيه ‎#plans‎ مثلاً: ننزل للقسم لما يتعرض (ولما البيانات توصل). */
 function useHashScroll(ready: boolean) {
   const { hash, key } = useLocation()
+  const type = useNavigationType()
   useEffect(() => {
     if (!ready || !hash) return
+    // الرجوع بالسهم بيرجّع المكان المحفوظ (Layout) بدل ما ينزل للقسم من جديد
+    if (type === 'POP' && savedScroll(key) !== undefined) return
     document.getElementById(decodeURIComponent(hash.slice(1)))?.scrollIntoView()
-  }, [ready, hash, key])
+  }, [ready, hash, key, type])
 }
 
 /** الصفحة الرئيسية للموقع العام: الهيرو، القوالب، المميزات، الباقات، الخطوات، الأسئلة، التواصل. */

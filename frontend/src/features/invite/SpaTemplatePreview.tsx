@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useState } from 'react'
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { useNavigate, useNavigationType, useParams, useSearchParams } from 'react-router-dom'
 
 import { boot } from '@/app/boot'
 import { PIXEL_ID, installFbq } from '@/features/public/pixel'
@@ -72,10 +72,23 @@ function enterInviteDocument() {
 /** المعاينة الحية فيها سكربتات runtime (قوالب مستوردة) أو مش لاقيينها: الصفحة المستقلة من السيرفر. */
 const needsServerPage = (payload: RenderPayload) => payload.stage.runtime || payload.runtimeScripts.length > 0
 
+/**
+ * الصفحة المستقلة من السيرفر. لو الزائر جاي من صفحة في الموقع نرجع خطوة ونفتحها كخانة جديدة:
+ * ‎replace‎ فوق خانة الـSPA بيخلّي السهم يرجّع مستند القالب نفسه تحت رابط الموقع.
+ */
+function openServerPage(cameFromSite: boolean) {
+  const href = window.location.href
+  if (!cameFromSite) return window.location.replace(href)
+  window.addEventListener('popstate', () => window.location.assign(href), { once: true })
+  window.history.back()
+}
+
 export function SpaTemplatePreview() {
   const { slug = '' } = useParams()
   const [search] = useSearchParams()
   const navigate = useNavigate()
+  // جاي من صفحة في الموقع (ضغطة جوّه التطبيق) → السهم/«عودة للموقع» بيرجّعوه لنفس المكان
+  const cameFromSite = useNavigationType() === 'PUSH'
   const [installed, setInstalled] = useState(false)
   const [payload, setPayload] = useState<RenderPayload | null>(null)
   const requested = search.get('lang')
@@ -93,17 +106,17 @@ export function SpaTemplatePreview() {
       .then((next) => {
         if (!alive) return
         if (needsServerPage(next)) {
-          window.location.replace(window.location.href)
+          openServerPage(cameFromSite)
           return
         }
         setPayload(next)
       })
       // قالب مش موجود أو خطأ شبكة: السيرفر يرد بصفحة الخطأ المناسبة
-      .catch(() => alive && window.location.replace(window.location.href))
+      .catch(() => alive && openServerPage(cameFromSite))
     return () => {
       alive = false
     }
-  }, [slug, lang])
+  }, [slug, lang, cameFromSite])
 
   // نفس PageView بتاع الصفحة المستقلة (من غير Contact — زي ‎no_contact‎ في الـshell)
   useEffect(() => {
@@ -114,17 +127,19 @@ export function SpaTemplatePreview() {
     fbq('track', 'PageView')
   }, [payload])
 
-  // «عودة للموقع» جوّه التطبيق بدل تحميل الرئيسية من جديد
+  // «عودة للموقع» جوّه التطبيق بدل تحميل الرئيسية من جديد. لو الزائر جاي من صفحة في الموقع
+  // نرجع خطوة في التاريخ (زي السهم) فيلاقي نفس التصنيف ونفس المكان؛ وإلا الرئيسية عند القوالب.
   useEffect(() => {
     const onClick = (event: MouseEvent) => {
       if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
       if (!(event.target as Element | null)?.closest?.('a[data-back-to-site]')) return
       event.preventDefault()
-      navigate({ pathname: '/', hash: '#templates' })
+      if (cameFromSite) navigate(-1)
+      else navigate({ pathname: '/', hash: '#templates' })
     }
     document.addEventListener('click', onClick)
     return () => document.removeEventListener('click', onClick)
-  }, [navigate])
+  }, [navigate, cameFromSite])
 
   if (!installed || !payload) {
     return (

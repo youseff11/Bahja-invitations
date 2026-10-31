@@ -1,9 +1,9 @@
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 
 import { ApiError } from '@/api/client'
 import { warmPreview } from '@/features/invite/previewPrefetch'
+import { useHistoryState } from '@/lib/useHistoryState'
 import { useGallery } from '../hooks'
 import { ScrollChips } from '../ScrollChips'
 import { firstChar, pick, truncateChars, useLang } from '../text'
@@ -110,7 +110,8 @@ interface Props {
 
 export function TemplatesSection({ templates, categories, error, mobileColumns = 1 }: Props) {
   const { t } = useTranslation()
-  const [category, setCategory] = useState('')
+  // محفوظ في خانة التاريخ: الرجوع من معاينة قالب بيلاقي نفس التصنيف
+  const [category, setCategory] = useHistoryState('templatesCategory', '')
   // الرئيسية بتجيب أول ١٢ قالب بس؛ لما التصنيف يتحدد بنجيب كل قوالبه من المعرض
   const filtered = useGallery(category, !!category)
   const shown = category ? filtered.data?.results : templates

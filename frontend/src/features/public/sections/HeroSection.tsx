@@ -40,10 +40,6 @@ export function HeroSection({ hero }: { hero?: HeroInfo }) {
   // أي حقل فاضي في اللوحة بيرجع للنص الافتراضي المترجم
   const custom = hero?.text[lang]
   const text = (value: string | undefined, key: string) => value?.trim() || t(`public.hero.${key}`)
-  const trust = ['templates', 'delivery', 'editable'].map((name, index) => ({
-    value: custom?.trust[index]?.value?.trim() || t(`public.hero.trust.${name}Value`),
-    label: custom?.trust[index]?.label?.trim() || t(`public.hero.trust.${name}Label`),
-  }))
   const imagesCss = heroImagesCss(hero?.images)
   const ref = useRef<HTMLElement>(null)
   const idle = useHeroIdle(ref)
@@ -72,12 +68,11 @@ export function HeroSection({ hero }: { hero?: HeroInfo }) {
         <ShootingStars idle={idle} />
       </div>
       <div className="hero-copy">
+        {/* جملة واحدة في نص الصورة + زرار واحد. السطر الصغير والوصف وأرقام الثقة
+            اتشالوا عن قصد: الصورة بتتكلم، والكلام الكتير كان بيزحمها. */}
         <div className="hero-copy-in" data-reveal>
-          <h1>
-            <span className="h1-top">{text(custom?.top, 'top')}</span>
-            <span className="h1-main">{text(custom?.main, 'main')}</span>
-          </h1>
-          <p className="hero-sub">{text(custom?.sub, 'sub')}</p>
+          <h1>{text(custom?.main, 'main')}</h1>
+          <span className="hero-orn" aria-hidden="true" />
           <div className="hero-actions">
             <Link className="btn btn--gold btn--lg btn--shine" to={{ pathname: '/', hash: '#templates' }}>
               <span>{text(custom?.cta, 'templates')}</span>
@@ -86,18 +81,6 @@ export function HeroSection({ hero }: { hero?: HeroInfo }) {
               </svg>
             </Link>
           </div>
-          {/* القيمة جوّه ‎<span>‎ جوّه ‎<b>‎ زي الموقع القديم (وسم ‎bi‎ بيطبع span) — قاعدة
-              ‎.hero-trust span‎ بتصغّرها وتخليها رمادي، ودي الصورة الفعلية في القديم. */}
-          <ul className="hero-trust" aria-hidden="true">
-            {trust.map((item, index) => (
-              <li key={index}>
-                <b>
-                  <span>{item.value}</span>
-                </b>
-                <span>{item.label}</span>
-              </li>
-            ))}
-          </ul>
         </div>
       </div>
     </section>

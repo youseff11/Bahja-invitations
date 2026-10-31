@@ -192,16 +192,7 @@ html[lang="en"][data-theme="dark"] .hero-art {
   --hero-img: url("/static/images/home-english-dark.webp");
 }
 
-/* شبكة أمان للتباين: تدرّج من حافة الصورة الشمال (مكان النص) ناحية النص.
-   في اللايت أبيض وفي الدارك أسود، فمابيبانش فوق المنطقة الفاضية أصلاً —
-   بيشتغل بس لو النص قرّب من الورد. */
-.hero-art::before {
-  content: ""; position: absolute; inset: 0; pointer-events: none;
-  background: linear-gradient(to right,
-              var(--bg) 0%,
-              color-mix(in srgb, var(--bg) 72%, transparent) 26%,
-              transparent 52%);
-}
+/* مفيش تدرّج أبيض/أسود على جنب الصورة: الكلام في النص دلوقتي والصورة بتبان كاملة بألوانها. */
 /* ذوبان الحافة السفلية في خلفية الصفحة */
 .hero-art::after {
   content: ""; position: absolute; inset-inline: 0; bottom: -1px; height: 16%;
@@ -209,49 +200,33 @@ html[lang="en"][data-theme="dark"] .hero-art {
   pointer-events: none;
 }
 
-/* الكلام: طبقة فوق الصورة، في النص الفاضي على الشمال في اللغتين
-   (المساحة الفاضية في الصورة نفسها على الشمال، فالوضع فيزيائي مش منطقي). */
+/* الكلام: جملة واحدة + زرار في نص الصورة بالظبط (الصور مفرّغة في النص والزخرفة على الجناب). */
 .hero-copy {
   position: absolute; inset: 0; z-index: 2;
-  display: flex; align-items: center;
+  display: flex; align-items: center; justify-content: center;
   padding-top: calc(var(--nav-space) * .5);
   pointer-events: none;
 }
-/* هوامش فيزيائية عن قصد: المساحة الفاضية في الصورة على الشمال في اللغتين،
-   فالكتلة لازم تفضل شمال سواء عربي (RTL) أو إنجليزي (LTR).
-   text-align:start بيخلي العربي محاذى يمين والإنجليزي شمال جوّه الكتلة نفسها. */
 .hero-copy-in {
   pointer-events: auto;
-  width: min(42%, 520px);
-  margin-left: clamp(20px, 5.5vw, 96px);
-  margin-right: auto;
-  text-align: center;          /* زي الصورة الأصلية بالظبط */
+  width: min(100% - 40px, 880px);
+  margin-inline: auto;
+  text-align: center;
 }
 
-/* ======== نص الهيرو — site.css:307-339 ======== */
-/* ---- العنوان بسطرين زي الصورة: سطر صغير غامق + سطر كبير ذهبي ---- */
-.hero-copy h1 { margin: 0; }
-.h1-top {
-  display: block; color: var(--text); font-weight: 400;
-  font-size: clamp(19px, 2.05vw, 34px); line-height: 1.35; margin-bottom: 2px;
+/* ======== نص الهيرو ======== */
+.hero-copy h1 {
+  margin: 0; color: var(--accent); font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(34px, 5.2vw, 88px); line-height: 1.25; text-wrap: balance;
+  /* هالة خفيفة بلون الخلفية تحافظ على القراءة لو الصورة المرفوعة فيها تفاصيل في النص */
+  text-shadow: 0 2px 24px color-mix(in srgb, var(--bg) 70%, transparent);
 }
-.h1-main {
-  display: block; color: var(--accent); font-weight: 700;
-  font-size: clamp(31px, 4.1vw, 66px); line-height: 1.2; text-wrap: balance;
-}
-
-/* ---- الفاصل: خط ذهبي متلاشي ← قلب → خط ذهبي متلاشي ---- */
-.hero-rule {
-  display: flex; align-items: center; justify-content: center; gap: 14px;
-  width: min(88%, 400px); margin: 20px auto 22px; font-size: 17px;
-}
-.hero-rule i { flex: 1; height: 1px; border: 0; }
-.hero-rule i:first-child { background: linear-gradient(to right, transparent, var(--accent)); }
-.hero-rule i:last-child  { background: linear-gradient(to left,  transparent, var(--accent)); }
-
-.hero-sub {
-  color: var(--muted); font-size: clamp(14px, 1.2vw, 18px);
-  max-width: 27ch; margin: 0 auto; line-height: 1.9; text-wrap: balance;
+/* زخرفة صغيرة تحت الجملة — نفس رسمة فاصل الأقسام */
+.hero-orn {
+  display: block; width: clamp(104px, 11vw, 168px); height: clamp(12px, 1.2vw, 18px);
+  margin: clamp(14px, 1.6vw, 24px) auto 0; background-color: var(--accent); opacity: .85;
+  -webkit-mask: var(--orn-rule) no-repeat center / contain;
+          mask: var(--orn-rule) no-repeat center / contain;
 }
 
 .hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 30px; }
@@ -375,7 +350,6 @@ html[lang="en"] .plan-badge { letter-spacing: .1em; }
   html[lang="en"] .hero-art { --hero-img: url("/static/images/home-english-light.webp"); }
   [data-theme="dark"] .hero-art { --hero-img: url("/static/images/home-arabic-dark.webp"); }
   html[lang="en"][data-theme="dark"] .hero-art { --hero-img: url("/static/images/home-english-dark.webp"); }
-  .hero-copy-in { width: min(48%, 460px); }
 }
 
 /* ---- الموبايل ---- */
@@ -407,35 +381,24 @@ html[lang="en"] .plan-badge { letter-spacing: .1em; }
   .nav-links.is-open { opacity: 1; visibility: visible; transform: none; }
   .nav-links a { padding: 12px 15px; border-radius: 13px; font-size: 15px; }
 
-  /* الهيرو على التليفون: الصورة كاملة بعرض الشاشة من غير أي قص،
-     والكلام تحتها — عشان النص ما يبقاش فوق ورد ومش مقروء.
-     مفيش سحب تحت الترويسة هنا: الصورة قصيرة والشريط كان هيغطي ثلثها. */
-  .hero { margin-top: 0; }
+  /* الهيرو على التليفون: شاشة طولية بتغطي معظم الارتفاع والترويسة طافية فوقها.
+     الصورة العريضة بتتقصّ ناحية الحرير والورد (يمين) والجملة والزرار في نصها. */
+  .hero { margin-top: calc(-1 * var(--nav-space)); }
   .hero-art {
-    aspect-ratio: 1672 / 941;
+    aspect-ratio: auto;
     width: 100%;
-    background-size: cover;           /* الخلفية الجديدة مع الهاتف داخلها */
-    background-position: center top;
-    --hero-img: url("/static/images/home-arabic-light.webp");
+    height: clamp(540px, 88svh, 780px);
+    background-size: cover;
+    background-position: 68% center;
   }
-  html[lang="en"] .hero-art { --hero-img: url("/static/images/home-english-light.webp"); }
-  [data-theme="dark"] .hero-art { --hero-img: url("/static/images/home-arabic-dark.webp"); }
-  html[lang="en"][data-theme="dark"] .hero-art { --hero-img: url("/static/images/home-english-dark.webp"); }
-  .hero-art::before { display: none; }          /* مفيش نص فوق الصورة هنا */
-  .hero-art::after  { height: 26%; }
+  .hero-art::after { height: 22%; }
 
-  .hero-copy {
-    position: static; display: block; padding: 26px 0 4px;
-    pointer-events: auto;
-  }
-  .hero-copy-in {
-    width: min(100% - 36px, 620px);
-    margin: 0 auto; text-align: center;
-  }
-  .hero-copy h1 { font-size: clamp(27px, 7.4vw, 40px); }
-  .hero-sub { max-width: none; margin-inline: auto; font-size: 15.5px; }
-  .hero-actions { justify-content: center; margin-top: 20px; }
-  .hero-actions .btn { flex: 1 1 auto; min-width: 150px; }
+  .hero-copy { padding-top: calc(var(--nav-space) * .6); padding-bottom: 8%; }
+  .hero-copy-in { width: min(100% - 44px, 520px); }
+  .hero-copy h1 { font-size: clamp(34px, 10.4vw, 54px); line-height: 1.3; }
+  .hero-orn { width: 112px; height: 13px; margin-top: 16px; }
+  .hero-actions { justify-content: center; margin-top: 26px; }
+  .hero-actions .btn { min-width: 168px; }
 }
 
 /* شاشات صغيرة جداً */
@@ -990,7 +953,6 @@ html[lang="en"] .feature-en { display: inline; }
   margin: 0 auto 14px; opacity: .95;
 }
 .orn-diamond { width: 34px; height: 18px; flex: none; }
-.hero-rule .orn-diamond { animation: orn-twinkle 4.5s ease-in-out infinite; }
 @keyframes orn-twinkle {
   0%, 100% { opacity: .95; transform: scale(1); }
   50%      { opacity: .6;  transform: scale(.9); }
@@ -1017,25 +979,7 @@ html[lang="en"] .feature-en { display: inline; }
 
 /* ---------------------------------------------------------- 5) الهيرو */
 .hero-copy-in { position: relative; z-index: 2; }
-.hero-sub { margin-bottom: 0; }
 
-/* شريط أرقام صغير تحت الأزرار — بيدّي إحساس بالثقة من غير زحمة */
-.hero-trust {
-  list-style: none; margin: 26px auto 0; padding: 0;
-  display: flex; justify-content: center; align-items: stretch;
-  gap: clamp(10px, 2vw, 26px); flex-wrap: wrap; pointer-events: none;
-}
-.hero-trust li {
-  display: flex; flex-direction: column; align-items: center; gap: 1px;
-  padding-inline: clamp(8px, 1.4vw, 18px);
-  border-inline-end: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
-}
-.hero-trust li:last-child { border-inline-end: 0; }
-.hero-trust b {
-  font-family: var(--font-display); color: var(--accent);
-  font-size: clamp(15px, 1.5vw, 21px); line-height: 1.2; font-weight: 500;
-}
-.hero-trust span { font-size: clamp(10px, .95vw, 12.5px); color: var(--muted); line-height: 1.3; }
 
 /* ---------------------------------------------------------- 6) الأزرار
    شكل واحد متّسق: ارتفاع ثابت، حواف كاملة الاستدارة، ظل ذهبي خفيف،
@@ -1238,17 +1182,10 @@ html.js [data-reveal].is-in { opacity: 1; transform: none; }
 @media (max-width: 780px) {
   .orn--crown { width: clamp(112px, 40vw, 168px); margin-bottom: 8px; }
   .section-head::after { width: 104px; height: 12px; margin-top: 11px; }
-  .hero-trust { gap: 8px; margin-top: 16px; }
-  .hero-trust li { padding-inline: 8px; }
   .btn--lg { padding: 12px 24px; min-height: 48px; font-size: 14.5px; }
   .hero-actions { gap: 9px; margin-top: 20px; }
   .home-cta-in { padding: 32px 18px; border-radius: 20px; }
   .fx-glow--a, .fx-glow--b { width: 70vw; height: 70vw; }
-}
-/* الأرقام التلاتة بيدخلوا في ٣٧٥px لو ضيّقنا المسافات — أحسن من إخفاء واحد */
-@media (max-width: 520px) {
-  .hero-trust { gap: 4px; }
-  .hero-trust li { padding-inline: 6px; }
 }
 
 /* احترام إعداد «تقليل الحركة» في النظام: كل حاجة بتقف، والمحتوى بيفضل ظاهر */
@@ -1375,27 +1312,14 @@ html[dir="ltr"] .steps { --pz-start: left; }
    الجزء من ٤٤٪ لـ ١٠٠٪ — يعني الموضوع بيبقى في نص الكادر بالظبط
    والفراغ بيتقص كله.
    ================================================================ */
-@media (max-width: 780px) {
-  .hero-art {
-    aspect-ratio: 1 / 0.95;
-    background-size: cover;
-    background-position: 100% center;
-  }
-  /* الذوبان السفلي أنعم مع الكادر الأطول */
-  .hero-art::after { height: 20%; }
-}
-
-/* التليفون بالعرض: نرجع للنسبة العريضة عشان الصورة ما تاخدش الشاشة كلها */
 @media (max-width: 780px) and (orientation: landscape) {
   .hero-art {
+    height: auto;
     aspect-ratio: 1672 / 941;
     background-position: center;
   }
-}
-
-/* شاشات صغيرة جداً: نقص شوية من الطول عشان الأزرار تفضل قريبة */
-@media (max-width: 400px) {
-  .hero-art { aspect-ratio: 1 / 0.9; }
+  .hero-copy h1 { font-size: clamp(26px, 5.4vw, 42px); }
+  .hero-actions { margin-top: 16px; }
 }
 
 
@@ -1539,11 +1463,11 @@ main { display: block; }
 .bento-accent .bento-art { background: color-mix(in srgb, #000 16%, var(--accent)); }
 .bento-accent .bento-copy p { color: inherit; opacity: .86; }
 .bento-dark {
-  --surface-2: #221d1e; background: #171314; border-color: #2d2729; color: #eee8e3;
+  --surface-2: #1f2922; background: #141a16; border-color: #2b362e; color: #ece9df;
 }
-html[data-theme="dark"] .bento-dark { background: #1f1a1b; }
-.bento-dark .bento-art { background: #221d1e; }
-.bento-dark .bento-copy p { color: #b3aaa4; }
+html[data-theme="dark"] .bento-dark { background: #1c261f; }
+.bento-dark .bento-art { background: #1f2922; }
+.bento-dark .bento-copy p { color: #aab3a9; }
 
 /* كل الحركات متوقّفة لحد ما المربّع يدخل الشاشة */
 .bento-art *, .bento-art *::before, .bento-art *::after { animation-play-state: paused !important; }
