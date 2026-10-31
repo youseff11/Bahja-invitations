@@ -35,20 +35,22 @@ describe('HeroSection settings', () => {
     expect(screen.getByText('شوف القوالب')).toBeInTheDocument()
     expect(screen.queryByText('شوف الباقات')).toBeNull() // زرار واحد بس
     expect(document.querySelectorAll('.hero-actions a')).toHaveLength(1)
+    // جملة واحدة وزرار بس: مفيش سطر صغير ولا وصف ولا أرقام ثقة
+    expect(screen.queryByText('دعوات زفاف رقمية')).toBeNull()
+    expect(document.querySelector('.hero-trust, .hero-sub')).toBeNull()
+    expect(document.querySelector('h1')?.textContent).toBe('تروي بدايتكم بأناقة')
     expect(document.querySelector('style')).toBeNull()
   })
 
   it('uses only the fields that were filled and keeps the default for the rest', () => {
     const hero: HeroInfo = {
       ...EMPTY,
-      text: { ...EMPTY.text, ar: { ...EMPTY.text.ar, main: 'عنوان مخصص', trust: [{ value: '+٨٠', label: '' }, EMPTY.text.ar.trust[1], EMPTY.text.ar.trust[2]] } },
+      text: { ...EMPTY.text, ar: { ...EMPTY.text.ar, main: 'عنوان مخصص' } },
     }
     show(hero)
     expect(screen.getByText('عنوان مخصص')).toBeInTheDocument()
     expect(screen.queryByText('تروي بدايتكم بأناقة')).toBeNull()
-    expect(screen.getByText('دعوات زفاف رقمية')).toBeInTheDocument() // السطر الصغير لسه الافتراضي
-    expect(screen.getByText('+٨٠')).toBeInTheDocument()
-    expect(screen.getByText('تصميم أنيق')).toBeInTheDocument() // التسمية فاضية → الافتراضي
+    expect(screen.getByText('شوف القوالب')).toBeInTheDocument() // الزرار فاضي → الافتراضي
   })
 
   it('shows the text of the current language', async () => {

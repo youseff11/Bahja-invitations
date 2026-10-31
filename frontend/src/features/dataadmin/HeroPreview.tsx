@@ -30,8 +30,12 @@ export function viewForField(field: string, current: HeroView): HeroView {
   return { lang, theme }
 }
 
+/** الهيرو دلوقتي جملة واحدة + زرار: السطر الصغير والوصف وأرقام الثقة مبقوش بيظهروا في الموقع. */
+const UNUSED = /^(top|sub|trust\d_(value|label))_(ar|en)$/
+
 /** الحقل ظاهر في النموذج؟ — اللي ليه علاقة بالمظهر/اللغة المختارين في المعاينة بس. */
 export function heroFieldVisible(field: string, view: HeroView): boolean {
+  if (UNUSED.test(field)) return false
   if (field.startsWith('bg_')) return field === `bg_${view.theme}_${view.lang}`
   if (field.endsWith('_ar')) return view.lang === 'ar'
   if (field.endsWith('_en')) return view.lang === 'en'
@@ -68,6 +72,7 @@ export function HeroPreview({
 }) {
   const { t, i18n } = useTranslation()
   const { lang, theme } = view
+  const [device, setDevice] = useState<'desktop' | 'phone'>('desktop')
   const active = focus ? targetOf(focus) : ''
 
   // صورة اتختارت ولسه ماتحفظتش: رابط مؤقت من الملف نفسه
@@ -87,17 +92,7 @@ export function HeroPreview({
       const custom = values[`${name}_${lang}`]
       return (typeof custom === 'string' && custom.trim()) || String(i18n.t(`public.hero.${defaultKey}`, { lng: lang }))
     }
-    const trust = ['templates', 'delivery', 'editable'].map((name, index) => ({
-      value: word(`trust${index + 1}_value`, `trust.${name}Value`),
-      label: word(`trust${index + 1}_label`, `trust.${name}Label`),
-    }))
-    return {
-      top: word('top', 'top'),
-      main: word('main', 'main'),
-      sub: word('sub', 'sub'),
-      cta: word('cta', 'templates'),
-      trust,
-    }
+    return { main: word('main', 'main'), cta: word('cta', 'templates') }
   }, [values, lang, i18n])
 
   const mark = (name: string) => (active === name ? 'hp-mark is-active' : 'hp-mark')
@@ -120,25 +115,22 @@ export function HeroPreview({
             </button>
           ))}
         </div>
+        <div className="hp-seg" role="group" aria-label={t('dataadmin.hero.device')}>
+          {(['desktop', 'phone'] as const).map((value) => (
+            <button key={value} type="button" className={device === value ? 'is-on' : undefined} onClick={() => setDevice(value)}>
+              {t(`dataadmin.hero.${value}`)}
+            </button>
+          ))}
+        </div>
       </div>
 
-      <div className={`hp-stage ${active === 'bg' ? 'is-active' : ''}`} data-theme={theme} dir={lang === 'ar' ? 'rtl' : 'ltr'}>
+      <div className={`hp-stage hp-stage--${device} ${active === 'bg' ? 'is-active' : ''}`} data-theme={theme} dir={lang === 'ar' ? 'rtl' : 'ltr'}>
         <div className="hp-art" style={{ backgroundImage: `url("${background}")` }} data-testid="hero-bg" />
         <div className="hp-copy">
-          <p className={`hp-top ${mark('top')}`}>{text.top}</p>
           <p className={`hp-main ${mark('main')}`}>{text.main}</p>
-          <p className={`hp-sub ${mark('sub')}`}>{text.sub}</p>
           <div className="hp-actions">
             <span className={`hp-btn hp-btn--gold ${mark('cta')}`}>{text.cta}</span>
           </div>
-          <ul className="hp-trust">
-            {text.trust.map((item, index) => (
-              <li key={index}>
-                <b className={mark(`trust${index + 1}value`)}>{item.value}</b>
-                <span className={mark(`trust${index + 1}label`)}>{item.label}</span>
-              </li>
-            ))}
-          </ul>
         </div>
       </div>
       <p className="hp-hint muted">{active ? t('dataadmin.hero.editing', { field: focusLabel }) : t('dataadmin.hero.hint')}</p>

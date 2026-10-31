@@ -72,7 +72,6 @@ export function HeroSection({ hero }: { hero?: HeroInfo }) {
             اتشالوا عن قصد: الصورة بتتكلم، والكلام الكتير كان بيزحمها. */}
         <div className="hero-copy-in" data-reveal>
           <h1>{text(custom?.main, 'main')}</h1>
-          <span className="hero-orn" aria-hidden="true" />
           <div className="hero-actions">
             <Link className="btn btn--gold btn--lg btn--shine" to={{ pathname: '/', hash: '#templates' }}>
               <span>{text(custom?.cta, 'templates')}</span>

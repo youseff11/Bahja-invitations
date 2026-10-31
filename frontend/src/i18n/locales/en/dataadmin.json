@@ -65,6 +65,9 @@
     "language": "Language",
     "theme": "Theme",
     "light": "Light",
+    "device": "Device",
+    "desktop": "Desktop",
+    "phone": "Phone",
     "dark": "Dark",
     "hint": "Click any field to see where it appears in the preview.",
     "editing": "Editing: {{field}}"

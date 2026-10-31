@@ -378,7 +378,8 @@ describe('hero live preview', () => {
     const title = screen.getByLabelText('العنوان الرئيسي — عربي') as HTMLInputElement
     expect(title.value).toBe('')
     expect(title.placeholder).toBe('تروي بدايتكم بأناقة')
-    expect((screen.getByLabelText('خانة ١ — القيمة (عربي)') as HTMLInputElement).placeholder).toBe('+٥٠')
+    // السطر الصغير/الوصف/أرقام الثقة مبقوش بيظهروا في الهيرو، فحقولهم مخفية من النموذج
+    expect(screen.queryByLabelText('خانة ١ — القيمة (عربي)')).toBeNull()
 
     fireEvent.change(title, { target: { value: 'عنواني' } })
     fireEvent.click(within(preview).getByRole('button', { name: 'English' }))
@@ -395,6 +396,16 @@ describe('hero live preview', () => {
     fireEvent.click(within(preview).getByRole('button', { name: 'داكن' }))
     // دارك إنجليزي فاضي ودارك عربي مرفوع (/media/home/x/dark.webp) → بياخد صورة العربي
     expect(screen.getByTestId('hero-bg').style.backgroundImage).toContain('/media/home/x/dark.webp')
+  })
+
+  it('switches the preview between desktop and phone framing', async () => {
+    mount('/dashboard/data/system.homehero/1')
+    const preview = (await screen.findByTestId('hero-bg')).closest('.hp') as HTMLElement
+    const stage = preview.querySelector('.hp-stage') as HTMLElement
+    expect(stage).toHaveClass('hp-stage--desktop')
+    fireEvent.click(within(preview).getByRole('button', { name: 'هاتف' }))
+    expect(stage).toHaveClass('hp-stage--phone')
+    expect(within(preview).getByText('تروي بدايتكم بأناقة')).toBeInTheDocument()
   })
 
   it('is not shown for other tables', async () => {
