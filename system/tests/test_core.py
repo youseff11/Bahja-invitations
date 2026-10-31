@@ -1701,9 +1701,21 @@ class AutoScrollTests(BaseAppTest):
 
 
     def test_bogus_speed_falls_back(self):
-        body = self._render(auto_scroll=True, auto_scroll_speed="\"};alert(1)//")
-        self.assertIn('"speed": "normal"', body)
+        body = self._render(auto_scroll=True, auto_scroll_pps="\"};alert(1)//")
+        self.assertIn('"speed": 34', body)
         self.assertNotIn("alert(1)", body)
+
+    def test_speed_is_clamped(self):
+        self.assertIn('"speed": 300', self._render(auto_scroll=True, auto_scroll_pps=99999))
+        self.assertIn('"speed": 10', self._render(auto_scroll=True, auto_scroll_pps=1))
+
+    def test_custom_speed_passes_through(self):
+        self.assertIn('"speed": 120', self._render(auto_scroll=True, auto_scroll_pps=120))
+
+    def test_legacy_named_speed_is_converted(self):
+        """دعوة محفوظة بـ«سريع» قبل الشريط تفضل على نفس السرعة."""
+        doc = B.normalize_document({"settings": {"auto_scroll": True, "auto_scroll_speed": "fast"}})
+        self.assertEqual(doc["settings"]["auto_scroll_pps"], 60)
 
 
     def test_delay_is_clamped(self):

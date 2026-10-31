@@ -1500,10 +1500,9 @@ SETTINGS_FIELDS = [
     field("auto_scroll", "تمرير تلقائي", "toggle", False, group="التمرير",
           help_text="الدعوة بتنزل لوحدها بالراحة زي العرض. بتقف فوراً أول "
                "ما الضيف يلمس الشاشة أو يمرّر بنفسه، وفيه زر إيقاف ظاهر."),
-    field("auto_scroll_speed", "سرعة التمرير", "select", "normal",
-          group="التمرير", options=[
-              opt("slow", "بطيء"), opt("normal", "عادي"), opt("fast", "سريع"),
-          ]),
+    field("auto_scroll_pps", "سرعة التمرير", "range", 34, group="التمرير",
+          minimum=10, maximum=300, step=2, unit="بكسل/ث",
+          help_text="كل ما الرقم زاد النزول بقى أسرع (٣٤ عادي، ٦٠ سريع، ١٢٠ سريع جداً)."),
     field("auto_scroll_delay", "يبدأ بعد (ثانية)", "range", 3, group="التمرير",
           minimum=0, maximum=20, step=1,
           help_text="مهلة قبل ما يبدأ عشان الضيف يقرا أول قسم براحته."),
@@ -1759,6 +1758,10 @@ def _legacy_intro_video_audio(settings: dict) -> str:
     return "silent"
 
 
+# سرعة التمرير كانت اختيار من ٣ (بطيء/عادي/سريع) قبل ما تبقى شريط بالبكسل في الثانية
+_LEGACY_SCROLL_PPS = {"slow": 18, "normal": 34, "fast": 60}
+
+
 def _legacy_intro_play_mode(settings: dict) -> str:
     """يحوّل إعدادات بداية الفيديو القديمة للوضع الجديد بدون فقدها."""
     explicit = settings.get("intro_play_mode")
@@ -1815,6 +1818,9 @@ def normalize_document(raw: Any, *, allowed_features: set[str] | None = None) ->
     settings_for_schema = dict(set_raw)
     settings_for_schema["intro_play_mode"] = _legacy_intro_play_mode(set_raw)
     settings_for_schema["intro_video_audio"] = _legacy_intro_video_audio(set_raw)
+    if "auto_scroll_pps" not in set_raw:
+        settings_for_schema["auto_scroll_pps"] = _LEGACY_SCROLL_PPS.get(
+            str(set_raw.get("auto_scroll_speed") or ""), 34)
     out["settings"] = {
         s["key"]: _coerce(settings_for_schema.get(s["key"]), s)
         for s in SETTINGS_FIELDS

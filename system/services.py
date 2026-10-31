@@ -80,7 +80,7 @@ def _scroll_config(doc_settings: dict, *, editable: bool = False) -> dict:
         return {"enabled": False}
     return {
         "enabled": True,
-        "speed": doc_settings.get("auto_scroll_speed") or "normal",
+        "speed": doc_settings.get("auto_scroll_pps") or 34,
         "delay": doc_settings.get("auto_scroll_delay") or 0,
         "loop": bool(doc_settings.get("auto_scroll_loop")),
     }

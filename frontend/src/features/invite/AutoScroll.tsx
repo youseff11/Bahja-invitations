@@ -9,7 +9,8 @@ declare global {
   }
 }
 
-const SPEED_PPS: Record<string, number> = { slow: 18, normal: 34, fast: 60 } // بكسل في الثانية
+const DEFAULT_SPEED = 34 // بكسل في الثانية
+const MAX_SPEED = 300
 
 /**
  * الدعوة بتنزل لوحدها بالراحة زي العرض (نفس ‎initAutoScroll‎):
@@ -31,7 +32,7 @@ export function AutoScroll({ config }: { config: ScrollConfig }) {
   useEffect(() => {
     const button = btn.current
     if (!enabled || !button || window.__lbScroll) return
-    const speed = SPEED_PPS[config.speed ?? ''] || SPEED_PPS.normal
+    const speed = Math.min(Math.max(Number(config.speed) || DEFAULT_SPEED, 1), MAX_SPEED)
     const delay = Math.max(0, Number(config.delay) || 0) * 1000
     const loop = Boolean(config.loop)
     let running = false

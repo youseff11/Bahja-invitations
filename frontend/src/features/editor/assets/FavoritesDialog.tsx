@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import type { BlockSpec, DocBlock, EditorSchema, FavoriteRow } from '../types'
@@ -9,7 +9,7 @@ import { addFavoriteToDocument } from './favorites'
 import { errorText } from './errors'
 import { FavoritePreview } from './FavoritePreview'
 import { Modal } from './Modal'
-import { countByCategory, FAVORITES_KEY, UNCATEGORIZED, useFavoriteActions, useFavoritesQuery } from './useFavorites'
+import { countByCategory, FAVORITES_KEY, prefetchFavorites, UNCATEGORIZED, useFavoriteActions, useFavoritesQuery } from './useFavorites'
 
 /** ‎null‎: شاشة اختيار التصنيف · ‎'all'‎: كل العناصر · ‎UNCATEGORIZED‎: من غير تصنيف · رقم: تصنيف بعينه */
 type View = null | 'all' | typeof UNCATEGORIZED | number
@@ -134,10 +134,19 @@ export function FavoritesDialog({ schema, onClose }: { schema: EditorSchema; onC
 /** زر «★ المفضلة» في تبويب الأقسام. */
 export function FavoritesButton({ schema }: { schema: EditorSchema }) {
   const { t } = useTranslation()
+  const client = useQueryClient()
   const [open, setOpen] = useState(false)
+  // المكتبة بتتجاب أول ما الزر يتشاف (وقت فراغ) فتكون جاهزة قبل الضغطة
+  useEffect(() => {
+    const idle = (window as unknown as { requestIdleCallback?: (cb: () => void) => number }).requestIdleCallback
+    const run = () => void prefetchFavorites(client)
+    if (idle) idle(run)
+    else setTimeout(run, 1500)
+  }, [client])
+  const warm = () => void prefetchFavorites(client)
   return (
     <>
-      <button type="button" className="ed-btn ed-btn--sm" onClick={() => setOpen(true)}>
+      <button type="button" className="ed-btn ed-btn--sm" onClick={() => setOpen(true)} onPointerEnter={warm} onFocus={warm}>
         {t('editorAssets.favorites.open')}
       </button>
       {open && <FavoritesDialog schema={schema} onClose={() => setOpen(false)} />}

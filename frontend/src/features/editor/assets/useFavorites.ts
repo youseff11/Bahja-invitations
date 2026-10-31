@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
 
 import type { FavoriteCategory, FavoriteRow } from '../types'
 import {
@@ -16,10 +16,16 @@ export const FAVORITES_KEY = ['editor', 'favorites']
 /** قيمة «التصنيف» للعناصر اللي من غير تصنيف (في الفلاتر والاختيار). */
 export const UNCATEGORIZED = 'none'
 
-/** مكتبة المفضلة (مشتركة بين كل الدعوات والقوالب) — بتتجاب وقت الفتح بس لأنها تقيلة (مئات الكيلوبايت). */
-export function useFavoritesQuery() {
-  return useQuery({ queryKey: FAVORITES_KEY, queryFn: fetchFavorites, staleTime: 0, gcTime: 60_000 })
-}
+/**
+ * مكتبة المفضلة (مشتركة بين كل الدعوات والقوالب). الكاش بيفضل ٣٠ دقيقة والقايمة بتظهر منه في نفس اللحظة،
+ * وبعد ٣٠ ثانية بتتحدّث في الخلفية من غير ما تختفي — بدل «جارٍ التحميل» في كل مرة.
+ */
+export const favoritesQuery = () => ({ queryKey: FAVORITES_KEY, queryFn: fetchFavorites, staleTime: 30_000, gcTime: 30 * 60_000 })
+
+export const useFavoritesQuery = () => useQuery(favoritesQuery())
+
+/** يجيب المكتبة قبل ما المستخدم يفتحها (مؤشر فوق الزر/الرابط أو وقت فراغ). */
+export const prefetchFavorites = (client: QueryClient) => client.prefetchQuery(favoritesQuery())
 
 /** عدد العناصر في كل تصنيف (‎UNCATEGORIZED‎ لغير المصنّفة). */
 export function countByCategory(favorites: FavoriteRow[]): Map<number | typeof UNCATEGORIZED, number> {

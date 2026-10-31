@@ -5,7 +5,7 @@ import { fetchPreview } from '../api'
 import { parseMessage, sendToFrame } from '../frame/bridge'
 import { useEditor } from '../store'
 import type { DocBlock, FromFrame, PreviewPayload } from '../types'
-import { fetchFavoritePreview } from './api'
+import { cachedPreview, loadStandalonePreview, rememberPreview } from './previewCache'
 
 /**
  * معاينة صغيرة للقسم المفضّل: نفس إطار المعاينة (‎/editor-frame/‎) بس بقسم واحد، بثيم المستند الحالي،
@@ -33,9 +33,13 @@ export function FavoritePreview({
   useEffect(() => {
     const node = box.current
     if (visible || !node) return
-    const observer = new IntersectionObserver((entries) => {
-      if (entries.some((e) => e.isIntersecting)) setVisible(true)
-    })
+    // نبدأ قبل ما الصف يظهر بشاشة تقريباً، عشان يكون جاهز لما المستخدم يوصله
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) setVisible(true)
+      },
+      { rootMargin: '600px 0px' },
+    )
     observer.observe(node)
     return () => observer.disconnect()
   }, [visible])
@@ -43,15 +47,25 @@ export function FavoritePreview({
   useEffect(() => {
     if (!visible || !block) return
     const controller = new AbortController()
-    const request = standalone
-      ? fetchFavoritePreview(block, '', controller.signal)
-      : (() => {
-          const { mode, id, doc, fields, previewLang } = useEditor.getState()
-          const single = { ...doc, blocks: [JSON.parse(JSON.stringify(block)) as DocBlock] }
-          return fetchPreview(mode, id, single, previewLang, controller.signal, fields)
-        })()
-    request
-      .then((next) => setPayload({ ...next, intro: null, showBranding: false }))
+    if (standalone) {
+      loadStandalonePreview(block, controller.signal)
+        .then((next) => setPayload({ ...next, intro: null, showBranding: false }))
+        .catch(() => !controller.signal.aborted && setFailed(true))
+      return () => controller.abort()
+    }
+    const { mode, id, doc, fields, previewLang } = useEditor.getState()
+    const single = { ...doc, blocks: [JSON.parse(JSON.stringify(block)) as DocBlock] }
+    const key = `${mode}|${id}|${previewLang}|${JSON.stringify(single)}|${JSON.stringify(fields ?? null)}`
+    const hit = cachedPreview(key)
+    if (hit) {
+      setPayload({ ...hit, intro: null, showBranding: false })
+      return
+    }
+    fetchPreview(mode, id, single, previewLang, controller.signal, fields)
+      .then((next) => {
+        rememberPreview(key, next)
+        setPayload({ ...next, intro: null, showBranding: false })
+      })
       .catch(() => !controller.signal.aborted && setFailed(true))
     return () => controller.abort()
   }, [visible, block, standalone])

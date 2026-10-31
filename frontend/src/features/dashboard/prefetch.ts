@@ -1,5 +1,7 @@
 import type { QueryClient } from '@tanstack/react-query'
 
+import { warmFavoritePreviews } from '../editor/assets/previewCache'
+import { favoritesQuery } from '../editor/assets/useFavorites'
 import { catalogQuery } from '../dataadmin/api'
 import { dashQueries } from './api'
 
@@ -33,7 +35,14 @@ const TARGETS: Record<string, Target> = {
   '/dashboard/music': library('music', () => import('./pages/MusicPage')),
   '/dashboard/videos': { chunk: () => import('./pages/VideosPage'), data: (c) => c.prefetchQuery(dashQueries.videos()) },
   '/dashboard/images': { chunk: () => import('./pages/ImagesPage'), data: (c) => c.prefetchQuery(dashQueries.images()) },
-  '/dashboard/favorites': { chunk: () => import('./pages/FavoritesPage') },
+  '/dashboard/favorites': {
+    chunk: () => import('./pages/FavoritesPage'),
+    // القايمة + معاينات أول العناصر، عشان الصفحة تفتح وهي ظاهرة بدل ما تحمّل قدام المستخدم
+    data: async (c) => {
+      const { favorites } = await c.fetchQuery(favoritesQuery())
+      warmFavoritePreviews(favorites.map((f) => f.block))
+    },
+  },
   '/dashboard/intros': library('intros', () => import('./pages/IntrosPage')),
   '/dashboard/data': { chunk: () => import('../dataadmin/DataHomePage'), data: (c) => c.prefetchQuery(catalogQuery()) },
 }

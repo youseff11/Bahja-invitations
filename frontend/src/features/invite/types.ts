@@ -130,7 +130,8 @@ export interface MusicConfig {
 
 export interface ScrollConfig {
   enabled: boolean
-  speed?: string
+  /** بكسل في الثانية */
+  speed?: number
   delay?: number
   loop?: boolean
 }
