@@ -42,7 +42,9 @@
   },
   "intro": {
     "hello": "Welcome {name}",
-    "play": "Play video"
+    "play": "Play video",
+    "soundOn": "Turn sound on",
+    "soundOff": "Mute sound"
   },
   "music": {
     "play": "Play music",

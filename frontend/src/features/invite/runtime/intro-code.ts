@@ -157,8 +157,10 @@ export function bindCodeCover(intro: HTMLElement, api: Api) {
       handed = e
       return
     }
-    const cover = codeCover(intro)
     const target = e.target as Element | null
+    // سماعة الصوت ليها معالجها الخاص — مش ضغطة على الكود ولا على الغطا
+    if (target?.closest?.('.lb-intro-sound')) return
+    const cover = codeCover(intro)
     // الضغطة جت على عنصر من كود الافتتاحية نفسه: الكود هو اللي بيرد عليها.
     // من غير ده أي افتتاحية من غير غطا بيملا الشاشة (ظرف صغير مثلاً) كانت
     // بتفتح الدعوة من أول ضغطة والحركة ماتبانش. لو الكود ماردّش خالص

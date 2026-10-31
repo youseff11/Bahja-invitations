@@ -51,10 +51,15 @@ export function Intro({ data, lockSkip = false }: { data: IntroData; lockSkip?: 
   const video = useRef<HTMLVideoElement>(null)
   const playBtn = useRef<HTMLButtonElement>(null)
   const openBtn = useRef<HTMLButtonElement>(null)
+  const soundBtn = useRef<HTMLButtonElement>(null)
 
   const manual = Boolean(data.video) && (data.playMode === 'button' || data.playMode === 'button_effects')
   // كود الافتتاحية بيشغّل الفيديو بنفسه (مثلاً بعد ٣ دقّات): ماننافسوهوش بتشغيل تلقائي
   const selfPlay = !manual && ownsVideo(data)
+  // فيديو بيبدأ لوحده ومفيش زرار فتح: سماعة على الشاشة الضيف يضغطها يشغّل بيها الصوت،
+  // وبتختفي مع الافتتاحية. (لو فيه زرار فتح، أول لمسة بترجّع الصوت زي الأول.)
+  const withSoundBtn = Boolean(data.video) && !manual && !data.button
+  const [soundOn, setSoundOn] = useState(data.audio === 'sound')
   const [open, setOpen] = useState(false)
   const [awaiting, setAwaiting] = useState(manual)
   const [blocked, setBlocked] = useState(false)
@@ -269,9 +274,13 @@ export function Intro({ data, lockSkip = false }: { data: IntroData; lockSkip?: 
               if (vid.muted) return refused()
               // الموبايل بيرفض التشغيل التلقائي بصوت — نجرّب صامت الأول
               vid.muted = true
-              mutedFallback = true
-              setSoundHint(true)
-              gestures.forEach((ev) => document.addEventListener(ev, unmuteOnGesture, true))
+              if (withSoundBtn) {
+                setSoundOn(false)
+              } else {
+                mutedFallback = true
+                setSoundHint(true)
+                gestures.forEach((ev) => document.addEventListener(ev, unmuteOnGesture, true))
+              }
               const again = vid.play()
               if (again && again.catch) again.catch(refused)
             })
@@ -305,6 +314,38 @@ export function Intro({ data, lockSkip = false }: { data: IntroData; lockSkip?: 
       }
       btn.addEventListener('click', onBtn)
       cleanup.push(() => btn.removeEventListener('click', onBtn))
+    }
+
+    const sound = soundBtn.current
+    if (sound && vid) {
+      const onSound = (e: Event) => {
+        e.stopPropagation() // السماعة مش «لمسة في أي مكان»: ماتفتحش الدعوة ولا تتحسب ضغطة كود
+        if (needsTap) {
+          // المتصفح رفض التشغيل: الضغطة دي بتبدأ الفيديو وبصوت
+          needsTap = false
+          setBlocked(false)
+          vid.muted = false
+          setSoundOn(true)
+          const start = vid.play()
+          if (start && start.catch) {
+            start.catch(() => {
+              vid.muted = true
+              setSoundOn(false)
+              const again = vid.play()
+              if (again && again.catch)
+                again.catch(() => {
+                  setBlocked(true)
+                  unlock()
+                })
+            })
+          }
+          return
+        }
+        vid.muted = !vid.muted
+        setSoundOn(!vid.muted)
+      }
+      sound.addEventListener('click', onSound)
+      cleanup.push(() => sound.removeEventListener('click', onSound))
     }
 
     // منطق «غطا الكود» نادر ومش بيتحمّل غير لو الافتتاحية فيها كود
@@ -428,6 +469,24 @@ export function Intro({ data, lockSkip = false }: { data: IntroData; lockSkip?: 
             {data.playLabel && <span className="lb-intro-play-text">{data.playLabel}</span>}
           </button>
         ))}
+      {withSoundBtn && (
+        <button
+          ref={soundBtn}
+          type="button"
+          className={`lb-intro-sound${soundOn ? ' is-on' : ''}`}
+          aria-label={t(soundOn ? 'intro.soundOff' : 'intro.soundOn')}
+          aria-pressed={soundOn}
+        >
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M3 9v6h4l5 5V4L7 9H3Z" />
+            <path className="lb-intro-sound-waves" d="M16.5 12A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12Zm2.5 0a7 7 0 0 1-5 6.7v2.06A9 9 0 0 0 21 12a9 9 0 0 0-7-8.76v2.06A7 7 0 0 1 19 12Z" />
+            <path
+              className="lb-intro-sound-off"
+              d="m16.3 9.7 1.4-1.4 2.3 2.3 2.3-2.3 1.4 1.4-2.3 2.3 2.3 2.3-1.4 1.4-2.3-2.3-2.3 2.3-1.4-1.4 2.3-2.3-2.3-2.3Z"
+            />
+          </svg>
+        </button>
+      )}
       <div className="lb-intro-inner">
         {data.note && (
           <p className="lb-kicker" data-intro-item="note" style={parseStyle(items.note)}>

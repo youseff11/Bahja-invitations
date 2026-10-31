@@ -1913,6 +1913,21 @@ a.lb-social:hover { transform: translateY(-2px); opacity: .85; }
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23fff'%3E%3Cpath d='M3 9v6h4l5 5V4L7 9H3Zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12Z'/%3E%3C/svg%3E")
     center / 22px no-repeat;
 }
+/* سماعة الصوت: بتظهر لفيديو بيبدأ لوحده من غير زرار فتح، وبتختفي مع الافتتاحية */
+.lb-intro-sound {
+  position: absolute; z-index: 6;
+  inset-block-end: calc(18px + env(safe-area-inset-bottom, 0px)); inset-inline-end: 18px;
+  inline-size: 46px; block-size: 46px; padding: 0;
+  display: grid; place-items: center;
+  border: 1px solid rgba(255, 255, 255, .5); border-radius: 50%;
+  background: rgba(20, 18, 16, .5); color: #fff;
+  cursor: pointer; appearance: none; -webkit-tap-highlight-color: transparent;
+}
+.lb-intro-sound svg { inline-size: 24px; block-size: 24px; }
+.lb-intro-sound:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+.lb-intro-sound .lb-intro-sound-waves { display: none; }
+.lb-intro-sound.is-on .lb-intro-sound-waves { display: inline; }
+.lb-intro-sound.is-on .lb-intro-sound-off { display: none; }
 /* المتصفح رفض التشغيل التلقائي: علامة تشغيل توضّح إن لمسة هتبدأ الفيديو */
 .lb-intro.is-video-blocked::after {
   content: ''; position: absolute; inset: 0; margin: auto; z-index: 4; pointer-events: none;

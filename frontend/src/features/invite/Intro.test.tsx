@@ -251,6 +251,42 @@ describe('Intro — the guest cannot skip the video', () => {
     expect(root.classList.contains('is-open')).toBe(false)
   })
 
+  describe('sound button (video that starts by itself, no enter button)', () => {
+    const noButton = (extra = {}) => renderIntro(intro({ video: '/v.mp4', button: '', ...extra }), true)
+
+    it('shows a speaker only when there is a video and no enter button', () => {
+      expect(noButton().container.querySelector('.lb-intro-sound')).not.toBeNull()
+      expect(renderIntro(intro({ video: '/v.mp4' }), true).container.querySelector('.lb-intro-sound')).toBeNull()
+      expect(renderIntro(intro({ button: '' }), true).container.querySelector('.lb-intro-sound')).toBeNull()
+      expect(
+        renderIntro(intro({ video: '/v.mp4', button: '', playMode: 'button' }), true).container.querySelector('.lb-intro-sound'),
+      ).toBeNull()
+    })
+
+    it('tapping it toggles the sound without opening the invitation', () => {
+      const { container } = noButton()
+      const root = container.querySelector('.lb-intro')!
+      const video = container.querySelector('video')!
+      const sound = container.querySelector('.lb-intro-sound')!
+      expect(video.muted).toBe(true)
+      fireEvent.click(sound)
+      expect(video.muted).toBe(false)
+      expect(sound.classList.contains('is-on')).toBe(true)
+      fireEvent.click(sound)
+      expect(video.muted).toBe(true)
+      expect(root.classList.contains('is-open')).toBe(false)
+    })
+
+    it('goes away with the intro', () => {
+      const { container } = noButton()
+      fireEvent.ended(container.querySelector('video')!)
+      act(() => {
+        vi.advanceTimersByTime(800)
+      })
+      expect(container.querySelector('.lb-intro-sound')).toBeNull()
+    })
+  })
+
   it('does not lock the editor preview or a no-video intro', () => {
     const editor = renderIntro(intro({ video: '/v.mp4' }), false)
     fireEvent.click(editor.container.querySelector('.lb-intro')!)
