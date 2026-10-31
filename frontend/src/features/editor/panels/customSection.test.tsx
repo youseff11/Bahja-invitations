@@ -134,7 +134,7 @@ describe('custom code section inspector', () => {
     act(() => s().selectElement('a', 'el-1'))
     expect(summaries()).not.toContain('ألوان القسم')
     const colors = document.querySelector('[data-field-key="element-colors"]') as HTMLElement
-    expect(colors.querySelectorAll('input[type="color"]').length).toBe(2)
+    expect(colors.querySelectorAll('input[type="color"]').length).toBe(3)
     fireEvent.change(colors.querySelector('input[type="color"]') as HTMLInputElement, { target: { value: '#ff0000' } })
     expect(String(s().doc.blocks[0].props.html)).toMatch(/color:\s*rgb\(255, 0, 0\)/)
   })

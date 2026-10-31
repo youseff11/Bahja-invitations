@@ -13,7 +13,7 @@ const ROOTS = '.lb-custom, .lb-extra-html, .lb-intro-extra'
  * المحرر بيفرض ‎pointer-events: auto‎ على كل عنصر مرقّم، فشرائح كاروسيل مخفية (شريحة نشطة واحدة والباقي
  * ‎opacity: 0‎ فوق بعض) كانت بتاخد الضغطة بدل الشريحة اللي باينة.
  */
-function isGhost(el: Element): boolean {
+export function isGhost(el: Element): boolean {
   const root = el.closest(ROOTS)
   for (let cur: Element | null = el; cur; cur = cur.parentElement) {
     const style = getComputedStyle(cur)

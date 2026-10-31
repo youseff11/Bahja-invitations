@@ -7,7 +7,7 @@ import { useSchema } from '../hooks'
 import { cssNumber, fontKey, lineRatio, toHex } from '../imported/css'
 import { computedValue } from '../imported/live'
 import { mapEmbedUrl } from '../imported/map'
-import { normalizeText, type NodeInfo, type SelfProp, type StyleProp } from '../imported/nodeEdit'
+import { normalizeText, type NodeInfo, type StyleProp } from '../imported/nodeEdit'
 import { useElementActions } from '../imported/useElementActions'
 import { useEditor } from '../store'
 import type { FieldSpec, FieldType } from '../types'
@@ -36,9 +36,10 @@ const ALIGNS = ['', 'right', 'center', 'left']
  * حقول تنسيق العنصر حسب نوعه: النص والأشكال بيقبلوا الخط والألوان والمسافات، والصورة بتاخد مقاسها
  * واستدارتها ولون خلفيتها بس (الخط مالوش تأثير عليها)، والفيديو لون الخلفية، والخريطة مالهاش تنسيق (مقاسها ورابطها بأدواتها).
  */
-function styleFields(t: (key: string) => string, kind: NodeInfo['kind']): StyleField[] {
+function styleFields(t: (key: string) => string, info: NodeInfo): StyleField[] {
+  const kind = info.kind
   const k = (key: string) => t(`editorInline.element.fields.${key}`)
-  const color = (prop: 'color' | 'background-color', label: string): StyleField => ({
+  const color = (prop: StyleProp, label: string): StyleField => ({
     prop,
     unit: '',
     spec: field(prop, 'color', label, { clearable: true }),
@@ -53,15 +54,19 @@ function styleFields(t: (key: string) => string, kind: NodeInfo['kind']): StyleF
     unit: '',
     spec: field(prop, 'select', label, { options: values.map((v) => ({ value: v, label: k(`${names}.${v || 'inherit'}`) })) }),
   })
+  const border = color('border-color', k('border'))
+  const opacity = range('opacity', k('opacity'), 0, 100, 1, '%')
   if (kind === 'map') return []
   if (kind === 'image') {
     return [
       color('background-color', k('background')),
+      border,
+      opacity,
       range('width', k('imageWidth'), 10, 100, 1, '%'),
       range('border-radius', k('imageRadius'), 0, 200, 2, 'px'),
     ]
   }
-  if (kind === 'video') return [color('background-color', k('background'))]
+  if (kind === 'video') return [color('background-color', k('background')), opacity]
   return [
     { prop: 'font-family', unit: '', spec: field('font-family', 'font', k('font')) },
     range('font-size', k('size'), 8, 120, 1, 'px'),
@@ -69,32 +74,11 @@ function styleFields(t: (key: string) => string, kind: NodeInfo['kind']): StyleF
     select('text-align', k('align'), ALIGNS, 'aligns'),
     color('color', k('color')),
     color('background-color', k('background')),
+    border,
+    ...(info.svg ? [color('fill', k('fill')), color('stroke', k('stroke'))] : []),
+    opacity,
     range('letter-spacing', k('letter'), -3, 16, 0.5, 'px'),
     range('line-height', k('line'), 0.8, 3.2, 0.05, ''),
-  ]
-}
-
-interface SelfField {
-  prop: SelfProp
-  spec: FieldSpec
-}
-
-/**
- * ألوان وشفافية العنصر المحدَّد نفسه (برواز، كارت، أيقونة…) مش النص اللي جواه: الخلفية والإطار وشفافية العنصر كله،
- * ولون النص الموروث (أيقونات currentColor) لو عقدة التنسيق نص جواه، وملء/خط الـSVG.
- * اللي بيكتب أصلاً على العنصر نفسه (عقدة التنسيق = هو) مش بيتكرر هنا.
- */
-function selfFields(t: (key: string) => string, info: NodeInfo): SelfField[] {
-  const k = (key: string) => t(`editorInline.element.fields.${key}`)
-  const color = (prop: SelfProp, label: string): SelfField => ({ prop, spec: field(prop, 'color', label, { clearable: true }) })
-  if (info.kind === 'map') return []
-  const textual = info.kind === 'text' || info.kind === 'shape'
-  return [
-    ...(info.ownTarget ? [] : [color('background-color', k('selfBackground'))]),
-    color('border-color', k('selfBorder')),
-    ...(info.ownTarget || !textual ? [] : [color('color', k('selfColor'))]),
-    ...(info.svg ? [color('fill', k('selfFill')), color('stroke', k('selfStroke'))] : []),
-    { prop: 'opacity', spec: field('opacity', 'range', k('selfOpacity'), { min: 0, max: 100, step: 1, unit: '%' }) },
   ]
 }
 
@@ -191,18 +175,20 @@ export function ElementFields({ blockId, slot, info }: Props) {
   const typed = typedAt?.slot === slot ? typedAt.text : null
   const { data: schema } = useSchema()
   const library = useEditor((s) => s.lib.fonts)
-  const all = useMemo(() => styleFields(t, info.kind), [t, info.kind])
-  // الألوان قدّام طول الوقت (حدّد عنصر وغيّر لونه)، وباقي التنسيق ورا الترس
-  const colors = all.filter((item) => item.spec.type === 'color')
-  const fields = all.filter((item) => item.spec.type !== 'color')
-  const own = useMemo(() => selfFields(t, info), [t, info])
+  const all = useMemo(() => styleFields(t, info), [t, info])
+  // الألوان والشفافية قدّام طول الوقت (حدّد عنصر وغيّر لونه)، وباقي التنسيق ورا الترس
+  const upfront = (item: StyleField) => item.spec.type === 'color' || item.prop === 'opacity'
+  const colors = all.filter(upfront)
+  const fields = all.filter((item) => !upfront(item))
 
   const computed = (prop: string) => computedValue(blockId, slot, prop)
   const number = (prop: StyleProp): number => {
-    const inline = cssNumber(info.styles[prop])
+    const inline = prop === 'opacity' ? null : cssNumber(info.styles[prop])
     if (inline !== null) return inline
     const size = cssNumber(computed('font-size')) ?? 16
     switch (prop) {
+      case 'opacity':
+        return Math.round((cssNumber(info.styles.opacity) ?? cssNumber(computed('opacity')) ?? 1) * 100)
       case 'font-size':
         return Math.round(size)
       case 'letter-spacing':
@@ -234,19 +220,12 @@ export function ElementFields({ blockId, slot, info }: Props) {
   }
 
   const write = (item: StyleField, next: unknown) => {
-    const css = next === '' || next == null ? '' : `${next}${item.spec.type === 'range' ? item.unit : ''}`
-    actions.edit({ kind: 'style', prop: item.prop, value: css }, `el-style:${slot}:${item.prop}`)
-  }
-
-  const ownValue = ({ prop }: SelfField): unknown => {
-    if (prop !== 'opacity') return toHex(info.self[prop])
-    const inline = cssNumber(info.self.opacity)
-    return Math.round((inline ?? cssNumber(computedValue(blockId, slot, 'opacity', true)) ?? 1) * 100)
-  }
-
-  const ownWrite = ({ prop }: SelfField, next: unknown) => {
-    const raw = next === '' || next == null ? '' : prop === 'opacity' ? String(Math.min(100, Math.max(0, Number(next) || 0)) / 100) : String(next)
-    actions.edit({ kind: 'self', prop, value: raw, important: true }, `el-self:${slot}:${prop}`)
+    const empty = next === '' || next == null
+    // الشفافية في CSS من ٠ لـ١ (الشريط ٠–١٠٠)
+    const css = empty ? '' : item.prop === 'opacity' ? String(Math.min(100, Math.max(0, Number(next) || 0)) / 100) : `${next}${item.spec.type === 'range' ? item.unit : ''}`
+    // اللي بيكسب على كود المصمّم (‎!important‎ وسكربتات الظهور) — خاصة الإطار والشفافية وألوان الـSVG
+    const important = ['border-color', 'opacity', 'fill', 'stroke'].includes(item.prop)
+    actions.edit({ kind: 'style', prop: item.prop, value: css, important }, `el-style:${slot}:${item.prop}`)
   }
 
   const panel = gear && (
@@ -310,15 +289,6 @@ export function ElementFields({ blockId, slot, info }: Props) {
         <div data-field-key="element-colors">
           {colors.map((item) => (
             <FieldRenderer key={item.prop} spec={item.spec} value={value(item)} onChange={(next) => write(item, next)} />
-          ))}
-        </div>
-      )}
-
-      {own.length > 0 && (
-        <div data-field-key="element-self">
-          <p className="ed-hint">{t('editorInline.element.fields.selfHint')}</p>
-          {own.map((item) => (
-            <FieldRenderer key={item.prop} spec={item.spec} value={ownValue(item)} onChange={(next) => ownWrite(item, next)} />
           ))}
         </div>
       )}

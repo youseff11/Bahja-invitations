@@ -9,6 +9,14 @@ export interface Numbered {
   added: HTMLElement[]
 }
 
+/** أول رقم فاضي (‎ce-N‎) في جذر — لعنصر اتضغط عليه ومالوش رقم. */
+export function nextSlot(root: Element, prefix = root.matches(CODE_ROOTS) ? 'ce-' : 'el-'): string {
+  const used = new Set(Array.from(root.querySelectorAll('[data-move]')).map((n) => n.getAttribute('data-move')))
+  let next = 1
+  while (used.has(`${prefix}${next}`)) next++
+  return `${prefix}${next}`
+}
+
 /**
  * يجهّز جذر قسم مستورد (‎.lb-custom‎) للتحرير:
  *  ١) يعلّم وحدات النص (‎data-lb-text‎) — فيهم أولاً عشان اللي جوّاها يطلع من اللعبة.

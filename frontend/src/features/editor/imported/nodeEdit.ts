@@ -10,9 +10,9 @@ import { CODE_ROOTS, isImportedCountdownPart, isTextual } from './units'
  */
 export type NodeEdit =
   /** ‎style‎ على «عقدة التنسيق»: الصورة/الفيديو لو فيه، وإلا وحدة النص اللي جوّه، وإلا العنصر نفسه */
-  | { kind: 'style'; prop: string; value: string }
+  | { kind: 'style'; prop: string; value: string; important?: boolean }
   /** ‎style‎ على العنصر المحدَّد نفسه (الإخفاء ‎display:none‎) */
-  | { kind: 'self'; prop: string; value: string; important?: boolean }
+  | { kind: 'self'; prop: string; value: string }
   | { kind: 'text'; value: string }
   /** محتوى العنصر نفسه (‎innerHTML‎) — كتابة وحدة نص في صندوق الكود من المعاينة (بتحافظ على الوسوم السطرية اللي فيها) */
   | { kind: 'inner'; html: string }
@@ -60,9 +60,14 @@ export function textUnitIn(node: Element): Element | null {
   return Array.from(node.querySelectorAll('*')).find(isTextual) ?? null
 }
 
-/** العقدة اللي بتتكتب عليها الخصائص: صورة ثم فيديو ثم وحدة نص ثم العنصر نفسه (ترتيب القديم). */
+/**
+ * العقدة اللي بتتكتب عليها الخصائص: صورة ثم فيديو ثم وحدة نص ثم العنصر نفسه (ترتيب القديم).
+ * جوّه صندوق كود المصمّم العنصر المحدَّد هو اللي بيتلوّن (برواز/كارت/شكل) مش أول نص جواه — المحرر بيحدّد الحتة اللي اتضغطت بالظبط.
+ */
 export function styleTarget(node: Element): Element {
-  return imageIn(node) ?? videoIn(node) ?? textUnitIn(node) ?? node
+  const media = imageIn(node) ?? videoIn(node)
+  if (media) return media
+  return node.closest(CODE_ROOTS) ? node : (textUnitIn(node) ?? node)
 }
 
 function setProp(node: Element, prop: string, value: string, priority = '') {
@@ -109,10 +114,10 @@ export function applyNodeEdit(root: Element, slot: string, edit: NodeEdit): bool
   if (!node) return false
   switch (edit.kind) {
     case 'style':
-      setProp(styleTarget(node), edit.prop, edit.value)
+      setProp(styleTarget(node), edit.prop, edit.value, edit.important ? 'important' : '')
       return true
     case 'self':
-      setProp(node, edit.prop, edit.value, edit.important ? 'important' : '')
+      setProp(node, edit.prop, edit.value)
       return true
     case 'text': {
       const unit = textUnitIn(node)
@@ -169,16 +174,9 @@ export function applyNodeEdit(root: Element, slot: string, edit: NodeEdit): bool
 /** خصائص التنسيق اللي اللوحة بتقراها من العقدة. */
 export const STYLE_PROPS = [
   'font-family', 'font-size', 'font-weight', 'text-align', 'color', 'background-color',
-  'letter-spacing', 'line-height', 'width', 'border-radius',
+  'letter-spacing', 'line-height', 'width', 'border-radius', 'border-color', 'opacity', 'fill', 'stroke',
 ] as const
 export type StyleProp = (typeof STYLE_PROPS)[number]
-
-/**
- * خصائص العنصر المحدَّد نفسه (مش وحدة النص اللي جواه): خلفيته وإطاره وشفافيته وألوان الأيقونات SVG.
- * بتتكتب ‎!important‎ عشان تكسب على ‎!important‎ جوّه كود المصمّم (وعلى سكربتات الظهور اللي بتكتب ‎opacity‎).
- */
-export const SELF_PROPS = ['background-color', 'border-color', 'color', 'fill', 'stroke', 'opacity'] as const
-export type SelfProp = (typeof SELF_PROPS)[number]
 
 export type NodeKind = 'image' | 'video' | 'map' | 'text' | 'shape'
 
@@ -197,14 +195,10 @@ export interface NodeInfo {
   /** جزء من عدّاد القالب المستورد (موعده واتجاهه إعدادات القسم) */
   countdown: boolean
   hidden: boolean
+  /** العنصر نفسه رسمة SVG — حقلا التعبئة والخط */
+  svg: boolean
   /** القيم المضمّنة على عقدة التنسيق (فاضية = مفيش قيمة مضمّنة) */
   styles: Record<StyleProp, string>
-  /** عقدة التنسيق هي العنصر نفسه (يعني حقول اللون/الخلفية فوق بتكتب عليه هو) */
-  ownTarget: boolean
-  /** العنصر أيقونة/رسمة SVG أو فيه واحدة — حقلا الملء والخط */
-  svg: boolean
-  /** القيم المضمّنة على العنصر المحدَّد نفسه */
-  self: Record<SelfProp, string>
 }
 
 const OWN_CLASSES = new Set(['lb-el-picked', 'lb-el-typing', 'lb-dragging', 'lb-el-swap'])
@@ -252,12 +246,7 @@ export function readNode(root: Element, slot: string): NodeInfo | null {
     map: frame ? { src: frame.getAttribute('src') ?? '', width: mapSize(node, 'width'), height: mapSize(node, 'height') } : null,
     countdown: isImportedCountdownPart(node),
     hidden: (node as HTMLElement).style?.display === 'none',
+    svg: tagOf(node) === 'SVG',
     styles,
-    ownTarget: target === node,
-    svg: tagOf(node) === 'SVG' || !!node.querySelector('svg'),
-    self: Object.fromEntries(SELF_PROPS.map((prop) => [prop, (node as HTMLElement).style?.getPropertyValue(prop) ?? ''])) as Record<
-      SelfProp,
-      string
-    >,
   }
 }

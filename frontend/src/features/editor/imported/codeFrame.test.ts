@@ -88,10 +88,38 @@ describe('advanced-code box: selecting and typing', () => {
     arm()
     box.querySelector('.a')!.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     expect(picks.at(-1)).toEqual({ id: 'b1', slot: 'ce-3' })
+    // الضغطة على الحشو: مفيش عنصر جوّه تحت النقطة (الهندسة هنا حقيقية: الأبناء بعيد عن (0,0))
+    vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(function (this: Element) {
+      return (this === box ? { left: 0, top: 0, right: 200, bottom: 200, width: 200, height: 200 } : { left: 500, top: 500, right: 580, bottom: 530, width: 80, height: 30 }) as DOMRect
+    })
     box.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     expect(picks.at(-1)).toEqual({ id: 'b1', slot: 'code' })
     markPicked({ id: 'b1', slot: 'ce-4' })
     expect(box.querySelector('.b')!.classList.contains('lb-el-picked')).toBe(true)
+  })
+
+  it('a click picks the exact part under the mouse — a frame with no number gets one on the spot', () => {
+    const box = mountSection(
+      '<div class="lb-extra-html" data-move="code"><div class="wrap"><div class="card"><div class="line"></div><span class="t">نص</span></div></div></div>',
+    )
+    arm()
+    const card = box.querySelector<HTMLElement>('.card')!
+    expect(card.hasAttribute('data-move')).toBe(false) // مش مرقّم: مش وحدة نص ولا طبقة خارجية
+    // الأب الخارجي واسع، الكارت أصغر وتحت الماوس، والباقي بعيد
+    const rects = new Map<Element, DOMRect>([
+      [box, { left: 0, top: 0, right: 400, bottom: 400, width: 400, height: 400 } as DOMRect],
+      [box.querySelector('.wrap')!, { left: 0, top: 0, right: 300, bottom: 300, width: 300, height: 300 } as DOMRect],
+      [card, { left: 40, top: 40, right: 140, bottom: 120, width: 100, height: 80 } as DOMRect],
+    ])
+    vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(function (this: Element) {
+      return rects.get(this) ?? ({ left: 900, top: 900, right: 980, bottom: 930, width: 80, height: 30 } as DOMRect)
+    })
+    sent.length = 0
+    box.querySelector('.wrap')!.dispatchEvent(new MouseEvent('click', { bubbles: true, clientX: 60, clientY: 60 }))
+    expect(card.getAttribute('data-move')).toBe('ce-3')
+    expect(picks.at(-1)).toEqual({ id: 'b1', slot: 'ce-3' })
+    const msg = sent.find((m) => m.type === 'lb-editor:code-number') as Extract<FromFrame, { type: 'lb-editor:code-number' }>
+    expect(msg.items).toEqual([{ path: [0, 0], slot: 'ce-3', tag: 'DIV' }])
   })
 
   it('a click in the intro code selects an element of __intro', () => {

@@ -1,8 +1,8 @@
 import type { FromFrame, PreviewPayload } from '../types'
 import { applyNodeEdit, keepsShape, textUnitIn, videoIn, type NodeEdit } from './nodeEdit'
-import { numberElements } from './numbering'
+import { nextSlot, numberElements } from './numbering'
 import { upgradeLazyImages, savedSrc } from './lazyImages'
-import { pointTarget } from '../frame/pointTarget'
+import { isGhost, pointTarget } from '../frame/pointTarget'
 import { htmlOf, mirror, snapshot } from './pristine'
 import { serializeCustom } from './serialize'
 import { INTRO_ID } from './source'
@@ -74,6 +74,30 @@ function scheduleNode(node: Element, send: Send) {
     node,
     setTimeout(() => writeNode(node, send), WRITE_WAIT),
   )
+}
+
+const NOT_PICKABLE = new Set(['SCRIPT', 'STYLE', 'BR', 'HR', 'LINK', 'META'])
+
+/**
+ * أصغر عنصر باين جوّه صندوق كود تحت نقطة الضغطة (برواز، كارت، خط، شكل…) — حتى لو مالوش رقم: كود المصمّم غالباً
+ * ‎pointer-events:none‎ فالضغطة بتروح للأب المرقّم، فالمحرر هو اللي بيدوّر بالمقاس. وحدات النص وجوّه الـSVG بتتخطّى
+ * (النص ليه تحديده، والـSVG بيتحدّد كله).
+ */
+function codeElementAt(box: Element, x: number, y: number): HTMLElement | null {
+  let best: HTMLElement | null = null
+  let bestArea = Infinity
+  for (const n of Array.from(box.querySelectorAll<HTMLElement>('*'))) {
+    if (NOT_PICKABLE.has(n.tagName.toUpperCase())) continue
+    if ((n.tagName.toLowerCase() !== 'svg' && n.closest('svg')) || n.parentElement?.closest('[data-lb-text]')) continue
+    const r = n.getBoundingClientRect()
+    const slop = Math.max(0, 4 - Math.min(r.width, r.height)) / 2 // خط رفيع: هامش صغير عشان يتضغط
+    if (r.width <= 0 || r.height <= 0 || x < r.left - slop || x > r.right + slop || y < r.top - slop || y > r.bottom + slop) continue
+    const area = r.width * r.height
+    if (area > bestArea || isGhost(n)) continue
+    best = n
+    bestArea = area
+  }
+  return best
 }
 
 /** تبديل صورتين جوّه صندوق كود: المصدرين الجداد (src وsrcset) بيتبعتوا بأرقام الصورتين. */
@@ -230,12 +254,24 @@ export function installImported({ payload, send, onPick }: Options): () => void 
 
   // ضغطة = اختيار أقرب عنصر مرقّم (اللي جوّه وحدة نص مابيترقّمش فالنص نفسه هو اللي بيتحدّد)
   const onClick = (e: MouseEvent) => {
-    const node = inRoot(pointTarget(e), '[data-move]')
+    const hit = pointTarget(e)
+    let node = inRoot(hit, '[data-move]')
+    // صندوق كود المصمّم: الحتة اللي اتضغطت بالظبط هي اللي بتتحدّد (وبتتلوّن) — مش أقرب أب مرقّم. وحدة النص لسه بتتحدّد زي ما هي
+    const box = hit instanceof Element && !hit.closest('[data-lb-text]') ? hit.closest<HTMLElement>(CODE_ROOTS) : null
+    if (box) node = codeElementAt(box, e.clientX, e.clientY) ?? node
     if (!node || node.classList.contains('lb-el-typing')) return
     const root = rootAt(node)
     const id = root && blockIdOf(root)
-    const slot = node.getAttribute('data-move')
-    if (!id || !slot) return
+    let slot = node.getAttribute('data-move')
+    if (!id || !root) return
+    if (!slot) {
+      // عنصر مالوش رقم: بنرقّمه دلوقتي (يتكتب في النص الأصلي بالمسار) عشان يتحدّد ويتلوّن
+      const path = isCodeRoot(root) ? pathOf(node, root) : null
+      if (!path) return
+      slot = nextSlot(root)
+      node.setAttribute('data-move', slot)
+      send({ type: 'lb-editor:code-number', id, items: [{ path, slot, tag: node.tagName }] })
+    }
     onPick({ id, slot })
     send({ type: 'lb-editor:element', id, slot })
   }

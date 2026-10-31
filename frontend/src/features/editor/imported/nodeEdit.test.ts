@@ -34,6 +34,28 @@ describe('style target', () => {
   })
 })
 
+describe('colors in a code box', () => {
+  const code = '<div class="lb-extra-html"><div data-move="ce-1" class="card"><span data-move="ce-2">نص</span></div></div>'
+
+  it('paint the selected element itself (a frame), not the first text inside it', () => {
+    const root = parse(code, 'code')
+    applyNodeEdit(root, 'ce-1', { kind: 'style', prop: 'border-color', value: '#c1272d', important: true })
+    applyNodeEdit(root, 'ce-1', { kind: 'style', prop: 'opacity', value: '0.4', important: true })
+    const card = node(root, 'ce-1')
+    expect(card.style.getPropertyValue('border-color')).toBe('rgb(193, 39, 45)')
+    expect(card.style.getPropertyPriority('opacity')).toBe('important')
+    expect(node(root, 'ce-2').hasAttribute('style')).toBe(false)
+    expect(readNode(root, 'ce-1')?.styles).toMatchObject({ opacity: '0.4' })
+    applyNodeEdit(root, 'ce-1', { kind: 'style', prop: 'opacity', value: '', important: true })
+    expect(readNode(root, 'ce-1')?.styles.opacity).toBe('')
+  })
+
+  it('keep the old target outside code boxes (first text unit of a container)', () => {
+    const root = parse('<div data-move="el-1"><p data-move="el-2">أول</p></div>')
+    expect(styleTarget(node(root, 'el-1')).tagName).toBe('P')
+  })
+})
+
 describe('empty element in a code box', () => {
   const code = '<div data-move="ce-1"><span class="ck-sub" data-move="ce-2"></span><div data-move="ce-3"><b>x</b></div></div>'
 
@@ -75,20 +97,6 @@ describe('applyNodeEdit', () => {
     expect(node(root, 'el-3').style.display).toBe('')
     applyNodeEdit(root, 'el-1', { kind: 'self', prop: 'display', value: '' })
     expect(node(root, 'el-1').hasAttribute('style')).toBe(false)
-  })
-
-  it('self edits can be !important so they beat the designer code and reveal scripts', () => {
-    const root = dom()
-    applyNodeEdit(root, 'el-1', { kind: 'self', prop: 'border-color', value: '#c1272d', important: true })
-    applyNodeEdit(root, 'el-1', { kind: 'self', prop: 'opacity', value: '0.4', important: true })
-    const box = node(root, 'el-1')
-    expect(box.style.getPropertyValue('border-color')).toBe('rgb(193, 39, 45)')
-    expect(box.style.getPropertyPriority('opacity')).toBe('important')
-    expect(readNode(root, 'el-1')?.self.opacity).toBe('0.4')
-    expect(readNode(root, 'el-3')?.self.opacity).toBe('')
-    applyNodeEdit(root, 'el-1', { kind: 'self', prop: 'opacity', value: '', important: true })
-    applyNodeEdit(root, 'el-1', { kind: 'self', prop: 'border-color', value: '', important: true })
-    expect(readNode(root, 'el-1')?.self).toMatchObject({ opacity: '', 'border-color': '' })
   })
 
   it('replaces text as plain text (markup in the value stays text)', () => {
