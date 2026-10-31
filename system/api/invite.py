@@ -28,7 +28,7 @@ from django.utils import timezone
 from django.views.decorators.cache import never_cache
 
 from .. import blocks as blocks_engine
-from .. import services
+from .. import protection, services
 from ..models import Guest, Invitation, RSVPResponse, Template
 from . import invite_render
 from .http import ApiError, api_view, client_hash, json_body
@@ -164,6 +164,8 @@ def template_response(request, template: Template, *, lang: str = "") -> dict:
 @never_cache
 @api_view("GET")
 def invitation_render(request, slug):
+    if not protection.is_same_origin(request):
+        raise ApiError(403, "forbidden", "غير مسموح.")
     invitation = get_live_invitation(slug)
     guest = None
     token = request.GET.get("guest", "")
@@ -179,6 +181,8 @@ def invitation_render(request, slug):
 @never_cache
 @api_view("GET")
 def template_preview(request, slug):
+    if not protection.is_same_origin(request):
+        raise ApiError(403, "forbidden", "غير مسموح.")
     template = get_object_or_404(Template, slug=slug, is_active=True)
     return template_response(request, template, lang=services._lang(request))  # noqa: SLF001
 

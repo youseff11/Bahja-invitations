@@ -2,6 +2,7 @@
 <html lang="{{ lang|default:'ar' }}" dir="{{ dir|default:'rtl' }}">
 <head>
 <meta charset="utf-8">
+{% if domain_lock %}<script>!function(a,h){var c=location.hostname.toLowerCase();if(a.indexOf(c)<0){try{window.stop()}catch(e){}document.documentElement.innerHTML="";location.replace(h)}}({{ domain_lock.hosts|safe }},{{ domain_lock.home|safe }})</script>{% endif %}
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>{{ page_title }}</title>
 <meta name="description" content="{{ page_description }}">
@@ -58,7 +59,7 @@ html { overflow-x: clip; }
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Aref+Ruqaa:wght@400;700&family=Cairo:wght@300;400;600;700&family=Cormorant+Garamond:wght@300;400;500;600&family=Gelasio:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Great+Vibes&family=Marcellus&family=Montserrat:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600&family=Reem+Kufi:wght@400;600&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;700&family=Tajawal:wght@400;700&display=swap" rel="stylesheet"></noscript>
-{% vite_assets 'src/invite-main.tsx' %}
+{% if not lite %}{% vite_assets 'src/invite-main.tsx' %}{% endif %}
 {% comment %}
   سكربتات القالب المستورد بتتنفّذ بالترتيب واحد ورا التاني. الـpreload
   بيخلّيهم ينزلوا كلهم بالتوازي من أول ما الرأس يتقري (شوف ‎render.html‎
@@ -74,8 +75,10 @@ html { overflow-x: clip; }
 {% if pixel %}{% include 'partials/_meta_pixel.html' with no_contact=True %}{% endif %}
 </head>
 <body class="lb-doc" style="{{ body_style }}" data-invite-root data-ready="1">
-<div id="root" data-invite-language-content></div>
+{% if lite %}<noscript>افتح هذا الرابط من متصفح لعرض الدعوة.</noscript>
+<script>try{document.cookie="bjv=1;path=/;max-age=86400;samesite=lax";if(document.cookie.indexOf("bjv=1")>-1&&!sessionStorage.bjr){sessionStorage.bjr=1;location.reload()}}catch(e){}</script>
+{% else %}<div id="root" data-invite-language-content></div>
 {{ boot|json_script:"invite-data" }}
-<noscript>هذه الدعوة تحتاج تفعيل JavaScript.</noscript>
+<noscript>هذه الدعوة تحتاج تفعيل JavaScript.</noscript>{% endif %}
 </body>
 </html>

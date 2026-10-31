@@ -18,7 +18,7 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_safe
 
-from .. import services
+from .. import protection, services
 from ..models import Invitation, Template
 from . import invite
 
@@ -28,9 +28,10 @@ def _boot(payload: dict) -> dict:
     return {"mode": "view", **{k: v for k, v in payload.items() if k != "css"}}
 
 
-def _response(request, payload: dict) -> "HttpResponse":
+def _response(request, payload: dict, *, lite: bool = False) -> "HttpResponse":
+    """‎lite‎: طلب مش شبه متصفح (أداة نسخ/زاحف) — الميتا بس، من غير محتوى ولا أكواد ولا وسائط."""
     head = payload["head"]
-    response = render(request, "spa/invite.html", {
+    context = {
         "lang": payload["lang"],
         "dir": payload["dir"],
         "page_title": head["title"],
@@ -45,7 +46,15 @@ def _response(request, payload: dict) -> "HttpResponse":
         "runtime_scripts": payload["runtimeScripts"],
         "pixel": True,
         "boot": _boot(payload),
-    })
+        "domain_lock": protection.domain_lock(request),
+    }
+    if lite:
+        context.update({
+            "css": {"font": "", "layout": "", "shared": "", "zero": ""},
+            "body_style": "", "font_preloads": [], "runtime_scripts": [],
+            "pixel": False, "boot": {}, "lite": True,
+        })
+    response = render(request, "spa/invite.html", context)
     response["X-Robots-Tag"] = "noindex, nofollow"
     return response
 
@@ -92,10 +101,12 @@ def invitation_page(request, slug, token=None):
     elif not invite.is_unlocked(request, invitation):
         return _locked_response(request, invitation)
 
-    _count_view(request, invitation)
+    browser = protection.is_browser(request)
+    if browser:
+        _count_view(request, invitation)
     payload = invite.invitation_response(
         request, invitation, guest=guest, lang=services._lang(request))  # noqa: SLF001
-    return _response(request, payload)
+    return _response(request, payload, lite=not browser)
 
 
 @require_safe
@@ -105,4 +116,4 @@ def template_page(request, slug):
     template = get_object_or_404(Template, slug=slug, is_active=True)
     payload = invite.template_response(
         request, template, lang=services._lang(request))  # noqa: SLF001
-    return _response(request, payload)
+    return _response(request, payload, lite=not protection.is_browser(request))

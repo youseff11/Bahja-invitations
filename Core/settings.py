@@ -245,6 +245,17 @@ if not DEBUG:
     SECURE_HSTS_PRELOAD = True
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
+# ---------------------------------------------------------------- حماية القوالب
+# صفحة خفيفة لغير المتصفحات + قفل الدومين + قصر واجهة المعاينة على نفس الموقع (شوف ‎system/protection.py‎).
+# مقفولة في التطوير والاختبارات؛ ‎PROTECT_TEMPLATES=0‎ في ‎.env‎ لإيقافها في الإنتاج.
+PROTECT_TEMPLATES = env_bool("PROTECT_TEMPLATES", not DEBUG)
+if sys.argv[1:2] == ["test"]:
+    PROTECT_TEMPLATES = False
+# دومينات إضافية مسموح تفتح عليها الصفحات (غير دومين الطلب و‎SITE_URL‎)، مفصولة بفاصلة.
+PROTECT_ALLOWED_HOSTS = env_list("PROTECT_ALLOWED_HOSTS", "")
+# رمز اختياري: هيدر ‎X-Bahja-Bypass: <الرمز>‎ بيعدّي الحماية (لفحص الموقع الحي بـPlaywright/curl).
+PROTECT_BYPASS_TOKEN = env("PROTECT_BYPASS_TOKEN", "")
+
 # ---------------------------------------------------------------- caching
 # يُستخدم لتحديد معدّل إرسال RSVP ومنع إغراق النموذج.
 CACHES = {
