@@ -270,9 +270,9 @@ CACHES = {
 
 # ---------------------------------------------------------------- app settings
 SITE_NAME = env("SITE_NAME", "بهجة")
-SITE_TAGLINE = env("SITE_TAGLINE", "دعوات رقمية تروي بدايتكم بأناقة")
+SITE_TAGLINE = env("SITE_TAGLINE", "دعوة عمرك ما تنساها")
 SITE_NAME_EN = env("SITE_NAME_EN", "Bahja Invitations")
-SITE_TAGLINE_EN = env("SITE_TAGLINE_EN", "Digital invitations that open your day with grace")
+SITE_TAGLINE_EN = env("SITE_TAGLINE_EN", "An invitation you'll never forget")
 SITE_WHATSAPP = env("SITE_WHATSAPP", "")
 SITE_EMAIL = env("SITE_EMAIL", "")
 SITE_CURRENCY = env("SITE_CURRENCY", "ج.م")
@@ -284,12 +284,12 @@ SITE_URL = env("SITE_URL", "https://www.bahja-invitations.com").rstrip("/")
 # الوصف اللي بيظهر مع الرابط لما يتبعت (واتساب/فيسبوك/تويتر) وتحت العنوان في المتصفح.
 SEO_DESCRIPTION_AR = env(
     "SEO_DESCRIPTION_AR",
-    "بهجة — دعوات زفاف رقمية بتصاميم أنيقة. اختاروا القالب، أضيفوا تفاصيل يومكم، "
-    "وشاركوا رابطاً واحداً مع كل ضيوفكم.",
+    "بهجة — دعوات فرح رقمية فاخرة بتصاميم راقية. اختار القالب، ضيف تفاصيل فرحك، "
+    "وابعت لينك واحد لكل ضيوفك.",
 )
 SEO_DESCRIPTION_EN = env(
     "SEO_DESCRIPTION_EN",
-    "Bahja Invitations — elegant digital wedding invitations. Pick a template, add your "
+    "Bahja Invitations — luxury digital wedding invitations. Pick a template, add your "
     "details, and share one link with every guest.",
 )
 

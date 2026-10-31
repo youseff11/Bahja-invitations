@@ -60,6 +60,9 @@ export function HeroSection({ hero }: { hero?: HeroInfo }) {
     <section className="hero" ref={ref}>
       {imagesCss && <style>{imagesCss}</style>}
       <div className="hero-art">
+        {/* على التليفون الصورة بتتقسم نصين (فوق وتحت) عشان الأربع أركان المزخرفة تفضل باينة */}
+        <span className="hero-side hero-side--t" aria-hidden="true" />
+        <span className="hero-side hero-side--b" aria-hidden="true" />
         <span className="sr-only">{t('public.hero.alt')}</span>
         {/* نجوم بتقع فوق صورة الهيرو + شهاب بيعدّي كل شوية. جوّه ‎.hero-art‎ عن
             قصد: على التليفون الكلام بينزل تحت الصورة، فكده المؤثرات تفضل على

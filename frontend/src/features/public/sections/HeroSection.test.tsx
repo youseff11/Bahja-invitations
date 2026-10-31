@@ -31,14 +31,14 @@ afterEach(async () => {
 describe('HeroSection settings', () => {
   it('falls back to the translated defaults when nothing is set', () => {
     show(EMPTY)
-    expect(screen.getByText('تروي بدايتكم بأناقة')).toBeInTheDocument()
+    expect(screen.getByText('دعوة عمرك ما تنساها')).toBeInTheDocument()
     expect(screen.getByText('شوف القوالب')).toBeInTheDocument()
     expect(screen.queryByText('شوف الباقات')).toBeNull() // زرار واحد بس
     expect(document.querySelectorAll('.hero-actions a')).toHaveLength(1)
     // جملة واحدة وزرار بس: مفيش سطر صغير ولا وصف ولا أرقام ثقة
     expect(screen.queryByText('دعوات زفاف رقمية')).toBeNull()
     expect(document.querySelector('.hero-trust, .hero-sub')).toBeNull()
-    expect(document.querySelector('h1')?.textContent).toBe('تروي بدايتكم بأناقة')
+    expect(document.querySelector('h1')?.textContent).toBe('دعوة عمرك ما تنساها')
     expect(document.querySelector('style')).toBeNull()
   })
 
@@ -49,7 +49,7 @@ describe('HeroSection settings', () => {
     }
     show(hero)
     expect(screen.getByText('عنوان مخصص')).toBeInTheDocument()
-    expect(screen.queryByText('تروي بدايتكم بأناقة')).toBeNull()
+    expect(screen.queryByText('دعوة عمرك ما تنساها')).toBeNull()
     expect(screen.getByText('شوف القوالب')).toBeInTheDocument() // الزرار فاضي → الافتراضي
   })
 

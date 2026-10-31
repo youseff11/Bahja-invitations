@@ -342,14 +342,14 @@ describe('hero live preview', () => {
     mount('/dashboard/data/system.homehero/1')
     const stage = await screen.findByTestId('hero-bg')
     const preview = stage.closest('.hp') as HTMLElement
-    expect(within(preview).getByText('تروي بدايتكم بأناقة')).toBeInTheDocument() // الافتراضي المترجم
+    expect(within(preview).getByText('دعوة عمرك ما تنساها')).toBeInTheDocument() // الافتراضي المترجم
 
     const input = screen.getByLabelText('العنوان الرئيسي — عربي')
     fireEvent.focus(input)
     fireEvent.change(input, { target: { value: 'قصة حبكم تبدأ هنا' } })
     const typed = within(preview).getByText('قصة حبكم تبدأ هنا')
     expect(typed).toHaveClass('is-active')
-    expect(within(preview).queryByText('تروي بدايتكم بأناقة')).toBeNull()
+    expect(within(preview).queryByText('دعوة عمرك ما تنساها')).toBeNull()
     expect(within(preview).getByText(/بتعدّل: العنوان الرئيسي — عربي/)).toBeInTheDocument()
   })
 
@@ -377,7 +377,7 @@ describe('hero live preview', () => {
     const preview = (await screen.findByTestId('hero-bg')).closest('.hp') as HTMLElement
     const title = screen.getByLabelText('العنوان الرئيسي — عربي') as HTMLInputElement
     expect(title.value).toBe('')
-    expect(title.placeholder).toBe('تروي بدايتكم بأناقة')
+    expect(title.placeholder).toBe('دعوة عمرك ما تنساها')
     // السطر الصغير/الوصف/أرقام الثقة مبقوش بيظهروا في الهيرو، فحقولهم مخفية من النموذج
     expect(screen.queryByLabelText('خانة ١ — القيمة (عربي)')).toBeNull()
 
@@ -405,7 +405,7 @@ describe('hero live preview', () => {
     expect(stage).toHaveClass('hp-stage--desktop')
     fireEvent.click(within(preview).getByRole('button', { name: 'هاتف' }))
     expect(stage).toHaveClass('hp-stage--phone')
-    expect(within(preview).getByText('تروي بدايتكم بأناقة')).toBeInTheDocument()
+    expect(within(preview).getByText('دعوة عمرك ما تنساها')).toBeInTheDocument()
   })
 
   it('is not shown for other tables', async () => {

@@ -125,7 +125,14 @@ export function HeroPreview({
       </div>
 
       <div className={`hp-stage hp-stage--${device} ${active === 'bg' ? 'is-active' : ''}`} data-theme={theme} dir={lang === 'ar' ? 'rtl' : 'ltr'}>
-        <div className="hp-art" style={{ backgroundImage: `url("${background}")` }} data-testid="hero-bg" />
+        <div className="hp-art" style={{ backgroundImage: `url("${background}")` }} data-testid="hero-bg">
+          {device === 'phone' && (
+            <>
+              <span className="hp-side hp-side--t" style={{ backgroundImage: `url("${background}")` }} />
+              <span className="hp-side hp-side--b" style={{ backgroundImage: `url("${background}")` }} />
+            </>
+          )}
+        </div>
         <div className="hp-copy">
           <p className={`hp-main ${mark('main')}`}>{text.main}</p>
           <div className="hp-actions">

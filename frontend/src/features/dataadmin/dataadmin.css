@@ -198,7 +198,11 @@ details > summary { cursor: pointer; padding: 8px 12px; border: 1px dashed var(-
 .hp-stage.is-active { outline: 2px solid var(--accent); outline-offset: 2px; }
 .hp-stage--phone { aspect-ratio: 9 / 16; width: min(100%, 270px); margin-inline: auto; border-radius: 22px; }
 .hp-art { position: absolute; inset: 0; background: center / cover no-repeat; }
-.hp-stage--phone .hp-art { background-position: 68% center; }
+/* التليفون: الصورة نسختين (فوق/تحت) عشان الأركان الأربعة تبان زي الموقع */
+.hp-stage--phone .hp-art { background-image: none !important; }
+.hp-side { position: absolute; left: -10%; width: 120%; aspect-ratio: 1376 / 768; background: no-repeat; background-size: 100% 100%; }
+.hp-side--t { top: 0; -webkit-mask-image: linear-gradient(to bottom, #000 46%, transparent 80%); mask-image: linear-gradient(to bottom, #000 46%, transparent 80%); }
+.hp-side--b { bottom: 0; -webkit-mask-image: linear-gradient(to top, #000 46%, transparent 80%); mask-image: linear-gradient(to top, #000 46%, transparent 80%); }
 /* مفيش تبييت على جنب الصورة؛ بس ذوبان الحافة السفلية في الخلفية زي الموقع */
 .hp-art::after { content: ""; position: absolute; inset-inline: 0; bottom: -1px; height: 16%; background: linear-gradient(to bottom, transparent, var(--hp-bg)); }
 .hp-copy { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 6% 8% 3%; }

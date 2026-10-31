@@ -192,6 +192,7 @@ html[lang="en"][data-theme="dark"] .hero-art {
   --hero-img: url("/static/images/home-english-dark.webp");
 }
 
+.hero-side { display: none; }
 /* مفيش تدرّج أبيض/أسود على جنب الصورة: الكلام في النص دلوقتي والصورة بتبان كاملة بألوانها. */
 /* ذوبان الحافة السفلية في خلفية الصفحة */
 .hero-art::after {
@@ -384,11 +385,27 @@ html[lang="en"] .plan-badge { letter-spacing: .1em; }
   .hero-art {
     aspect-ratio: auto;
     width: 100%;
-    height: clamp(540px, 88svh, 780px);
-    background-size: cover;
-    background-position: 68% center;
+    height: clamp(500px, 76svh, 680px);
+    background-image: none;
   }
-  .hero-art::after { height: 22%; }
+  /* الصورة إطار مزخرف من الأركان والنص فاضي. على التليفون الطولي بنعرضها بعرض الشاشة مرتين:
+     نسخة ملزوقة فوق (الركنين العلويين) ونسخة تحت (الركنين السفليين) وبتتلاشى ناحية النص،
+     فالأركان الأربعة تبان بحجم مناسب بدل ما القص الجانبي يكبّر الورد على الكلام. */
+  .hero-side {
+    display: block; position: absolute; left: -10%; width: 120%; aspect-ratio: 1376 / 768;
+    background-image: var(--hero-img); background-repeat: no-repeat; background-size: 100% 100%;
+  }
+  .hero-side--t {
+    top: 0;
+    -webkit-mask-image: linear-gradient(to bottom, #000 46%, transparent 80%);
+            mask-image: linear-gradient(to bottom, #000 46%, transparent 80%);
+  }
+  .hero-side--b {
+    bottom: 0;
+    -webkit-mask-image: linear-gradient(to top, #000 46%, transparent 80%);
+            mask-image: linear-gradient(to top, #000 46%, transparent 80%);
+  }
+  .hero-art::after { height: 7%; }
 
   .hero-copy { padding-top: calc(var(--nav-space) * .6); padding-bottom: 8%; }
   .hero-copy-in { width: min(100% - 44px, 520px); }
@@ -1313,8 +1330,11 @@ html[dir="ltr"] .steps { --pz-start: left; }
   .hero-art {
     height: auto;
     aspect-ratio: 1672 / 941;
+    background-image: var(--hero-img);
+    background-size: cover;
     background-position: center;
   }
+  .hero-side { display: none; }
   .hero .hero-copy h1 { font-size: clamp(28px, 5.6vw, 44px); }
   html[lang="en"] .hero .hero-copy h1 { font-size: clamp(32px, 6.4vw, 52px); }
   .hero-actions { margin-top: 16px; }
