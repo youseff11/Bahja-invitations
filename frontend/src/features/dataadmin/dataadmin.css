@@ -199,7 +199,6 @@ details > summary { cursor: pointer; padding: 8px 12px; border: 1px dashed var(-
 .hp-stage--phone { aspect-ratio: 9 / 16; width: min(100%, 270px); margin-inline: auto; border-radius: 22px; }
 .hp-art { position: absolute; inset: 0; background: center / cover no-repeat; }
 /* التليفون: الصورة نسختين (فوق/تحت) عشان الأركان الأربعة تبان زي الموقع */
-.hp-stage--phone .hp-art { background-image: none !important; }
 .hp-side { position: absolute; left: -10%; width: 120%; aspect-ratio: 1376 / 768; background: no-repeat; background-size: 100% 100%; }
 .hp-side--t { top: 0; -webkit-mask-image: linear-gradient(to bottom, #000 46%, transparent 80%); mask-image: linear-gradient(to bottom, #000 46%, transparent 80%); }
 .hp-side--b { bottom: 0; -webkit-mask-image: linear-gradient(to top, #000 46%, transparent 80%); mask-image: linear-gradient(to top, #000 46%, transparent 80%); }

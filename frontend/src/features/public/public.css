@@ -219,7 +219,6 @@ html[lang="en"][data-theme="dark"] .hero-art {
 .hero .hero-copy h1 {
   margin: 0; color: var(--text); font-family: 'Amiri', var(--font-display); font-weight: 400;
   font-size: clamp(40px, 5.8vw, 96px); line-height: 1.35; letter-spacing: 0; text-wrap: balance;
-  text-shadow: 0 2px 24px color-mix(in srgb, var(--bg) 70%, transparent);
 }
 /* الإنجليزي: سيريف مائل كلاسيكي (حجمه أكبر لأن خطه أصغر في الارتفاع) */
 html[lang="en"] .hero .hero-copy h1 {
@@ -386,7 +385,9 @@ html[lang="en"] .plan-badge { letter-spacing: .1em; }
     aspect-ratio: auto;
     width: 100%;
     height: clamp(500px, 76svh, 680px);
-    background-image: none;
+    overflow: hidden;   /* نسختين الصورة أعرض من الشاشة (120%) — من غير ده بيطلع تمرير أفقي */
+    /* الأساس: وسط الصورة (ورق فاضي) عشان نص الهيرو يفضل بلون الصورة نفسها من غير هالة فاتحة */
+    background-size: cover; background-position: center;
   }
   /* الصورة إطار مزخرف من الأركان والنص فاضي. على التليفون الطولي بنعرضها بعرض الشاشة مرتين:
      نسخة ملزوقة فوق (الركنين العلويين) ونسخة تحت (الركنين السفليين) وبتتلاشى ناحية النص،
@@ -1797,4 +1798,117 @@ html[dir="rtl"] .art-map-pin { margin: -34px -17px 0 0; }
   #templates .grid--4[data-mobile-cols="2"] .tpl-actions .btn {
     width: 100%; padding: 8px 10px; font-size: 13px; gap: 6px; justify-content: center;
   }
+}
+
+
+/* ================================================================
+   ترويسة الموقع — شكل «الكبسولة الزجاجية»
+   جزيرة عائمة بحواف كاملة الاستدارة: اللوجو على الجنب، الروابط في النص بحروف
+   متباعدة، وعلى الجنب التاني أزرار دايرية رفيعة الإطار + زر الطلب. محصور في
+   ‎.nav--site‎ فترويسة لوحة التحكم ما تتأثرش. ارتفاعات الترويسة الكلية (94 / 82)
+   ما اتغيّرتش عشان الهيرو يفضل مسحوب تحتها بنفس المقدار.
+   ================================================================ */
+.nav--site .nav-shell,
+.nav--site.is-stuck .nav-shell {
+  width: min(1280px, 100% - 40px); height: 66px; padding-inline: 14px 12px; gap: 14px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  border: 1px solid color-mix(in srgb, var(--line) 80%, transparent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .05), 0 18px 40px -26px rgba(0, 0, 0, .7);
+  backdrop-filter: blur(20px) saturate(1.4); -webkit-backdrop-filter: blur(20px) saturate(1.4);
+}
+.nav--site.is-stuck .nav-shell { height: 58px; transform: translateY(-6px); background: color-mix(in srgb, var(--surface) 92%, transparent); }
+
+.nav--site .brand { height: 28px; margin-inline-start: 14px; }
+.nav--site.is-stuck .brand { height: 26px; }
+
+/* الروابط: كلام بحروف متباعدة بدون خلفيات، والقسم الحالي بلون الهوية */
+.nav--site .nav-links a:not(.btn) {
+  padding: 9px 4px; border-radius: 0; background: none; position: relative;
+  font-size: 14.5px; font-weight: 600; letter-spacing: 0;
+  color: color-mix(in srgb, var(--text) 62%, transparent);
+  transition: color .2s;
+}
+html[lang="en"] .nav--site .nav-links a:not(.btn) { font-size: 12.5px; letter-spacing: .2em; text-transform: uppercase; }
+.nav--site .nav-links a:not(.btn):hover { color: var(--text); background: none; }
+.nav--site .nav-links a:not(.btn).is-active { color: var(--accent); background: none; font-weight: 600; }
+.nav--site .nav-links a:not(.btn)::after { display: none; }
+
+/* أزرار الأدوات: دايرة رفيعة الإطار + كبسولة اللغة */
+.nav--site .lang-btn,
+.nav--site .icon-btn {
+  height: 40px; background: none; color: color-mix(in srgb, var(--text) 80%, transparent);
+  border: 1px solid color-mix(in srgb, var(--text) 22%, transparent);
+}
+.nav--site .icon-btn { width: 40px; }
+.nav--site .lang-btn { padding: 0 16px; }
+.nav--site .lang-btn:hover,
+.nav--site .icon-btn:hover { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); transform: none; }
+.nav--site .nav-burger { background: none; border: 1px solid color-mix(in srgb, var(--text) 22%, transparent); border-radius: 50%; width: 40px; height: 40px; }
+
+/* ترتيب الأدوات: المظهر ثم اللغة ثم الطلب */
+.nav--site .icon-btn { order: 1; }
+.nav--site .lang-btn { order: 2; }
+.nav--site .nav-cta { order: 3; margin-inline-start: 4px; }
+.nav--site .nav-burger { order: 4; }
+
+/* زر الطلب: كبسولة بلون الهوية */
+.nav--site .nav-cta {
+  border-radius: 999px; font-weight: 600; font-size: 13.5px; padding: 11px 22px;
+  background: var(--accent); color: var(--on-accent); border: 0; box-shadow: none; letter-spacing: 0;
+}
+html[lang="en"] .nav--site .nav-cta { letter-spacing: .08em; font-size: 12.5px; }
+.nav--site .nav-cta:hover { filter: brightness(1.08); transform: none; box-shadow: none; background: var(--accent); color: var(--on-accent); }
+
+/* واسعة: اللوجو على الجنب والروابط في نص الكبسولة بالظبط */
+@media (min-width: 1051px) {
+  .nav--site .nav-shell { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); }
+  .nav--site .brand { justify-self: start; }
+  .nav--site .nav-links { justify-self: center; margin-inline: 0; gap: 34px; }
+  .nav--site .nav-tools { justify-self: end; margin-inline-start: 0; gap: 10px; }
+}
+/* متوسطة: نضغط المسافات */
+@media (min-width: 781px) and (max-width: 1050px) {
+  .nav--site .nav-links { gap: 14px; margin-inline: 14px auto; }
+  .nav--site .nav-links a:not(.btn) { font-size: 13px; }
+  html[lang="en"] .nav--site .nav-links a:not(.btn) { font-size: 11px; letter-spacing: .12em; }
+  .nav--site .nav-cta { padding: 9px 14px; }
+  .nav--site .lang-btn { padding: 0 12px; }
+}
+
+/* ---- الموبايل ---- */
+@media (max-width: 780px) {
+  .nav--site .nav-shell,
+  .nav--site.is-stuck .nav-shell { width: calc(100% - 24px); height: 58px; padding-inline: 10px 8px; gap: 8px; }
+  .nav--site.is-stuck .nav-shell { height: 54px; transform: translateY(-4px); }
+  .nav--site .brand, .nav--site.is-stuck .brand { height: 20px; margin-inline-start: 8px; }
+  .nav--site .nav-tools { margin-inline-start: auto; gap: 6px; }
+  .nav--site .lang-btn { height: 36px; padding: 0 12px; }
+  .nav--site .icon-btn, .nav--site .nav-burger { width: 36px; height: 36px; }
+  .nav--site .lang-btn span { display: inline; }
+
+  /* القائمة: كارت بحواف مستديرة تحت الكبسولة، روابط كبيرة بخطوط فاصلة رفيعة */
+  .nav--site .nav-links {
+    top: calc(100% + 10px); inset-inline: 0;
+    flex-direction: column; align-items: stretch; gap: 0;
+    padding: 6px 20px 20px; border-radius: 28px;
+    border: 1px solid color-mix(in srgb, var(--line) 85%, transparent);
+    background: color-mix(in srgb, var(--surface) 96%, transparent);
+    box-shadow: 0 26px 44px -26px rgba(0, 0, 0, .7);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  }
+  .nav--site .nav-links a:not(.btn) {
+    padding: 16px 2px; font-size: 18px; text-align: center; letter-spacing: 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--line) 80%, transparent);
+  }
+  .nav--site .nav-links a:not(.btn):last-of-type { border-bottom: 0; }
+  html[lang="en"] .nav--site .nav-links a:not(.btn) { font-size: 13px; }
+  .nav--site .nav-links a.nav-cta-inline {
+    margin-top: 12px; padding: 14px 20px; justify-content: center; border-radius: 999px;
+    background: var(--accent); color: var(--on-accent); font-size: 14.5px;
+  }
+}
+@media (max-width: 380px) {
+  .nav--site .lang-btn span { display: none; }
+  .nav--site .lang-btn { padding: 0; width: 36px; justify-content: center; }
 }
