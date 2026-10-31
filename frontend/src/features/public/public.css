@@ -226,7 +226,25 @@ html[lang="en"] .hero .hero-copy h1 {
   font-size: clamp(46px, 7vw, 116px); line-height: 1.08; letter-spacing: -.01em;
 }
 
-.hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 40px; }
+/* فاصل رفيع بمعين في نصه + جملة صغيرة تحت العنوان */
+.hero-orn {
+  display: block; width: min(220px, 52%); height: 11px; margin: 22px auto 0; position: relative;
+  background: linear-gradient(to right, transparent, var(--accent) 30%, var(--accent) 70%, transparent) center / 100% 1px no-repeat;
+  opacity: .7;
+}
+.hero-orn::after {
+  content: ""; position: absolute; top: 50%; left: 50%; width: 9px; height: 9px;
+  transform: translate(-50%, -50%) rotate(45deg);
+  border: 1px solid var(--accent); background: var(--bg);
+}
+.hero .hero-sub {
+  margin: 18px auto 0; max-width: 34ch; color: var(--text); opacity: .85;
+  text-shadow: 0 0 10px var(--bg), 0 0 4px var(--bg);
+  font-size: clamp(15px, 1.35vw, 20px); line-height: 1.8; text-wrap: balance;
+}
+html[lang="en"] .hero .hero-sub { font-size: clamp(16px, 1.45vw, 21px); line-height: 1.6; }
+
+.hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 32px; }
 
 /* زر محدَّد بإطار ذهبي وقلبين على الجنبين — زي الصورة */
 .btn--outline {
@@ -384,7 +402,7 @@ html[lang="en"] .plan-badge { letter-spacing: .1em; }
   .hero-art {
     aspect-ratio: auto;
     width: 100%;
-    height: clamp(500px, 76svh, 680px);
+    height: 100vh; height: 100svh; min-height: 540px;   /* شاشة كاملة */
     overflow: hidden;   /* نسختين الصورة أعرض من الشاشة (120%) — من غير ده بيطلع تمرير أفقي */
     /* الأساس: وسط الصورة (ورق فاضي) عشان نص الهيرو يفضل بلون الصورة نفسها من غير هالة فاتحة */
     background-size: cover; background-position: center;
@@ -396,15 +414,16 @@ html[lang="en"] .plan-badge { letter-spacing: .1em; }
     display: block; position: absolute; left: -10%; width: 120%; aspect-ratio: 1376 / 768;
     background-image: var(--hero-img); background-repeat: no-repeat; background-size: 100% 100%;
   }
+  /* التلاشي تدريجي على عدة نقاط وبيوصل صفر قبل حافة الصندوق بشوية: مفيش خط بين النسختين */
   .hero-side--t {
     top: 0;
-    -webkit-mask-image: linear-gradient(to bottom, #000 46%, transparent 80%);
-            mask-image: linear-gradient(to bottom, #000 46%, transparent 80%);
+    -webkit-mask-image: linear-gradient(to bottom, #000 30%, rgba(0,0,0,.7) 50%, rgba(0,0,0,.3) 70%, transparent 92%);
+            mask-image: linear-gradient(to bottom, #000 30%, rgba(0,0,0,.7) 50%, rgba(0,0,0,.3) 70%, transparent 92%);
   }
   .hero-side--b {
     bottom: 0;
-    -webkit-mask-image: linear-gradient(to top, #000 46%, transparent 80%);
-            mask-image: linear-gradient(to top, #000 46%, transparent 80%);
+    -webkit-mask-image: linear-gradient(to top, #000 30%, rgba(0,0,0,.7) 50%, rgba(0,0,0,.3) 70%, transparent 92%);
+            mask-image: linear-gradient(to top, #000 30%, rgba(0,0,0,.7) 50%, rgba(0,0,0,.3) 70%, transparent 92%);
   }
   .hero-art::after { height: 7%; }
 
@@ -412,7 +431,10 @@ html[lang="en"] .plan-badge { letter-spacing: .1em; }
   .hero-copy-in { width: min(100% - 44px, 520px); }
   .hero .hero-copy h1 { font-size: clamp(36px, 11vw, 58px); line-height: 1.4; }
   html[lang="en"] .hero .hero-copy h1 { font-size: clamp(44px, 13.4vw, 72px); line-height: 1.08; }
-  .hero-actions { justify-content: center; margin-top: 26px; }
+  .hero-orn { margin-top: 18px; }
+  .hero .hero-sub { margin-top: 14px; font-size: 16px; max-width: 28ch; }
+  html[lang="en"] .hero .hero-sub { font-size: 17px; }
+  .hero-actions { justify-content: center; margin-top: 28px; }
   .hero-actions .btn { min-width: 168px; }
 }
 
@@ -1329,7 +1351,7 @@ html[dir="ltr"] .steps { --pz-start: left; }
    ================================================================ */
 @media (max-width: 780px) and (orientation: landscape) {
   .hero-art {
-    height: auto;
+    height: auto; min-height: 0;
     aspect-ratio: 1672 / 941;
     background-image: var(--hero-img);
     background-size: cover;
@@ -1339,6 +1361,7 @@ html[dir="ltr"] .steps { --pz-start: left; }
   .hero .hero-copy h1 { font-size: clamp(28px, 5.6vw, 44px); }
   html[lang="en"] .hero .hero-copy h1 { font-size: clamp(32px, 6.4vw, 52px); }
   .hero-actions { margin-top: 16px; }
+  .hero-orn, .hero .hero-sub { display: none; }   /* الارتفاع ضيق في الوضع الأفقي */
 }
 
 

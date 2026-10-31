@@ -35,9 +35,10 @@ describe('HeroSection settings', () => {
     expect(screen.getByText('شوف القوالب')).toBeInTheDocument()
     expect(screen.queryByText('شوف الباقات')).toBeNull() // زرار واحد بس
     expect(document.querySelectorAll('.hero-actions a')).toHaveLength(1)
-    // جملة واحدة وزرار بس: مفيش سطر صغير ولا وصف ولا أرقام ثقة
+    // جملة كبيرة + جملة صغيرة تحتها وزرار بس: مفيش سطر صغير فوق ولا أرقام ثقة
     expect(screen.queryByText('دعوات زفاف رقمية')).toBeNull()
-    expect(document.querySelector('.hero-trust, .hero-sub')).toBeNull()
+    expect(document.querySelector('.hero-trust')).toBeNull()
+    expect(document.querySelector('.hero-sub')?.textContent).toBe('قوالب شيك بتفاصيلك إنت، ورابط واحد يوصل لكل ضيوفك')
     expect(document.querySelector('h1')?.textContent).toBe('دعوة عمرك ما تنساها')
     expect(document.querySelector('style')).toBeNull()
   })

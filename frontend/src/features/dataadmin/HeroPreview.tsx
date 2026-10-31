@@ -30,8 +30,8 @@ export function viewForField(field: string, current: HeroView): HeroView {
   return { lang, theme }
 }
 
-/** الهيرو دلوقتي جملة واحدة + زرار: السطر الصغير والوصف وأرقام الثقة مبقوش بيظهروا في الموقع. */
-const UNUSED = /^(top|sub|trust\d_(value|label))_(ar|en)$/
+/** الهيرو دلوقتي جملة كبيرة + جملة صغيرة تحتها + زرار: السطر الصغير اللي فوق وأرقام الثقة مبقوش بيظهروا في الموقع. */
+const UNUSED = /^(top|trust\d_(value|label))_(ar|en)$/
 
 /** الحقل ظاهر في النموذج؟ — اللي ليه علاقة بالمظهر/اللغة المختارين في المعاينة بس. */
 export function heroFieldVisible(field: string, view: HeroView): boolean {
@@ -92,7 +92,7 @@ export function HeroPreview({
       const custom = values[`${name}_${lang}`]
       return (typeof custom === 'string' && custom.trim()) || String(i18n.t(`public.hero.${defaultKey}`, { lng: lang }))
     }
-    return { main: word('main', 'main'), cta: word('cta', 'templates') }
+    return { main: word('main', 'main'), sub: word('sub', 'sub'), cta: word('cta', 'templates') }
   }, [values, lang, i18n])
 
   const mark = (name: string) => (active === name ? 'hp-mark is-active' : 'hp-mark')
@@ -135,6 +135,7 @@ export function HeroPreview({
         </div>
         <div className="hp-copy">
           <p className={`hp-main ${mark('main')}`}>{text.main}</p>
+          <p className={`hp-sub ${mark('sub')}`}>{text.sub}</p>
           <div className="hp-actions">
             <span className={`hp-btn hp-btn--gold ${mark('cta')}`}>{text.cta}</span>
           </div>

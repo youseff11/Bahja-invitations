@@ -71,10 +71,12 @@ export function HeroSection({ hero }: { hero?: HeroInfo }) {
         <ShootingStars idle={idle} />
       </div>
       <div className="hero-copy">
-        {/* جملة واحدة في نص الصورة + زرار واحد. السطر الصغير والوصف وأرقام الثقة
-            اتشالوا عن قصد: الصورة بتتكلم، والكلام الكتير كان بيزحمها. */}
+        {/* جملة كبيرة + فاصل صغير + جملة صغيرة تحتها + زرار واحد. السطر الصغير اللي فوق
+            وأرقام الثقة اتشالوا عن قصد: الصورة بتتكلم، والكلام الكتير كان بيزحمها. */}
         <div className="hero-copy-in" data-reveal>
           <h1>{text(custom?.main, 'main')}</h1>
+          <span className="hero-orn" aria-hidden="true" />
+          <p className="hero-sub">{text(custom?.sub, 'sub')}</p>
           <div className="hero-actions">
             <Link className="btn btn--gold btn--lg btn--shine" to={{ pathname: '/', hash: '#templates' }}>
               <span>{text(custom?.cta, 'templates')}</span>

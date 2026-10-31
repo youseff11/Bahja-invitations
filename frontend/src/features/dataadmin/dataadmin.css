@@ -208,6 +208,8 @@ details > summary { cursor: pointer; padding: 8px 12px; border: 1px dashed var(-
 .hp-copy p { margin: 0; }
 .hp-main { font-family: 'Amiri', var(--font-display); font-weight: 400; font-size: 5.8cqw; line-height: 1.35; color: var(--hp-text); text-wrap: balance; max-width: 90%; }
 .hp-stage[dir="ltr"] .hp-main { font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-weight: 500; font-size: 7cqw; line-height: 1.08; }
+.hp-sub { margin-top: 1.4cqw !important; font-size: 1.7cqw; line-height: 1.7; max-width: 60%; opacity: .78; }
+.hp-stage--phone .hp-sub { margin-top: 3cqw !important; font-size: 3.8cqw; max-width: 80%; }
 .hp-actions { display: flex; justify-content: center; margin-top: 3.2cqw; }
 .hp-btn { padding: .9cqw 2.4cqw; border-radius: .9cqw; border: 1px solid var(--hp-accent); color: var(--hp-accent); font-size: 1.6cqw; }
 .hp-btn--gold { background: var(--hp-accent); color: var(--hp-on-accent); }
