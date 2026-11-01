@@ -56,13 +56,31 @@ export function Music({ config }: { config: MusicConfig }) {
       button.classList.toggle('is-playing', on)
       button.setAttribute('aria-label', on ? tRef.current('music.pause') : tRef.current('music.play'))
     }
-    const play = () => {
+    const startPlayback = () => {
       audio
         .play()
         .then(() => setPlaying(true))
         .catch(() => {
           /* المتصفح منع التشغيل — ينتظر ضغطة المستخدم */
         })
+    }
+    // السيرفر مابيدعمش Range فالقفز لثانية البداية وسط الستريمنج بيرجع لأول الأغنية:
+    // مع بداية محددة بنحمّل الملف كامل ونشغّله من blob (لو فشل بنكمّل ستريمنج)
+    let objectUrl = ''
+    let loading: Promise<void> | null = null
+    const load = () =>
+      (loading ??= fetch(config.url)
+        .then((r) => (r.ok ? r.blob() : Promise.reject(new Error(String(r.status)))))
+        .then((blob) => {
+          objectUrl = URL.createObjectURL(blob)
+          audio.src = objectUrl
+        })
+        .catch(() => {
+          /* نكمّل بالرابط العادي */
+        }))
+    const play = () => {
+      if (start > 0 && !objectUrl) void load().then(startPlayback)
+      else startPlayback()
     }
     const pause = () => {
       audio.pause()
@@ -149,6 +167,7 @@ export function Music({ config }: { config: MusicConfig }) {
       button,
       destroy() {
         audio.pause()
+        if (objectUrl) URL.revokeObjectURL(objectUrl)
         if (autoplayOnce) {
           document.removeEventListener('click', autoplayOnce)
           document.removeEventListener('touchstart', autoplayOnce)

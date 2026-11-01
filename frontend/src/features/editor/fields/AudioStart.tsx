@@ -28,16 +28,30 @@ export function AudioStartBody({ value, onChange, id }: FieldProps) {
     setPlaying(false)
     if (!url) return
     const el = new Audio()
-    el.preload = 'metadata'
+    let objectUrl = ''
+    let cancelled = false
     el.addEventListener('loadedmetadata', () => setDuration(Number.isFinite(el.duration) ? el.duration : 0))
     el.addEventListener('error', () => setFailed(true))
     el.addEventListener('pause', () => setPlaying(false))
     el.addEventListener('play', () => setPlaying(true))
-    el.src = url
+    // السيرفر مابيدعمش Range فالقفز جوّه الأغنية وهي بتتحمّل ستريمنج بيرجع لأولها:
+    // بنحمّلها كاملة ونشغّلها من blob (بيتقفز فيه بحرية)
+    fetch(url)
+      .then((r) => (r.ok ? r.blob() : Promise.reject(new Error(String(r.status)))))
+      .then((blob) => {
+        if (cancelled) return
+        objectUrl = URL.createObjectURL(blob)
+        el.src = objectUrl
+      })
+      .catch(() => {
+        if (!cancelled) setFailed(true)
+      })
     audio.current = el
     return () => {
+      cancelled = true
       el.pause()
       el.removeAttribute('src')
+      if (objectUrl) URL.revokeObjectURL(objectUrl)
       audio.current = null
     }
   }, [url])
