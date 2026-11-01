@@ -292,6 +292,22 @@ export function Intro({ data, lockSkip = false }: { data: IntroData; lockSkip?: 
       }
       vid.addEventListener('ended', onEnded)
       cleanup.push(() => vid.removeEventListener('ended', onEnded))
+      // آيفون: الفيديو ساعات بيقف عند آخره أو في النص من غير ‎ended‎ فالدعوة بتفضل مقفولة
+      // وراه. لو الصورة وقفت بعد ما بدأت: قرب النهاية ندخل بسرعة، وفي النص بعد مهلة أطول.
+      let lastTime = -1
+      let lastMove = 0
+      const watchdog = window.setInterval(() => {
+        if (isOpen || isAwaiting || document.hidden) return
+        if (vid.currentTime !== lastTime) {
+          lastTime = vid.currentTime
+          lastMove = Date.now()
+          return
+        }
+        if (lastTime < 0.5) return // ماابتدأش أصلاً (مستني لمسة/تحميل)
+        const left = Number.isFinite(vid.duration) ? vid.duration - lastTime : Infinity
+        if (Date.now() - lastMove >= (left < 2.5 ? 1500 : 6000)) doOpen()
+      }, 500)
+      cleanup.push(() => window.clearInterval(watchdog))
       if (locked) {
         vid.addEventListener('error', unlock)
         cleanup.push(() => vid.removeEventListener('error', unlock))

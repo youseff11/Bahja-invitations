@@ -406,7 +406,7 @@ class RenderApiTests(InviteBase):
         self.inv.save()
         block = self.client.get(f"/api/v1/invitations/{self.inv.slug}/render/").json()["blocks"][0]
         self.assertEqual(block["type"], "cover_video")
-        self.assertEqual(block["props"]["url"], "/media/c.mp4")
+        self.assertEqual(block["props"]["url"], "/stream/c.mp4")
         self.assertTrue(block["props"]["loop"])
         self.assertIn("lb-cover--medium", block["attrs"]["className"])
         self.assertTrue(B.BLOCK_REGISTRY["cover_video"]["place_first"])

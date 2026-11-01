@@ -39,4 +39,6 @@ urlpatterns += [
 # المفروض تقدّمها هي (Static files mapping)؛ ده شبكة أمان لو المسار ناقص أو غلط عندها.
 urlpatterns.append(re_path(rf"^{re.escape(settings.MEDIA_URL.strip('/'))}/(?P<path>.*)$", files.media_file))
 
+urlpatterns.append(re_path(rf"^{re.escape(settings.STREAM_URL.strip('/'))}/(?P<path>.*)$", files.media_stream))
+
 urlpatterns.append(re_path(rf"^{_prefix}(?:/.*)?$" if _prefix else r"^.*$", spa_shell, name="spa"))

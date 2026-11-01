@@ -209,6 +209,9 @@ VITE_DEV_SERVER = env("VITE_DEV_SERVER", "").rstrip("/") if DEBUG else ""
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = Path(env("DJANGO_MEDIA_ROOT", str(BASE_DIR / "media")))
+# فيديو وصوت الدعوة بيتقدّموا من هنا (Django، بدعم Range) لأن الاستضافة بتقدّم ‎/media/‎ من غير Range
+# والآيفون بيوقف الفيديو في النص — راجع ‎system/mediastream.py‎. مهم: ماتضيفوش static mapping ليه.
+STREAM_URL = "/stream/"
 
 STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},

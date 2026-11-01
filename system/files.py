@@ -17,14 +17,13 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views.decorators.http import require_GET, require_safe
 from django.views.static import serve as static_serve
-from . import qrcodes, siteicon
+from . import mediastream, qrcodes, siteicon
 from .models import Guest, Invitation
 
 
-def media_video(request, path):
+def media_video(request, path, *, allowed=mediastream.VIDEO_EXTS):
     """يخدم فيديوهات media مع دعم Range Requests للبدء السريع."""
-    if Path(path).suffix.lower() not in {".mp4", ".m4v", ".mov", ".webm", ".ogv"}:
-
+    if Path(path).suffix.lower() not in allowed:
         raise Http404
     root = Path(settings.MEDIA_ROOT).resolve()
     target = (root / path).resolve()
@@ -76,6 +75,12 @@ def media_video(request, path):
     if status == 206:
         response["Content-Range"] = f"bytes {start}-{end}/{size}"
     return response
+
+
+@require_safe
+def media_stream(request, path):
+    """‎/stream/…‎ فيديو وصوت الدعوة بـRange (206): الآيفون بيوقف الفيديو من غيره."""
+    return media_video(request, path, allowed=mediastream.STREAM_EXTS)
 
 
 def media_file(request, path):

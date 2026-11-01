@@ -29,7 +29,7 @@ from django.views.decorators.cache import never_cache
 
 from .. import audioclip
 from .. import blocks as blocks_engine
-from .. import protection, services
+from .. import mediastream, protection, services
 from ..models import Guest, Invitation, RSVPResponse, Template
 from . import invite_render
 from .http import ApiError, api_view, client_hash, json_body
@@ -137,7 +137,7 @@ def invitation_response(request, invitation: Invitation, *, guest=None,
         "siteName": settings.SITE_NAME,
         "siteUrl": request.build_absolute_uri("/"),
     })
-    return payload
+    return mediastream.streamify(payload)
 
 
 def _template_canonical(request, template: Template) -> str:
@@ -175,7 +175,7 @@ def template_response(request, template: Template, *, lang: str = "") -> dict:
         "siteName": settings.SITE_NAME,
         "siteUrl": request.build_absolute_uri("/"),
     })
-    return payload
+    return mediastream.streamify(payload)
 
 
 # ---------------------------------------------------------------- GET render / preview

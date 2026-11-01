@@ -187,6 +187,50 @@ describe('Intro — the guest cannot skip the video', () => {
     expect(root.classList.contains('is-open')).toBe(true)
   })
 
+  describe('video that stops without firing ended (iPhone)', () => {
+    function stopAt(container: HTMLElement, time: number, duration = 8) {
+      const video = container.querySelector('video')!
+      Object.defineProperty(video, 'duration', { configurable: true, value: duration })
+      Object.defineProperty(video, 'currentTime', { configurable: true, writable: true, value: time })
+      return video
+    }
+
+    it('opens shortly after the picture freezes near the end', () => {
+      const { container } = rendered()
+      stopAt(container, 7.1)
+      act(() => {
+        vi.advanceTimersByTime(1000) // أول قراءة بتسجّل الوقت
+      })
+      expect(container.querySelector('.lb-intro')!.classList.contains('is-open')).toBe(false)
+      act(() => {
+        vi.advanceTimersByTime(1200)
+      })
+      expect(container.querySelector('.lb-intro')!.classList.contains('is-open')).toBe(true)
+    })
+
+    it('waits longer when it freezes in the middle (slow connection)', () => {
+      const { container } = rendered()
+      stopAt(container, 3)
+      act(() => {
+        vi.advanceTimersByTime(4000)
+      })
+      expect(container.querySelector('.lb-intro')!.classList.contains('is-open')).toBe(false)
+      act(() => {
+        vi.advanceTimersByTime(3000)
+      })
+      expect(container.querySelector('.lb-intro')!.classList.contains('is-open')).toBe(true)
+    })
+
+    it('does nothing while the video has not started', () => {
+      const { container } = rendered()
+      stopAt(container, 0)
+      act(() => {
+        vi.advanceTimersByTime(15000)
+      })
+      expect(container.querySelector('.lb-intro')!.classList.contains('is-open')).toBe(false)
+    })
+  })
+
   it('opens at the configured seconds even though skipping is locked', () => {
     const { container } = renderIntro(intro({ video: '/v.mp4', seconds: 3 }), true)
     act(() => {
