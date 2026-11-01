@@ -27,6 +27,7 @@ from django.urls import path
 from django.utils import timezone
 from django.views.decorators.cache import never_cache
 
+from .. import audioclip
 from .. import blocks as blocks_engine
 from .. import protection, services
 from ..models import Guest, Invitation, RSVPResponse, Template
@@ -74,14 +75,22 @@ def _seconds(value) -> float:
 def _music(settings_doc: dict) -> dict | None:
     if not settings_doc.get("music_url"):
         return None
+    url = settings_doc["music_url"]
+    start = _seconds(settings_doc.get("music_start"))
+    end = _seconds(settings_doc.get("music_end"))
+    if start > 0 or end > start:
+        # نسخة مقصوصة من الملف نفسه: بتشتغل من أولها فمفيش قفز ولا انتظار تحميل
+        clipped = audioclip.clipped_music_url(url, start, end if end > start else 0)
+        if clipped:
+            url, start, end = clipped, 0.0, 0.0
     return {
-        "url": settings_doc["music_url"],
+        "url": url,
         "autoplay": bool(settings_doc.get("music_autoplay")),
         "duringIntro": bool(settings_doc.get("music_during_intro")),
         "loop": bool(settings_doc.get("music_loop")),
         "player": settings_doc.get("music_player") or "floating",
-        "start": _seconds(settings_doc.get("music_start")),
-        "end": _seconds(settings_doc.get("music_end")),
+        "start": start,
+        "end": end,
     }
 
 
