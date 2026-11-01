@@ -35,10 +35,22 @@ export function Music({ config }: { config: MusicConfig }) {
     const button = btn.current
     if (!config.url || hidden || !button) return
     const audio = new Audio(config.url)
-    audio.loop = config.loop !== false
+    const loop = config.loop !== false
+    const start = Math.max(0, config.start || 0)
+    const end = config.end && config.end > start ? config.end : 0
+    // مقطع محدد: التكرار بيتعمل يدوي عشان يرجع لثانية البداية مش لأول الأغنية
+    const ranged = start > 0 || end > 0
+    audio.loop = loop && !ranged
     audio.preload = 'none'
     let autoplayOnce: (() => void) | null = null
     let introOpenStart: (() => void) | null = null
+
+    if (start > 0) {
+      audio.currentTime = start
+      audio.addEventListener('loadedmetadata', () => {
+        if (audio.currentTime < start) audio.currentTime = start
+      })
+    }
 
     const setPlaying = (on: boolean) => {
       button.classList.toggle('is-playing', on)
@@ -55,6 +67,21 @@ export function Music({ config }: { config: MusicConfig }) {
     const pause = () => {
       audio.pause()
       setPlaying(false)
+    }
+    /* وصلنا نهاية المقطع (ثانية النهاية أو آخر الأغنية): يكرر من البداية أو يقف */
+    const wrapRange = () => {
+      audio.currentTime = start
+      if (loop) {
+        if (audio.paused) play()
+      } else {
+        pause()
+      }
+    }
+    if (ranged) {
+      audio.addEventListener('timeupdate', () => {
+        if (end && audio.currentTime >= end) wrapRange()
+      })
+      audio.addEventListener('ended', wrapRange)
     }
 
     const stop = (e: Event) => e.stopPropagation()
@@ -140,7 +167,7 @@ export function Music({ config }: { config: MusicConfig }) {
     }
     window.__lbMusic = handle
     return () => handle.destroy()
-  }, [config.url, config.loop, config.autoplay, config.duringIntro, hidden])
+  }, [config.url, config.loop, config.autoplay, config.duringIntro, config.start, config.end, hidden])
 
   if (!config.url || hidden) return null
   return (

@@ -126,6 +126,10 @@ export interface MusicConfig {
   duringIntro?: boolean
   loop: boolean
   player: string
+  /** ثانية بداية المقطع (0 = أول الأغنية) */
+  start?: number
+  /** ثانية نهاية المقطع (0 = آخر الأغنية) */
+  end?: number
 }
 
 export interface ScrollConfig {

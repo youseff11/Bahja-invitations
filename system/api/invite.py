@@ -64,6 +64,13 @@ def is_unlocked(request, invitation: Invitation) -> bool:
 
 
 # ---------------------------------------------------------------- الحمولة الكاملة
+def _seconds(value) -> float:
+    try:
+        return max(0.0, float(value or 0))
+    except (TypeError, ValueError):
+        return 0.0
+
+
 def _music(settings_doc: dict) -> dict | None:
     if not settings_doc.get("music_url"):
         return None
@@ -73,6 +80,8 @@ def _music(settings_doc: dict) -> dict | None:
         "duringIntro": bool(settings_doc.get("music_during_intro")),
         "loop": bool(settings_doc.get("music_loop")),
         "player": settings_doc.get("music_player") or "floating",
+        "start": _seconds(settings_doc.get("music_start")),
+        "end": _seconds(settings_doc.get("music_end")),
     }
 
 
