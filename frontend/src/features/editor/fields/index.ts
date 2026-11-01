@@ -10,6 +10,7 @@ import {
   TextBody,
   ToggleBody,
 } from './basic'
+import { AudioStartBody } from './AudioStart'
 import { ListBody } from './ListField'
 import { MediaField } from './media'
 import { registerField } from './registry'
@@ -33,6 +34,7 @@ registerField('toggle', ToggleBody)
 registerField('image', MediaField)
 registerField('media', MediaField)
 registerField('list', ListBody)
+registerField('audio_start', AudioStartBody)
 
 export { FieldRenderer, registerField } from './registry'
 export type { FieldProps } from './registry'

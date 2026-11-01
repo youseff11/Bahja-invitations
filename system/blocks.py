@@ -58,6 +58,7 @@ FIELD_TYPES = {
     "list",       # مجموعة متكررة من الحقول الفرعية
     "gradient",
     "icon",
+    "audio_start",  # نقطة بداية الأغنية: شريط على طول الأغنية + معاينة
 }
 
 
@@ -1413,13 +1414,13 @@ SETTINGS_FIELDS = [
                "شغّال مع «تشغيل تلقائي» بس. لو المتصفح منع الصوت قبل أول "
                "لمسة، هتبدأ مع أول ضغطة من الضيف."),
     field("music_loop", "تكرار", "toggle", True, group="الموسيقى", feature="music"),
-    field("music_start", "تبدأ من ثانية", "number", 0, group="الموسيقى", feature="music",
+    field("music_start", "تبدأ من", "audio_start", 0, group="الموسيقى", feature="music",
           minimum=0, maximum=36000, step=1, unit="ث",
-          help_text="الأغنية تبدأ من الثانية دي بدل أولها. 0 = من البداية."),
+          help_text="اسحب الشريط للمكان اللي عايز الأغنية تبدأ منه، ودوس "
+               "«سمّع من هنا» تسمعها. أول الشريط = من بداية الأغنية."),
     field("music_end", "تنتهي عند ثانية", "number", 0, group="الموسيقى", feature="music",
-          minimum=0, maximum=36000, step=1, unit="ث",
-          help_text="الأغنية تقف (أو ترجع لثانية البداية لو «تكرار» شغّال) عند "
-               "الثانية دي. 0 = لحد آخر الأغنية."),
+          minimum=0, maximum=36000, step=1, unit="ث", editor_hidden=True,
+          help_text="0 = لحد آخر الأغنية."),
     field("music_player", "شكل المشغّل", "select", "floating", group="الموسيقى",
           feature="music", options=[
               opt("floating", "زر عائم"), opt("bar", "شريط سفلي"), opt("hidden", "مخفي"),
@@ -1684,7 +1685,7 @@ def _coerce(value: Any, spec: dict) -> Any:
             return value.strip().lower() in {"1", "true", "yes", "on"}
         return bool(default)
 
-    if ftype in {"number", "range"}:
+    if ftype in {"number", "range", "audio_start"}:
         try:
             num = float(value)
         except (TypeError, ValueError):

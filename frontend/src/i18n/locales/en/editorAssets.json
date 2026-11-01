@@ -82,7 +82,13 @@
       "audio": "Or paste a file link"
     },
     "crop": "Crop image",
-    "cropNeedsLibrary": "Pick an image from the library first so it can be cropped."
+    "cropNeedsLibrary": "Pick an image from the library first so it can be cropped.",
+    "audioStart": {
+      "needSong": "Pick a song first to choose where it starts.",
+      "preview": "Listen from here",
+      "stop": "Stop",
+      "failed": "Couldn't load the song for preview."
+    }
   },
   "favorites": {
     "open": "★ Favorites",

@@ -32,6 +32,7 @@ export type FieldType =
   | 'list'
   | 'gradient'
   | 'icon'
+  | 'audio_start'
 
 export interface FieldOption {
   value: string
