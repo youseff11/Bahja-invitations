@@ -120,6 +120,14 @@ export function Intro({ data, lockSkip = false }: { data: IntroData; lockSkip?: 
       document.dispatchEvent(new CustomEvent('lb:intro-open'))
     }
     window.__lbIntro = { open: doOpen, reopen: () => {} }
+    // لوحة ‎?debug=1‎ (runtime/intro-debug) بتقرا الحالة دي
+    let watch = ''
+    ;(window as unknown as { __lbIntroState?: () => object }).__lbIntroState = () => ({
+      isOpen,
+      isAwaiting,
+      locked,
+      watch,
+    })
 
     const startAuto = () => {
       if (timer) clearTimeout(timer)
@@ -297,15 +305,23 @@ export function Intro({ data, lockSkip = false }: { data: IntroData; lockSkip?: 
       let lastTime = -1
       let lastMove = 0
       const watchdog = window.setInterval(() => {
-        if (isOpen || isAwaiting || document.hidden) return
+        if (isOpen || isAwaiting || document.hidden) {
+          watch = 'skip'
+          return
+        }
         if (vid.currentTime !== lastTime) {
           lastTime = vid.currentTime
           lastMove = Date.now()
+          watch = 'moving'
           return
         }
         if (lastTime < 0.5) return // ماابتدأش أصلاً (مستني لمسة/تحميل)
         const left = Number.isFinite(vid.duration) ? vid.duration - lastTime : Infinity
-        if (Date.now() - lastMove >= (left < 2.5 ? 1500 : 6000)) doOpen()
+        watch = `still ${Date.now() - lastMove}ms left=${left.toFixed(2)}`
+        if (Date.now() - lastMove >= (left < 2.5 ? 1500 : 6000)) {
+          watch = 'open'
+          doOpen()
+        }
       }, 500)
       cleanup.push(() => window.clearInterval(watchdog))
       if (locked) {
