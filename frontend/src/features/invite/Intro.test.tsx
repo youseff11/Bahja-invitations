@@ -221,6 +221,28 @@ describe('Intro — the guest cannot skip the video', () => {
       expect(container.querySelector('.lb-intro')!.classList.contains('is-open')).toBe(true)
     })
 
+    it('opens by the clock when the picture plays but currentTime stays stuck (iOS 26 pending seek)', () => {
+      const { container } = rendered()
+      const video = stopAt(container, 0.01, 6)
+      fireEvent.playing(video)
+      act(() => {
+        vi.advanceTimersByTime(9000)
+      })
+      expect(container.querySelector('.lb-intro')!.classList.contains('is-open')).toBe(false)
+      act(() => {
+        vi.advanceTimersByTime(1500)
+      })
+      expect(container.querySelector('.lb-intro')!.classList.contains('is-open')).toBe(true)
+    })
+
+    it('does not seek the video before it plays when there is a poster', () => {
+      const { container } = renderIntro(intro({ video: '/v.mp4', poster: '/p.png', playMode: 'button' }), true)
+      const video = container.querySelector('video')!
+      Object.defineProperty(video, 'readyState', { configurable: true, value: 1 })
+      fireEvent.loadedMetadata(video)
+      expect(video.currentTime).toBe(0)
+    })
+
     it('does nothing while the video has not started', () => {
       const { container } = rendered()
       stopAt(container, 0)

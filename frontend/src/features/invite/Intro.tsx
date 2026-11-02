@@ -213,19 +213,9 @@ export function Intro({ data, lockSkip = false }: { data: IntroData; lockSkip?: 
         }
       }
 
-      if (manual && data.poster) {
-        // الفيديو المستني ضغطة بيعرض الغلاف بس؛ لو الغلاف تالف أو مابيتحمّلش بيظهر فاضي.
-        // الـseek الصغير بيخلّي المتصفح يرسم أول فريم تحته.
-        const paintFirstFrame = () => {
-          try {
-            if (vid.currentTime === 0) vid.currentTime = 0.01
-          } catch {
-            /* مش حرج */
-          }
-        }
-        if (vid.readyState >= 1) paintFirstFrame()
-        else vid.addEventListener('loadedmetadata', paintFirstFrame, { once: true })
-      }
+      // مفيش seek قبل التشغيل لما فيه غلاف: سفاري iOS 26 مابيكمّلش الـseek ده (مفيش seeked)
+      // فبيفضل ‎currentTime‎ = 0.01 والفيديو شغّال قدّام الضيف، و‎ended‎ مابيجيش أبداً.
+      // الغلاف نفسه ظاهر كـposter وكخلفية للفيديو.
 
       const wantsSound = data.audio === 'sound'
       if (manual && playBtn.current) {
@@ -304,9 +294,23 @@ export function Intro({ data, lockSkip = false }: { data: IntroData; lockSkip?: 
       // وراه. لو الصورة وقفت بعد ما بدأت: قرب النهاية ندخل بسرعة، وفي النص بعد مهلة أطول.
       let lastTime = -1
       let lastMove = 0
+      // آخر شبكة أمان: بساعة الحيطة من أول ‎playing‎ مش بـ‎currentTime‎ — سفاري ساعات
+      // بيعرض الفيديو للآخر و‎currentTime‎ واقف (seek معلّق)، فالعدّاد التاني مابيشوفش حركة
+      let playingAt = 0
+      const onPlaying = () => {
+        if (!playingAt) playingAt = Date.now()
+      }
+      vid.addEventListener('playing', onPlaying)
+      cleanup.push(() => vid.removeEventListener('playing', onPlaying))
       const watchdog = window.setInterval(() => {
         if (isOpen || isAwaiting || document.hidden) {
           watch = 'skip'
+          return
+        }
+        const total = Number.isFinite(vid.duration) && vid.duration > 0 ? vid.duration : 0
+        if (playingAt && total && Date.now() - playingAt >= (total + 4) * 1000) {
+          watch = 'open (clock)'
+          doOpen()
           return
         }
         if (vid.currentTime !== lastTime) {
