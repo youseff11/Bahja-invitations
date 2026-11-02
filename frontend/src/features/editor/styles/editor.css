@@ -96,9 +96,15 @@
   font-weight: 700; color: var(--e-text); text-decoration: none;
   white-space: nowrap;
 }
-.ed-brand-logo {
-  display: block; height: 30px; aspect-ratio: 7 / 1; flex: none;   /* نفس مقاس .brand في باقي الصفحات */
-  background: var(--site-logo-light, url("/site-logo/light.png")) center/contain no-repeat;
+/* علامة الترويسة بنفس مقاسات ترويسة الهوم (.brand-word / .brand-mono في public.css) */
+.ed-brand-word {
+  font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 600; font-size: 21px;
+  letter-spacing: .3em; margin-inline-end: -.3em; line-height: 1; color: var(--e-text); direction: ltr;
+}
+.ed-brand-mono {
+  display: block; width: 52px; height: 62px; flex: none; margin-block: -4px;
+  background: url("/static/images/bahja-mark.webp") center / contain no-repeat;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, .25));
 }
 .ed-title {
   color: var(--e-muted); font-size: 13px;
@@ -566,7 +572,8 @@
   .ed-top { gap: 8px; padding-inline: 10px; }
   .ed-seg { display: none; }              /* التليفون هو الموبايل أصلاً */
   .ed-brand-txt { display: none; }
-  .ed-brand-logo { height: 22px; }
+  .ed-brand-word { display: none; }
+  .ed-brand-mono { width: 38px; height: 45px; }
   .ed-top-actions { margin-inline-start: auto; gap: 6px; }
   .ed-btn { padding: 7px 11px; }
 
@@ -632,7 +639,6 @@
    تلميع + فروق المظهر الفاتح
    ================================================================ */
 
-[data-theme="dark"] .ed-brand-logo { background-image: var(--site-logo-dark, url("/site-logo/dark.png")); }
 
 /* الشريط العلوي واللوحة بيرتفعوا شوية عن الكانفس بظل خفيف بدل خط جاف */
 .ed-top   { box-shadow: 0 1px 0 var(--e-line), 0 6px 18px -14px rgba(0, 0, 0, .35); }

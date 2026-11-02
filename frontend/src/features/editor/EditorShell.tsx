@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 
+import { useSite } from '@/api/hooks'
 import { useTheme } from '@/lib/theme'
 
 import { startAutosave } from './autosave'
@@ -49,6 +50,9 @@ export function EditorShell({ schema }: { schema: EditorSchema }) {
   const blockCount = useEditor((s) => s.doc.blocks.length)
   const saving = useEditor((s) => s.saveStatus === 'saving')
   const toggleTheme = useTheme((s) => s.toggle)
+  const { data: site } = useSite()
+  // نفس علامة ترويسة الموقع: أول كلمة من الاسم الإنجليزي بحروف كبيرة + شعار الحرف B (ترويسة الهوم)
+  const wordmark = (site?.name.en.trim().split(/\s+/)[0] || 'Bahja').toUpperCase()
   const [moreOpen, setMoreOpen] = useState(false)
   const [panelOpen, setPanelOpen] = useState(false)
 
@@ -73,7 +77,10 @@ export function EditorShell({ schema }: { schema: EditorSchema }) {
       <header className="ed-top">
         <div className="ed-top-group">
           <Link className="ed-brand" to={meta?.backUrl || '/dashboard'} title={t('editor.top.back')}>
-            <span className="ed-brand-logo" aria-hidden="true" />
+            <span className="ed-brand-word" aria-hidden="true">
+              {wordmark}
+            </span>
+            <span className="ed-brand-mono" aria-hidden="true" />
             <span className="ed-brand-txt">{t('editor.title')}</span>
           </Link>
         </div>
