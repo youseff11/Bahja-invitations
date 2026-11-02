@@ -14,12 +14,25 @@ export function IntroButton() {
   const show = useIntroBus((s) => s.show)
   const skip = useIntroBus((s) => s.skip)
   const covering = useIntroBus((s) => s.visible)
+  const trying = useIntroBus((s) => s.trying)
+  const setTrying = useIntroBus((s) => s.setTrying)
   return (
     <>
       {covering && (
-        <button type="button" className="ed-btn ed-btn--sm ed-btn--primary ed-btn--skip-intro" title={t('editorSettings.intro.skipTitle')} onClick={skip}>
-          {t('editorSettings.intro.skip')}
-        </button>
+        <>
+          <button type="button" className="ed-btn ed-btn--sm ed-btn--primary ed-btn--skip-intro" title={t('editorSettings.intro.skipTitle')} onClick={skip}>
+            {t('editorSettings.intro.skip')}
+          </button>
+          <button
+            type="button"
+            className="ed-btn ed-btn--sm"
+            aria-pressed={trying}
+            title={t(trying ? 'editorSettings.intro.tryEndTitle' : 'editorSettings.intro.tryTitle')}
+            onClick={() => setTrying(!trying)}
+          >
+            {t(trying ? 'editorSettings.intro.tryEnd' : 'editorSettings.intro.try')}
+          </button>
+        </>
       )}
       <button
         type="button"

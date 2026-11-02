@@ -1,4 +1,5 @@
 import type { FromFrame, PreviewPayload } from '../types'
+import { introTrialAt } from './introTrial'
 
 /**
  * ضغطات الشاشة الافتتاحية داخل المحرر. في الدعوة الحقيقية أي لمسة بتفتحها، لكن المصمّم محتاج يعدّل عليها:
@@ -103,7 +104,7 @@ export function installIntroClicks({ payload, send }: Options): () => void {
   const onClick = (e: MouseEvent) => {
     const target = e.target
     if (!(target instanceof Element)) return
-    if (!target.closest('.lb-intro') || target.closest('.lb-intro-extra')) return
+    if (!target.closest('.lb-intro') || target.closest('.lb-intro-extra') || introTrialAt(target)) return
     // الضغطة بتفضل جوّه الافتتاحية: مفيش فتح، ومفيش بدء فيديو، ومفيش لينك
     e.stopPropagation()
     e.preventDefault()

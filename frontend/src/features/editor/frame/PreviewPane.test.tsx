@@ -172,4 +172,26 @@ describe('PreviewPane', () => {
     fromFrame({ type: 'lb-editor:intro-visible', visible: false })
     expect(skip()).toBeNull()
   })
+
+  it('the try button next to skip starts and ends the trial in the frame, and ends with the intro', async () => {
+    const { iframe, ready } = mount()
+    ready()
+    const post = vi.spyOn(iframe.contentWindow!, 'postMessage')
+    const fromFrame = (data: unknown) =>
+      act(() => {
+        window.dispatchEvent(new MessageEvent('message', { data, origin: window.location.origin, source: iframe.contentWindow }))
+      })
+
+    expect(screen.queryByRole('button', { name: 'تجربة الافتتاحية' })).toBeNull()
+    fromFrame({ type: 'lb-editor:intro-visible', visible: true })
+    fireEvent.click(screen.getByRole('button', { name: 'تجربة الافتتاحية' }))
+    await waitFor(() => expect(post).toHaveBeenCalledWith({ type: 'lb-editor:intro-try', on: true }, window.location.origin))
+
+    fireEvent.click(screen.getByRole('button', { name: 'إنهاء التجربة' }))
+    await waitFor(() => expect(post).toHaveBeenCalledWith({ type: 'lb-editor:intro-try', on: false }, window.location.origin))
+
+    fireEvent.click(screen.getByRole('button', { name: 'تجربة الافتتاحية' }))
+    fromFrame({ type: 'lb-editor:intro-visible', visible: false })
+    expect(useIntroBus.getState().trying).toBe(false)
+  })
 })

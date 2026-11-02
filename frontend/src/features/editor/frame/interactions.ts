@@ -4,6 +4,7 @@ import { INTRO_ID } from '../doc'
 import { commitHtml, commitSwap } from '../imported/frame'
 import { savedSrc, THUMB_ATTR } from '../imported/lazyImages'
 import type { FromFrame, PreviewPayload } from '../types'
+import { introTrialAt } from './introTrial'
 import { pointTarget } from './pointTarget'
 
 /**
@@ -278,7 +279,7 @@ export function installInteractions({ payload, send }: Options): () => void {
 
   // ---- السحب
   function movableAt(target: EventTarget | null): HTMLElement | null {
-    if (!(target instanceof Element)) return null
+    if (!(target instanceof Element) || introTrialAt(target)) return null
     // الكانفس سطح رسم لكود المصمّم و‎[data-no-drag]‎ لأي عنصر تفاعلي — الضغطة بتروح له مش للسحب.
     // عناصر فوق القسم وعناصر الافتتاحية ليها سحبها (extraDrags)؛ الاستثناء: عنصر مرقّم (‎ce-N‎) جوّه كود الافتتاحية بيتسحب هنا بالبكسل
     if (target.closest('canvas, [data-no-drag], [data-section-text]')) return null

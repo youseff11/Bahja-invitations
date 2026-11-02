@@ -238,6 +238,15 @@ export function PreviewPane({ onKey }: Props) {
     sendToFrame(frame.current, { type: 'lb-editor:intro-skip' })
   }, [skipCount])
 
+  // زرار «تجربة الافتتاحية» (وإنهاؤها): الإطار بيعيد الافتتاحية من الأول وبيسيب الضغطات تشتغل عليها
+  const tryCount = useIntroBus((s) => s.tryCount)
+  const seenTry = useRef(tryCount)
+  useEffect(() => {
+    if (tryCount === seenTry.current) return
+    seenTry.current = tryCount
+    sendToFrame(frame.current, { type: 'lb-editor:intro-try', on: useIntroBus.getState().trying })
+  }, [tryCount])
+
   // المعاينة اتقفلت مع المحرر: ماتفضلش «الافتتاحية ظاهرة» في الستور لمرة تانية
   useEffect(() => () => useIntroBus.getState().setVisible(false), [])
 

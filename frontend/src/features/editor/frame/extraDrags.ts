@@ -1,4 +1,5 @@
 import type { FromFrame } from '../types'
+import { introTrialAt } from './introTrial'
 
 /**
  * سحب «عناصر فوق القسم» (‎[data-section-text]‎: نص/صورة/زرار) وعناصر الشاشة الافتتاحية (‎[data-intro-item]‎) — S6.
@@ -78,7 +79,7 @@ export function installExtraDrags({ send }: { send: Send }): () => void {
   })
 
   const onPointerDown = (e: PointerEvent) => {
-    if (e.button !== 0 || drag || !(e.target instanceof Element)) return
+    if (e.button !== 0 || drag || !(e.target instanceof Element) || introTrialAt(e.target)) return
 
     // مقبض العرض: عرض الصندوق نسبة من الحاوية (الصندوق متمركز فسحب جنب واحد بيوسّع الجنبين ← ×٢)
     const grip = e.target.closest<HTMLElement>('.lb-section-text__grip')

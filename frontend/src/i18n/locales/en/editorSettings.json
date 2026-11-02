@@ -16,6 +16,10 @@
     "title": "Show the intro screen in the preview",
     "skip": "Skip intro",
     "skipTitle": "Open the invitation and skip the intro screen",
+    "try": "Try the intro",
+    "tryTitle": "Try it like a guest: tapping the button or anywhere opens the invitation, no editing",
+    "tryEnd": "End trial",
+    "tryEndTitle": "Back to edit mode (double and triple clicks)",
     "disabled": "Turn on “Intro screen” in the first Settings group."
   },
   "data": {

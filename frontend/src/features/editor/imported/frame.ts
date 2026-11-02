@@ -2,6 +2,7 @@ import type { FromFrame, PreviewPayload } from '../types'
 import { applyNodeEdit, keepsShape, textUnitIn, videoIn, type NodeEdit } from './nodeEdit'
 import { nextSlot, numberElements } from './numbering'
 import { upgradeLazyImages, savedSrc } from './lazyImages'
+import { introTrialAt } from '../frame/introTrial'
 import { isGhost, pointTarget } from '../frame/pointTarget'
 import { htmlOf, mirror, snapshot } from './pristine'
 import { serializeCustom } from './serialize'
@@ -254,6 +255,7 @@ export function installImported({ payload, send, onPick }: Options): () => void 
 
   // ضغطة = اختيار أقرب عنصر مرقّم (اللي جوّه وحدة نص مابيترقّمش فالنص نفسه هو اللي بيتحدّد)
   const onClick = (e: MouseEvent) => {
+    if (introTrialAt(e.target)) return // تجربة الافتتاحية: مفيش تحديد
     const hit = pointTarget(e)
     let node = inRoot(hit, '[data-move]')
     // صندوق كود المصمّم: الحتة اللي اتضغطت بالظبط هي اللي بتتحدّد (وبتتلوّن) — مش أقرب أب مرقّم. وحدة النص لسه بتتحدّد زي ما هي
@@ -278,6 +280,7 @@ export function installImported({ payload, send, onPick }: Options): () => void 
 
   // ضغطتين على نص = كتابة (الضغطة الواحدة بتفضل للتحديد عشان Delete والأسهم وCtrl+C تفضل للعنصر)
   const onDblClick = (e: MouseEvent) => {
+    if (introTrialAt(e.target)) return
     const node = inRoot(pointTarget(e), '[data-lb-text]')
     if (!node) return
     e.preventDefault()
@@ -335,7 +338,7 @@ export function installImported({ payload, send, onPick }: Options): () => void 
   // الافتتاحية بتفتح الدعوة بأي ضغطة جواها (لمسة في أي مكان) — ضغطة على كود الافتتاحية في المحرر معناها «اختار العنصر ده»،
   // فبنخطفها في مرحلة الالتقاط قبل ما توصل لمستمع الافتتاحية
   const onIntroCode = (e: MouseEvent) => {
-    if (!(e.target instanceof Element) || !e.target.closest('.lb-intro-extra')) return
+    if (!(e.target instanceof Element) || !e.target.closest('.lb-intro-extra') || introTrialAt(e.target)) return
     e.stopPropagation()
     onClick(e)
   }

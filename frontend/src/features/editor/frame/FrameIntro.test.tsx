@@ -179,6 +179,19 @@ describe('FrameApp intro screen', () => {
     expect(visible()).toEqual({ type: 'lb-editor:intro-visible', visible: true })
   })
 
+  it('skip also works for an intro made of advanced code: it stays gone instead of remounting', () => {
+    const { container } = render(<FrameApp />)
+    render_(intro({ code: { css: '.x{color:red}', html: '<p data-move="ce-1">زين</p>', js: '0' } }))
+    expect(introEl(container)).not.toBeNull()
+    fromParent({ type: 'lb-editor:intro-skip' })
+    act(() => {
+      vi.advanceTimersByTime(800)
+    })
+    expect(introEl(container)).toBeNull()
+    render_(intro({ code: { css: '.x{color:blue}', html: '<p data-move="ce-1">زين يارا</p>', js: '0' } }))
+    expect(introEl(container)).toBeNull()
+  })
+
   it('skip with no intro showing does nothing', () => {
     const { container } = render(<FrameApp />)
     render_(null)
@@ -263,6 +276,33 @@ describe('FrameApp intro clicks in the editor', () => {
       vi.advanceTimersByTime(800)
     })
     expect(container.querySelector('.lb-intro')).toBeNull()
+  })
+
+  it('trying the intro: one click on the button opens the invitation like a guest, and clicks edit nothing', () => {
+    const { container } = render(<FrameApp />)
+    render_(intro({ text: 'نص', button: 'ابدأ' }))
+    fromParent({ type: 'lb-editor:intro-try', on: true })
+    const button = container.querySelector<HTMLElement>('[data-intro-open]')!
+    fireEvent.click(button, { detail: 1 }) // ضغطة عادية: بتفتح (مش «مابتعملش حاجة» زي وضع التحرير)
+    expect(button.hasAttribute('contenteditable')).toBe(false)
+    expect(container.querySelector('.lb-intro')?.classList.contains('is-open')).toBe(true)
+    act(() => {
+      vi.advanceTimersByTime(800)
+    })
+    expect(container.querySelector('.lb-intro')).toBeNull()
+    expect(document.documentElement.hasAttribute('data-intro-trial')).toBe(false)
+  })
+
+  it('ending the trial brings back the editing clicks', () => {
+    const { container } = render(<FrameApp />)
+    render_(intro({ text: 'نص', button: 'ابدأ' }))
+    fromParent({ type: 'lb-editor:intro-try', on: true })
+    fromParent({ type: 'lb-editor:intro-try', on: false })
+    const button = container.querySelector<HTMLElement>('[data-intro-open]')!
+    fireEvent.click(button, { detail: 1 })
+    expect(container.querySelector('.lb-intro')?.classList.contains('is-open')).toBe(false)
+    fireEvent.click(button, { detail: 2 })
+    expect(button.getAttribute('contenteditable')).toBe('plaintext-only')
   })
 
   it('refuses editing while the translated preview is showing', () => {

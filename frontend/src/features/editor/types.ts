@@ -291,6 +291,8 @@ export type ToFrame =
   | { type: 'lb-editor:intro' }
   /** زرار «تخطّي الافتتاحية»: يفتح الدعوة بدل التلات ضغطات (نفس اللي بيعمله ‎__lbIntro.open‎) */
   | { type: 'lb-editor:intro-skip' }
+  /** «تجربة الافتتاحية» (on) أو إنهاؤها: الافتتاحية تتعاد من الأول والضغطات بتشتغل عليها زي الضيف، من غير تحرير */
+  | { type: 'lb-editor:intro-try'; on: boolean }
 export type FromFrame =
   | { type: 'lb-editor:ready' }
   /** الافتتاحية مغطّية المعاينة دلوقتي ولا لأ — عشان زرار التخطّي يظهر وقت الحاجة بس */

@@ -12,6 +12,7 @@ import { parseMessage, sendToParent, shortcutKey } from './bridge'
 import { hasRuntime, installImported, markPicked, patchNode, prepareImported, revealPicked } from '../imported/frame'
 import { installExtraDrags, prepareExtras } from './extraDrags'
 import { installIntroClicks } from './introClicks'
+import { setIntroTrial } from './introTrial'
 import { clearBounds, showBounds, type Bounds } from './sectionBounds'
 import { clearDragVars, editingNode, installInteractions, markEditable, patchText } from './interactions'
 import { installNoHover, stripHover } from './noHover'
@@ -26,6 +27,15 @@ const DATA_ATTR = /^data-[a-zA-Z0-9_-]{1,64}$/
 /** إعادة تشغيل سكربتات القالب بعد ما الرسمة تهدى (كل تعديل في قسم مستورد بيبني الـDOM من جديد) */
 const RUNTIME_FIRST_MS = 50
 const RUNTIME_AGAIN_MS = 400
+
+/**
+ * مفتاح تركيب الافتتاحية: HTML وستايل الكود مش فيه — تعديلهم بيتطبّق في مكانه (Raw morph) من غير ما الافتتاحية تتعاد من الأول.
+ * سكربت الكود فيه، لأنه لو اتغيّر لازم يتشغّل من جديد. نفس الدالة بتحسب «توقيع» الافتتاحية اللي اتفتحت: لو اتحسب
+ * بشكل تاني المفتاح بيتغيّر لحظة الفتح والافتتاحية بتتركّب وتظهر من جديد (كانت بتحصل مع كود الافتتاحية).
+ */
+function introKey(intro: PreviewPayload['intro'] | undefined): string {
+  return intro ? JSON.stringify({ ...intro, code: intro.code ? { js: intro.code.js } : null }) : ''
+}
 
 /** ‎data-block‎ للقسم اللي اتضغط عليه (أو أقرب أب ليه). */
 export function blockIdAt(target: EventTarget | null): string | null {
@@ -70,6 +80,7 @@ export function FrameApp() {
   // أقسام بنعيد تركيبها (مفتاح جديد) بعد تراجع/إعادة وهو بيكتب فيها
   const [remount, setRemount] = useState<Record<string, number>>({})
   const [introClosedAt, setIntroClosedAt] = useState<string | null>(null)
+  const [introTry, setIntroTry] = useState(false)
   const introSignature = useRef('')
   // آخر حمولة (لتفاعلات السحب والكتابة) + رد اتأجّل لأن المستخدم بيكتب في نص دلوقتي
   const payloadRef = useRef<PreviewPayload | null>(null)
@@ -85,9 +96,13 @@ export function FrameApp() {
 
   function applyRender(message: Extract<ToFrame, { type: 'lb-editor:render' }>) {
     const next = message.payload as PreviewPayload
-    introSignature.current = next.intro ? JSON.stringify(next.intro) : ''
+    introSignature.current = introKey(next.intro)
     // اتقفلت من الإعدادات: المرة الجاية اللي تتفعّل فيها لازم تظهر من جديد
-    if (!next.intro) setIntroClosedAt(null)
+    if (!next.intro) {
+      setIntroClosedAt(null)
+      setIntroTrial(false)
+      setIntroTry(false)
+    }
     setState({ payload: next, selected: message.selected })
   }
   const applyRenderRef = useRef(applyRender)
@@ -129,7 +144,11 @@ export function FrameApp() {
         patchText(message.id, message.key, message.value)
       } else if (message.type === 'lb-editor:overlays') {
         patchOverlays(message.id, message.items)
-      } else if (message.type === 'lb-editor:intro') {
+      } else if (message.type === 'lb-editor:intro' || message.type === 'lb-editor:intro-try') {
+        // «تجربة الافتتاحية»: تتعاد من الأول وتشتغل زي ما هتشتغل عند الضيف (ضغطة الزرار تفتح، والفيديو مايتخطّاش)
+        const trying = message.type === 'lb-editor:intro-try' && message.on
+        setIntroTrial(trying)
+        setIntroTry(trying)
         setIntroClosedAt(null)
         setIntroRun((n) => n + 1)
       } else if (message.type === 'lb-editor:intro-skip') {
@@ -222,18 +241,20 @@ export function FrameApp() {
   }, [])
 
   const payload = state?.payload
-  // مفتاح تركيب الافتتاحية: HTML وستايل الكود مش فيه — تعديلهم بيتطبّق في مكانه (Raw morph) من غير ما الافتتاحية تتعاد من الأول.
-  // سكربت الكود فيه، لأنه لو اتغيّر لازم يتشغّل من جديد
-  const introJson = useMemo(() => {
-    const intro = payload?.intro
-    return intro ? JSON.stringify({ ...intro, code: intro.code ? { js: intro.code.js } : null }) : ''
-  }, [payload])
+  const introJson = useMemo(() => introKey(payload?.intro), [payload])
 
   // الافتتاحية اتفتحت (لمسة، زرار، عدّاد، نهاية الفيديو): نفتكر محتواها عشان مانركّبهاش تاني
   useEffect(() => {
-    const onOpen = () => setIntroClosedAt(introSignature.current)
+    const onOpen = () => {
+      setIntroTrial(false)
+      setIntroTry(false)
+      setIntroClosedAt(introSignature.current)
+    }
     document.addEventListener('lb:intro-open', onOpen)
-    return () => document.removeEventListener('lb:intro-open', onOpen)
+    return () => {
+      document.removeEventListener('lb:intro-open', onOpen)
+      setIntroTrial(false)
+    }
   }, [])
 
   // الأم محتاجة تعرف الافتتاحية مغطّية المعاينة ولا لأ (زرار «تخطّي الافتتاحية»)
@@ -332,7 +353,7 @@ export function FrameApp() {
 
   return (
     <InviteContext.Provider value={ctx}>
-      {payload.intro && <Intro key={`${introRun}:${introClosedAt ?? introJson}`} data={payload.intro} />}
+      {payload.intro && <Intro key={`${introRun}:${introClosedAt ?? introJson}`} data={payload.intro} lockSkip={introTry} />}
       <div {...rootAttrs} className={stageClass}>
         {payload.blocks.map((block) => (
           <BlockView key={`${block.id}:${remount[block.id] ?? 0}`} block={block} />
