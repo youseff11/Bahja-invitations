@@ -800,21 +800,171 @@ html[lang="en"] .plan-badge { letter-spacing: .1em; }
 .section--features { background: var(--bg); }
 
 .wrap--narrow { width: min(760px, 100% - 36px); }
+
+/* ---- الأسئلة الشائعة: قائمة أسئلة + كارت إجابة كبير (زي كارت دعوة مطبوع) ----
+   الحالة في ‎data-active / data-open‎ مش في الكلاسات — شوف التعليق في FaqSection.tsx */
 .section--faq { background: var(--surface-2); }
-.faq-list { display: grid; gap: 10px; }
-.faq-item {
-  border: 1px solid var(--line); border-radius: 15px; background: var(--surface);
-  overflow: hidden; box-shadow: 0 12px 30px -28px rgba(23,19,15,.55);
+.faq { max-width: 1120px; }
+.faq-grid {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  gap: clamp(24px, 4vw, 56px); align-items: start;
 }
-.faq-item summary {
-  cursor: pointer; list-style: none; padding: 18px 22px;
-  color: var(--text); font-family: var(--font-display); font-size: 20px;
-  font-weight: 600; display: flex; align-items: center; justify-content: space-between; gap: 14px;
+
+/* القائمة */
+.faq-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.faq-item { position: relative; border-radius: 16px; }
+.faq-item + .faq-item::before {
+  content: ""; position: absolute; top: -2px; inset-inline: 18px; height: 1px;
+  background: color-mix(in srgb, var(--accent) 16%, var(--line));
+  transition: opacity .25s ease;
 }
-.faq-item summary::-webkit-details-marker { display: none; }
-.faq-item summary::after { content: "+"; color: var(--accent); font-family: sans-serif; font-size: 24px; font-weight: 300; }
-.faq-item[open] summary::after { content: "−"; }
-.faq-answer { padding: 0 22px 19px; color: var(--muted); line-height: 1.9; font-size: 15px; }
+.faq-item[data-active]::before, .faq-item[data-active] + .faq-item::before { opacity: 0; }
+.faq-q {
+  all: unset; box-sizing: border-box; width: 100%; cursor: pointer;
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 16px;
+  padding: 17px 18px; border-radius: 16px; text-align: start;
+  transition: background-color .25s ease, box-shadow .25s ease;
+}
+.faq-q:hover { background: color-mix(in srgb, var(--surface) 60%, transparent); }
+.faq-q:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.faq-num {
+  display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--line));
+  font-family: var(--font-display); font-size: 13px; font-weight: 600;
+  color: var(--accent); font-variant-numeric: tabular-nums;
+  transition: background-color .25s ease, color .25s ease, border-color .25s ease;
+}
+.faq-q-text {
+  color: var(--text); font-family: var(--font-display);
+  font-size: 18px; font-weight: 600; line-height: 1.55;
+}
+.faq-arrow {
+  display: grid; place-items: center; color: var(--muted); opacity: .5;
+  transition: transform .3s cubic-bezier(.22, .8, .3, 1), color .25s ease, opacity .25s ease;
+}
+[dir="rtl"] .faq-arrow svg { transform: scaleX(-1); }
+.faq-item[data-active] .faq-q {
+  background: var(--surface);
+  box-shadow: 0 18px 36px -28px color-mix(in srgb, var(--accent) 70%, rgba(23,19,15,.6)),
+              inset 0 0 0 1px color-mix(in srgb, var(--accent) 30%, var(--line));
+}
+.faq-item[data-active] .faq-num { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+.faq-item[data-active] .faq-arrow { color: var(--accent); opacity: 1; transform: translateX(4px); }
+[dir="rtl"] .faq-item[data-active] .faq-arrow { transform: translateX(-4px); }
+
+/* إجابة الموبايل — مخفية على الديسكتوب */
+.faq-inline { display: none; }
+
+/* كارت الإجابة */
+.faq-stage { position: sticky; top: 104px; }
+.faq-card {
+  position: relative; isolation: isolate; overflow: hidden;
+  min-height: 340px; display: flex; flex-direction: column;
+  padding: clamp(28px, 3.4vw, 44px);
+  border-radius: 28px; background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--accent) 26%, var(--line));
+  box-shadow: 0 34px 70px -48px color-mix(in srgb, var(--accent) 75%, rgba(23,19,15,.7));
+  animation: faq-card-in .5s cubic-bezier(.22, .8, .3, 1);
+}
+/* إطار داخلي رفيع — إحساس كارت الدعوة المطبوع */
+.faq-card::before {
+  content: ""; position: absolute; inset: 10px; z-index: -1; pointer-events: none;
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent); border-radius: 20px;
+}
+/* لمعة لونية خفيفة في الركن */
+.faq-card::after {
+  content: ""; position: absolute; z-index: -2; pointer-events: none;
+  width: 320px; height: 320px; inset-block-start: -160px; inset-inline-end: -120px; border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%);
+}
+@keyframes faq-card-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: none; }
+}
+.faq-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+.faq-card-mark {
+  display: grid; place-items: center; width: 56px; height: 56px; border-radius: 18px;
+  background: color-mix(in srgb, var(--accent) 11%, var(--surface));
+  color: var(--accent); font-family: var(--font-display); font-size: 30px; font-weight: 700; line-height: 1;
+  transform: rotate(-6deg);
+}
+.faq-card-count { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; letter-spacing: .08em; }
+.faq-card-count b { color: var(--accent); font-size: 18px; font-family: var(--font-display); }
+.faq-card-q {
+  margin: 0; color: var(--text); font-family: var(--font-display);
+  font-size: clamp(22px, 2.2vw, 28px); font-weight: 700; line-height: 1.5;
+}
+.faq-card-q::after {
+  content: ""; display: block; width: 110px; height: 13px; margin-top: 14px;
+  background-color: var(--accent); opacity: .7;
+  -webkit-mask: var(--orn-rule) no-repeat center / contain;
+          mask: var(--orn-rule) no-repeat center / contain;
+}
+.faq-card-a { margin: 18px 0 28px; color: var(--muted); font-size: 16px; line-height: 2; flex: 1; }
+.faq-card-foot {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  padding-top: 20px; border-top: 1px dashed color-mix(in srgb, var(--accent) 24%, var(--line));
+}
+.faq-card-nav { display: flex; gap: 8px; }
+.faq-nav {
+  all: unset; box-sizing: border-box; cursor: pointer;
+  display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--line)); color: var(--accent);
+  transition: background-color .2s ease, color .2s ease, transform .2s ease;
+}
+.faq-nav:hover { background: var(--accent); color: var(--surface); transform: translateY(-2px); }
+.faq-nav:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* «اللي بعده» بيشاور في اتجاه القراءة */
+.faq-nav--prev svg { transform: scaleX(-1); }
+[dir="rtl"] .faq-nav svg { transform: scaleX(-1); }
+[dir="rtl"] .faq-nav--prev svg { transform: none; }
+.faq-card-contact { color: var(--muted); font-size: 14px; text-decoration: none; }
+.faq-card-contact b {
+  color: var(--accent); font-weight: 600; margin-inline-start: 4px;
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 40%, transparent); transition: border-color .2s ease;
+}
+.faq-card-contact:hover b { border-color: var(--accent); }
+
+@media (prefers-reduced-motion: reduce) {
+  .faq-card { animation: none; }
+  .faq-q, .faq-num, .faq-arrow, .faq-inline { transition: none; }
+}
+
+/* موبايل وتابلت: الكارت بيختفي والإجابة بتفتح تحت السؤال نفسه */
+@media (max-width: 860px) {
+  .faq-grid { grid-template-columns: minmax(0, 1fr); }
+  .faq-stage { display: none; }
+  .faq-list { gap: 10px; }
+  .faq-item + .faq-item::before { display: none; }
+  .faq-item {
+    background: var(--surface); border: 1px solid var(--line);
+    box-shadow: 0 14px 30px -28px rgba(23,19,15,.55);
+    transition: border-color .25s ease;
+  }
+  .faq-item[data-open] { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); }
+  .faq-item[data-active] .faq-q { background: transparent; box-shadow: none; }
+  .faq-item:not([data-open]) .faq-num { background: transparent; border-color: color-mix(in srgb, var(--accent) 30%, var(--line)); color: var(--accent); }
+  .faq-q { padding: 15px; gap: 12px; }
+  .faq-q:hover { background: transparent; }
+  .faq-num { width: 32px; height: 32px; font-size: 12px; }
+  .faq-q-text { font-size: 16.5px; }
+  /* السهم بيشاور لتحت، ولما الإجابة تفتح بيلف لفوق */
+  .faq-arrow svg, [dir="rtl"] .faq-arrow svg { transform: rotate(90deg); }
+  .faq-item[data-active] .faq-arrow, [dir="rtl"] .faq-item[data-active] .faq-arrow { transform: none; }
+  .faq-item:not([data-open]) .faq-arrow { color: var(--muted); opacity: .5; }
+  .faq-item[data-open] .faq-arrow, [dir="rtl"] .faq-item[data-open] .faq-arrow { transform: rotate(180deg); }
+  .faq-inline {
+    display: grid; grid-template-rows: 0fr;
+    transition: grid-template-rows .35s cubic-bezier(.22, .8, .3, 1);
+  }
+  .faq-item[data-open] .faq-inline { grid-template-rows: 1fr; }
+  .faq-inline-in { overflow: hidden; min-height: 0; }
+  .faq-inline-text {
+    margin: 0 15px; padding: 12px 0 16px;
+    border-top: 1px dashed color-mix(in srgb, var(--accent) 24%, var(--line));
+    color: var(--muted); font-size: 14.5px; line-height: 1.95;
+  }
+}
 .home-cta { padding-block: 96px; background: var(--surface-2); }
 .home-cta-in { max-width: 720px; text-align: center; }
 .home-cta h2 { margin-bottom: 8px; font-size: clamp(28px, 4vw, 48px); }
@@ -828,8 +978,6 @@ html[lang="en"] .plan-badge { letter-spacing: .1em; }
 @media (max-width: 380px) { .foot-brand { height: 16px; } }
 
 @media (max-width: 700px) {
-  .faq-item summary { padding: 16px 17px; font-size: 18px; }
-  .faq-answer { padding: 0 17px 16px; font-size: 14px; }
   .home-cta { padding-block: 70px; }
   .foot-inner { flex-wrap: wrap; justify-content: center; text-align: center; }
   .foot-brand { order: 0; }
@@ -1189,8 +1337,6 @@ html.js [data-reveal].is-in { opacity: 1; transform: none; }
 /* الزرار الأساسي جوّه الكارت بينوّر مع الكارت — بيوضّح الفعل المتاح */
 .plan:hover .btn--gold { filter: brightness(1.06); box-shadow: 0 14px 28px -14px color-mix(in srgb, var(--accent) 90%, transparent); }
 
-.faq-item { transition: border-color .2s ease, box-shadow .2s ease; }
-.faq-item[open], .faq-item:hover { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); }
 
 /* قسم الدعوة الأخير: إطار زخرفي خفيف حوالين الكتلة */
 .home-cta-in {

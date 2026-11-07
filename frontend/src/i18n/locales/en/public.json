@@ -106,7 +106,12 @@
   },
   "faq": {
     "eyebrow": "Help",
-    "title": "Frequently asked questions"
+    "title": "Frequently asked questions",
+    "lead": "Answers to the questions we hear most about digital invitations — from delivery to the moment your guests open the link.",
+    "moreQuestions": "Still have a question?",
+    "contact": "Message us, we'll reply",
+    "prev": "Previous question",
+    "next": "Next question"
   },
   "cta": {
     "eyebrow": "Your next step",
