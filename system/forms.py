@@ -324,6 +324,7 @@ class SiteSettingForm(forms.ModelForm):
         # ونصوص شريط المعاينة تحت.
         fields = [
             "plans_public",
+            "dark_mode_enabled",
             "templates_mobile_columns",
             "orders_enabled",
             "whatsapp_enabled", "whatsapp_number",

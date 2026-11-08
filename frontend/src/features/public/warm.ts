@@ -49,12 +49,16 @@ export function warmOtherVariants() {
   const theme = root.getAttribute('data-theme') === 'dark' ? 'dark' : 'light'
   const lang = root.lang === 'en' ? 'en' : 'ar'
   const otherTheme = theme === 'dark' ? 'light' : 'dark'
-  // اللوجو ممكن يكون مرفوع من اللوحة — الـCSS بيقراه من ‎--site-logo-*‎
-  const logoVar = getComputedStyle(root).getPropertyValue(`--site-logo-${otherTheme}`).match(/url\(["']?([^"')]+)/)
-  warm(logoVar ? logoVar[1] : BRAND[otherTheme])
+  // الدارك مقفول من الإعدادات؟ مفيش تبديل مظهر — مانحمّلش صور مش هتتعرض
+  const themeSwitchable = !root.hasAttribute('data-dark-off')
+  if (themeSwitchable) {
+    // اللوجو ممكن يكون مرفوع من اللوحة — الـCSS بيقراه من ‎--site-logo-*‎
+    const logoVar = getComputedStyle(root).getPropertyValue(`--site-logo-${otherTheme}`).match(/url\(["']?([^"')]+)/)
+    warm(logoVar ? logoVar[1] : BRAND[otherTheme])
+  }
   // الهيرو في الرئيسية بس
   if (document.querySelector('.hero-art')) {
-    warm(heroUrl(lang, otherTheme))
+    if (themeSwitchable) warm(heroUrl(lang, otherTheme))
     warm(heroUrl(lang === 'ar' ? 'en' : 'ar', theme))
   }
 }

@@ -26,6 +26,7 @@ export function SitePage() {
     const flag = (key: keyof SiteValues) => values.has(key)
     const body: SiteValues = {
       plansPublic: flag('plansPublic'),
+      darkModeEnabled: flag('darkModeEnabled'),
       templatesMobileColumns: str(values, 'templatesMobileColumns') === '2' ? 2 : 1,
       ordersEnabled: flag('ordersEnabled'),
       whatsappEnabled: flag('whatsappEnabled'),
@@ -91,6 +92,11 @@ export function SitePage() {
               <form className="form" key={JSON.stringify(values)} onSubmit={onSubmit}>
                 <ErrorList message={errors.formError} nonField />
                 <CheckField name="plansPublic" label={t('dashboard.site.fields.plansPublic')} defaultChecked={values.plansPublic} />
+                <CheckField
+                  name="darkModeEnabled"
+                  label={t('dashboard.site.fields.darkModeEnabled')}
+                  defaultChecked={values.darkModeEnabled}
+                />
                 <SelectField
                   name="templatesMobileColumns"
                   label={t('dashboard.site.fields.templatesMobileColumns')}

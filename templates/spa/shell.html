@@ -1,5 +1,5 @@
 {% load static vite siteicon %}<!doctype html>
-<html lang="{{ LANGUAGE_CODE }}" dir="{% if LANGUAGE_BIDI %}rtl{% else %}ltr{% endif %}" data-theme="light">
+<html lang="{{ LANGUAGE_CODE }}" dir="{% if LANGUAGE_BIDI %}rtl{% else %}ltr{% endif %}" data-theme="light"{% if not boot.site.darkModeEnabled %} data-dark-off{% endif %}>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -24,14 +24,18 @@
 <meta name="twitter:image" content="{{ SEO_IMAGE }}">
 <script>
 /* يضبط المظهر قبل رسم الصفحة — نفس مفتاح الموقع القديم (leila-theme)،
-   فاختيار الزائر بيمشي بين النسختين. من غير متغيّرات Django عمداً. */
+   فاختيار الزائر بيمشي بين النسختين. من غير متغيّرات Django عمداً:
+   لو الدارك مقفول من إعدادات الموقع السيرفر بيحط data-dark-off على
+   الـ<html> والسكربت بيقراها — فاتح دايماً من غير ما نلمس اختيار الزائر. */
 (function () {
   try {
+    var root = document.documentElement;
+    if (root.hasAttribute("data-dark-off")) { root.setAttribute("data-theme", "light"); return; }
     var t = localStorage.getItem("leila-theme");
     if (t !== "light" && t !== "dark") {
       t = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
     }
-    document.documentElement.setAttribute("data-theme", t);
+    root.setAttribute("data-theme", t);
   } catch (e) {}
 })();
 </script>
@@ -40,8 +44,10 @@
 <link href="https://fonts.googleapis.com/css2?family=El+Messiri:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&family=Playfair+Display:wght@500;600&family=Amiri:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
 <link rel="icon" href="{% site_icon_href 'images/logo.jpeg' %}" type="image/png">
 <link rel="apple-touch-icon" href="{% site_icon_href 'images/logo.jpeg' %}">
-<meta name="theme-color" content="#fbf8f4" media="(prefers-color-scheme: light)">
+{% if boot.site.darkModeEnabled %}<meta name="theme-color" content="#fbf8f4" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#161d18" media="(prefers-color-scheme: dark)">
+{% else %}<meta name="theme-color" content="#fbf8f4">
+{% endif %}
 {% vite_assets %}
 </head>
 <body>

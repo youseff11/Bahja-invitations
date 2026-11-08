@@ -19,6 +19,8 @@ export interface SiteInfo {
   email: string
   ordersEnabled: boolean
   plansPublic: boolean
+  /** مقفول = الموقع فاتح دايماً وزرار المظهر مخفي */
+  darkModeEnabled: boolean
   /** عدد القوالب في الصف على التلفون في الرئيسية: ١ أو ٢ */
   templatesMobileColumns: 1 | 2
   whatsapp: {

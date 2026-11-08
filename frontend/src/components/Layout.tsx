@@ -9,10 +9,12 @@ import '@/features/public/public.css'
 import { useEffect, useRef } from 'react'
 import { Outlet, useLocation, useNavigationType } from 'react-router-dom'
 
+import { useSite } from '@/api/hooks'
 import { MetaPixel } from '@/features/public/metaPixel'
 import { WhatsAppFloat } from '@/features/public/WhatsAppFloat'
 import { scheduleWarm } from '@/features/public/warm'
 import { restoreScroll, savedScroll } from '@/lib/scrollMemory'
+import { useTheme } from '@/lib/theme'
 import { Header } from './Header'
 
 /** مسار الدخول: صفحة مستقلة من غير ترويسة ولا واتساب (زي ‎auth/login.html‎ القديم). */
@@ -49,6 +51,12 @@ export function Layout() {
   const { pathname } = useLocation()
   useScrollOnNavigate()
   useEffect(() => scheduleWarm(), [])
+  // الدارك اتقفل/اتفتح من اللوحة وسط الجلسة — الـshell بيظبط أول رسم بس
+  const darkAllowed = useSite().data?.darkModeEnabled
+  const setDarkAllowed = useTheme((s) => s.setDarkAllowed)
+  useEffect(() => {
+    if (darkAllowed !== undefined) setDarkAllowed(darkAllowed)
+  }, [darkAllowed, setDarkAllowed])
 
   return (
     <>

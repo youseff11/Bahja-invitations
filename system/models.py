@@ -1016,6 +1016,14 @@ class SiteSetting(models.Model):
                   "دي غير رسالة شريط «عجبك القالب؟» اللي فيها {template}.",
     )
 
+    # ---- المظهر
+    dark_mode_enabled = models.BooleanField(
+        "الوضع الليلي (الدارك مود) في الموقع", default=True,
+        help_text="اقفله والموقع يفضل فاتح دايماً لكل الزوار، وزرار "
+                  "الشمس/القمر بيختفي من القايمة. اختيار الزائر القديم "
+                  "مابيتمسحش — يرجع لو فتحته تاني.",
+    )
+
     # ---- عرض القوالب في الصفحة الرئيسية
     templates_mobile_columns = models.PositiveSmallIntegerField(
         "عدد القوالب في الصف على التلفون",

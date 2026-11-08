@@ -96,6 +96,8 @@ export function Header() {
 
   const ordersEnabled = !!site?.ordersEnabled
   const plansPublic = !!site?.plansPublic
+  // قبل ما الإعدادات توصل نعتبره مفتوح (القيمة الافتراضية)
+  const darkModeEnabled = site?.darkModeEnabled ?? true
   const whatsappUrl = site?.whatsapp.url ?? ''
   const siteName = site ? pick(lang, site.name.ar, site.name.en) : ''
   // علامة الترويسة: أول كلمة من الاسم الإنجليزي بحروف كبيرة (BAHJA) + شعار الحرف B بالتاج (صورة)
@@ -192,7 +194,7 @@ export function Header() {
 
           <div className="nav-tools">
             <LanguageSwitch />
-            <ThemeToggle />
+            {darkModeEnabled && <ThemeToggle />}
             {orderCta('btn btn--gold btn--sm nav-cta')}
             <button
               className="nav-burger"
