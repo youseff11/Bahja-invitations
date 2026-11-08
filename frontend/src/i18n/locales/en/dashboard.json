@@ -545,6 +545,7 @@
     "fields": {
       "plansPublic": "Show plans and prices on the site",
       "darkModeEnabled": "Dark mode — when off the site stays light and the sun/moon button is hidden",
+      "translationEnabled": "Translation (Arabic/English button) — when off the site stays Arabic and the language button is hidden",
       "templatesMobileColumns": "Templates per row on mobile",
       "ordersEnabled": "“Order your invitation” form on the site",
       "whatsappEnabled": "Show WhatsApp",

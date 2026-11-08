@@ -3,16 +3,14 @@ import { useLayoutEffect } from 'react'
 import { prefersReducedMotion } from './motion'
 
 /**
- * الظهور التدريجي بالسكرول لعناصر ‎[data-reveal]‎ جوّه ‎#main‎ (بما فيها اللي
- * بتتضاف بعد وصول البيانات). نفس سلوك ‎site.js‎: الأقسام تظهر لما تدخل الشاشة،
- * والكروت ورا بعض (‎data-reveal-stagger‎)، ومع «تقليل الحركة» تظهر كلها فوراً.
+ * بيعلّم عناصر ‎[data-reveal]‎ جوّه ‎#main‎ بكلاس ‎is-in‎ لما تدخل الشاشة (بما
+ * فيها اللي بتتضاف بعد وصول البيانات).
  *
- * كلاس ‎js‎ على ‎<html>‎ هو اللي بيخلّي الـCSS يخبّي العناصر دي — فبنضيفه
- * قبل أول رسم (layout effect) عشان مايبقاش فيه ومضة «ظاهر ثم مخفي».
+ * العناصر نفسها ظاهرة من الأول — مفيش إخفاء ولا ظهور تدريجي بالسكرول. الكلاس
+ * ده بيشغّل حركات مربّعات المميزات (Bento) بس، عشان ماتشتغلش وهي برّه الشاشة.
  */
 export function useReveal() {
   useLayoutEffect(() => {
-    document.documentElement.classList.add('js')
     const root = document.getElementById('main') ?? document.body
 
     if (prefersReducedMotion() || !('IntersectionObserver' in window)) {
@@ -28,17 +26,11 @@ export function useReveal() {
       (entries) => {
         for (const entry of entries) {
           if (!entry.isIntersecting) continue
-          const el = entry.target as HTMLElement
-          if (el.hasAttribute('data-reveal-stagger') && el.parentElement) {
-            // ترتيب العنصر جوّه أبوه بيحدد التأخير — الكروت بتظهر ورا بعض
-            const index = Array.prototype.indexOf.call(el.parentElement.children, el)
-            el.style.setProperty('--reveal-delay', `${Math.min(index, 8) * 70}ms`)
-          }
-          el.classList.add('is-in')
-          io.unobserve(el)
+          entry.target.classList.add('is-in')
+          io.unobserve(entry.target)
         }
       },
-      { threshold: 0.12, rootMargin: '0px 0px -8% 0px' },
+      { threshold: 0.12 },
     )
 
     const seen = new WeakSet<Element>()

@@ -887,7 +887,7 @@ class PlanTests(DashboardApiCase):
 class SiteTests(DashboardApiCase):
     def body(self, **extra):
         body = {
-            "plansPublic": True, "templatesMobileColumns": 1, "ordersEnabled": True,
+            "plansPublic": True, "darkModeEnabled": True, "translationEnabled": True, "templatesMobileColumns": 1, "ordersEnabled": True,
             "whatsappEnabled": True, "whatsappNumber": "+201000000000",
             "whatsappFloatEnabled": True, "whatsappCtaMessage": "أهلاً",
             "previewCtaEnabled": True, "previewCtaText": "عجبك القالب؟",

@@ -210,15 +210,35 @@ html[lang="en"][data-theme="dark"] .hero-art {
 }
 .hero-copy-in {
   pointer-events: auto;
-  width: min(100% - 40px, 880px);
+  width: min(100% - 40px, 1320px);
   margin-inline: auto;
   text-align: center;
 }
 
-/* ======== نص الهيرو ======== */
+/* ======== نص الهيرو ========
+   زي التصميم: سطر صغير متباعد فوق ← فاصل ذهبي بمعين ← الجملة بخط رقعة ← سطر إنجليزي متباعد.
+   ألوان الحبر من بالتة الصورة (برجاندي غامق + موف)، وبتنوّر في الدارك. */
+.hero {
+  --hero-ink: #2c1115;
+  --hero-muted: #7a4a52;
+  --hero-gold: #b08a4e;
+}
+[data-theme="dark"] .hero {
+  --hero-ink: var(--text);
+  --hero-muted: #d2b8a6;
+  --hero-gold: #c9a467;
+}
+.hero .hero-top {
+  margin: 0; color: var(--hero-muted);
+  font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 500;
+  font-size: clamp(13px, 1.9vw, 32px); line-height: 1.2;
+  letter-spacing: .55em; text-transform: uppercase;
+  /* التباعد بيتحط بعد آخر حرف كمان — بنعوّضه بنفس المسافة قبل أول حرف عشان السطر يفضل في النص بالظبط */
+  padding-inline-start: .55em;
+}
 .hero .hero-copy h1 {
-  margin: 0; color: var(--text); font-family: 'Amiri', var(--font-display); font-weight: 400;
-  font-size: clamp(40px, 5.8vw, 96px); line-height: 1.35; letter-spacing: 0; text-wrap: balance;
+  margin: .08em 0 0; color: var(--hero-ink); font-family: 'Aref Ruqaa', 'Amiri', var(--font-display); font-weight: 700;
+  font-size: clamp(44px, 8.4vw, 150px); line-height: 1.4; letter-spacing: 0; word-spacing: .12em; text-wrap: balance;
 }
 /* الإنجليزي: سيريف مائل كلاسيكي (حجمه أكبر لأن خطه أصغر في الارتفاع) */
 html[lang="en"] .hero .hero-copy h1 {
@@ -226,23 +246,24 @@ html[lang="en"] .hero .hero-copy h1 {
   font-size: clamp(46px, 7vw, 116px); line-height: 1.08; letter-spacing: -.01em;
 }
 
-/* فاصل رفيع بمعين في نصه + جملة صغيرة تحت العنوان */
+/* فاصل رفيع ذهبي بمعين مليان في نصه — بين السطر الصغير والجملة الكبيرة */
 .hero-orn {
-  display: block; width: min(220px, 52%); height: 11px; margin: 22px auto 0; position: relative;
-  background: linear-gradient(to right, transparent, var(--accent) 30%, var(--accent) 70%, transparent) center / 100% 1px no-repeat;
-  opacity: .7;
+  display: block; width: clamp(150px, 21vw, 340px); height: 9px; margin: clamp(10px, 1.2vw, 18px) auto 0; position: relative;
+  background: linear-gradient(to right, transparent, var(--hero-gold) 22%, var(--hero-gold) 78%, transparent) center / 100% 1px no-repeat;
+  opacity: .85;
 }
 .hero-orn::after {
-  content: ""; position: absolute; top: 50%; left: 50%; width: 9px; height: 9px;
+  content: ""; position: absolute; top: 50%; left: 50%; width: 7px; height: 7px;
   transform: translate(-50%, -50%) rotate(45deg);
-  border: 1px solid var(--accent); background: var(--bg);
+  background: var(--hero-gold);
 }
 .hero .hero-sub {
-  margin: 18px auto 0; max-width: 34ch; color: var(--text); opacity: .85;
-  text-shadow: 0 0 10px var(--bg), 0 0 4px var(--bg);
-  font-size: clamp(15px, 1.35vw, 20px); line-height: 1.8; text-wrap: balance;
+  margin: .2em auto 0; max-width: none; color: var(--hero-muted);
+  font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 500;
+  font-size: clamp(11px, 1.45vw, 24px); line-height: 1.6;
+  letter-spacing: .3em; text-transform: uppercase; text-wrap: balance;
+  padding-inline-start: .3em;
 }
-html[lang="en"] .hero .hero-sub { font-size: clamp(16px, 1.45vw, 21px); line-height: 1.6; }
 
 .hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 32px; }
 
@@ -429,13 +450,11 @@ html[lang="en"] .plan-badge { letter-spacing: .1em; }
 
   .hero-copy { padding-top: calc(var(--nav-space) * .6); padding-bottom: 8%; }
   .hero-copy-in { width: min(100% - 44px, 520px); }
-  .hero .hero-copy h1 { font-size: clamp(36px, 11vw, 58px); line-height: 1.4; }
+  .hero .hero-top { font-size: 12px; letter-spacing: .42em; padding-inline-start: .42em; }
+  .hero-orn { width: 150px; margin-top: 12px; }
+  .hero .hero-copy h1 { font-size: clamp(44px, 13.5vw, 64px); line-height: 1.5; margin-top: .1em; }
   html[lang="en"] .hero .hero-copy h1 { font-size: clamp(44px, 13.4vw, 72px); line-height: 1.08; }
-  .hero-orn { margin-top: 18px; }
-  .hero .hero-sub { margin-top: 14px; font-size: 16px; max-width: 28ch; }
-  html[lang="en"] .hero .hero-sub { font-size: 17px; }
-  .hero-actions { justify-content: center; margin-top: 28px; }
-  .hero-actions .btn { min-width: 168px; }
+  .hero .hero-sub { margin-top: 10px; font-size: 10.5px; letter-spacing: .18em; padding-inline-start: .18em; line-height: 1.9; }
 }
 
 /* شاشات صغيرة جداً */
@@ -1227,15 +1246,9 @@ html[lang="en"] .feature-en { display: inline; }
 [dir="rtl"] .btn-arrow { transform: scaleX(-1); }
 [dir="rtl"] .btn:hover .btn-arrow { transform: scaleX(-1) translateX(4px); }
 
-/* ---------------------------------------------------------- 7) ظهور تدريجي بالسكرول */
-html.js [data-reveal] {
-  opacity: 0; transform: translateY(16px);
-  transition: opacity .5s cubic-bezier(.22, .8, .3, 1),
-              transform .5s cubic-bezier(.22, .8, .3, 1);
-  transition-delay: var(--reveal-delay, 0s);
-}
-html.js [data-reveal].is-in { opacity: 1; transform: none; }
-/* أمان: من غير جافاسكربت الكلاس js مش بيتحط، فالمحتوى بيفضل ظاهر عادي */
+/* ---------------------------------------------------------- 7) الظهور بالسكرول
+   اتلغى: عناصر الصفحة الرئيسية ظاهرة من الأول. ‎.is-in‎ (من useReveal) بقى
+   بيشغّل حركات مربّعات المميزات بس — شوف قسم «Bento» تحت. */
 
 /* ---------------------------------------------------------- 8) لمسات على الأقسام
    ملحوظة: مقاس كارت القالب زي ما هو — التعديل على الظل والحدود بس. */
@@ -1374,7 +1387,6 @@ html.js [data-reveal].is-in { opacity: 1; transform: none; }
 /* احترام إعداد «تقليل الحركة» في النظام: كل حاجة بتقف، والمحتوى بيفضل ظاهر */
 @media (prefers-reduced-motion: reduce) {
   .fx-sky, .hero-sparks, .hero-shooting { display: none; }
-  html.js [data-reveal] { opacity: 1; transform: none; transition: none; }
   .btn, .tpl-card, .plan { transition: none; }
   .btn:hover, .tpl-card:hover, .plan:hover { transform: none; }
   .orn-diamond, .fx-glow { animation: none; }
@@ -1504,10 +1516,10 @@ html[dir="ltr"] .steps { --pz-start: left; }
     background-position: center;
   }
   .hero-side { display: none; }
-  .hero .hero-copy h1 { font-size: clamp(28px, 5.6vw, 44px); }
+  .hero .hero-copy h1 { font-size: clamp(30px, 6vw, 48px); }
   html[lang="en"] .hero .hero-copy h1 { font-size: clamp(32px, 6.4vw, 52px); }
-  .hero-actions { margin-top: 16px; }
-  .hero-orn, .hero .hero-sub { display: none; }   /* الارتفاع ضيق في الوضع الأفقي */
+  .hero .hero-top { font-size: 11px; }
+  .hero .hero-sub { font-size: 10px; }
 }
 
 

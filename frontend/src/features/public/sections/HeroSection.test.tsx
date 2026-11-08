@@ -32,13 +32,12 @@ describe('HeroSection settings', () => {
   it('falls back to the translated defaults when nothing is set', () => {
     show(EMPTY)
     expect(screen.getByText('دعوة عمرك ما تنساها')).toBeInTheDocument()
-    expect(screen.getByText('شوف القوالب')).toBeInTheDocument()
-    expect(screen.queryByText('شوف الباقات')).toBeNull() // زرار واحد بس
-    expect(document.querySelectorAll('.hero-actions a')).toHaveLength(1)
-    // جملة كبيرة + جملة صغيرة تحتها وزرار بس: مفيش سطر صغير فوق ولا أرقام ثقة
-    expect(screen.queryByText('دعوات زفاف رقمية')).toBeNull()
+    // زي التصميم: سطر صغير فوق + فاصل + الجملة + سطر إنجليزي تحت — من غير زرار ولا أرقام ثقة
+    expect(document.querySelector('.hero-top')?.textContent).toBe('BAHJA INVITATIONS')
+    expect(document.querySelector('.hero-orn')).not.toBeNull()
+    expect(document.querySelector('.hero-sub')?.textContent).toBe('LUXURY DIGITAL WEDDING & ENGAGEMENT INVITATIONS')
+    expect(document.querySelector('.hero-actions')).toBeNull()
     expect(document.querySelector('.hero-trust')).toBeNull()
-    expect(document.querySelector('.hero-sub')?.textContent).toBe('قوالب شيك بتفاصيلك إنت، ورابط واحد يوصل لكل ضيوفك')
     expect(document.querySelector('h1')?.textContent).toBe('دعوة عمرك ما تنساها')
     expect(document.querySelector('style')).toBeNull()
   })
@@ -51,7 +50,7 @@ describe('HeroSection settings', () => {
     show(hero)
     expect(screen.getByText('عنوان مخصص')).toBeInTheDocument()
     expect(screen.queryByText('دعوة عمرك ما تنساها')).toBeNull()
-    expect(screen.getByText('شوف القوالب')).toBeInTheDocument() // الزرار فاضي → الافتراضي
+    expect(document.querySelector('.hero-top')?.textContent).toBe('BAHJA INVITATIONS') // فاضي → الافتراضي
   })
 
   it('shows the text of the current language', async () => {

@@ -98,6 +98,7 @@ export function Header() {
   const plansPublic = !!site?.plansPublic
   // قبل ما الإعدادات توصل نعتبره مفتوح (القيمة الافتراضية)
   const darkModeEnabled = site?.darkModeEnabled ?? true
+  const translationEnabled = site?.translationEnabled ?? true
   const whatsappUrl = site?.whatsapp.url ?? ''
   const siteName = site ? pick(lang, site.name.ar, site.name.en) : ''
   // علامة الترويسة: أول كلمة من الاسم الإنجليزي بحروف كبيرة (BAHJA) + شعار الحرف B بالتاج (صورة)
@@ -193,7 +194,7 @@ export function Header() {
           </nav>
 
           <div className="nav-tools">
-            <LanguageSwitch />
+            {translationEnabled && <LanguageSwitch />}
             {darkModeEnabled && <ThemeToggle />}
             {orderCta('btn btn--gold btn--sm nav-cta')}
             <button

@@ -1024,6 +1024,13 @@ class SiteSetting(models.Model):
                   "مابيتمسحش — يرجع لو فتحته تاني.",
     )
 
+    # ---- اللغة
+    translation_enabled = models.BooleanField(
+        "الترجمة (زرار العربي/English) في الموقع", default=True,
+        help_text="اقفلها والموقع كله يفضل عربي لكل الزوار، وزرار اللغة "
+                  "بيختفي من القايمة. السيرفر نفسه بيرجّع عربي — مش بيتخبّى بس.",
+    )
+
     # ---- عرض القوالب في الصفحة الرئيسية
     templates_mobile_columns = models.PositiveSmallIntegerField(
         "عدد القوالب في الصف على التلفون",

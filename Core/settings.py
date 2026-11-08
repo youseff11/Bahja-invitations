@@ -90,6 +90,8 @@ MIDDLEWARE = [
     # العربية هي الافتراضي حتى لو المتصفح إنجليزي — لازم تسبق LocaleMiddleware
     "system.middleware.DefaultLanguageMiddleware",
     "django.middleware.locale.LocaleMiddleware",
+    # الترجمة مقفولة من «إعدادات الموقع»؟ عربي للكل — لازم تيجي بعد LocaleMiddleware
+    "system.middleware.TranslationLockMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",

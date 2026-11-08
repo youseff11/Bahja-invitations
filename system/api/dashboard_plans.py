@@ -162,6 +162,7 @@ def _site_payload(cfg) -> dict:
             "instagramLinked": bool(cfg.instagram_enabled and cfg.instagram_url),
             "ordersEnabled": cfg.orders_enabled,
             "darkModeEnabled": cfg.dark_mode_enabled,
+            "translationEnabled": cfg.translation_enabled,
             "whatsappFloatEnabled": cfg.whatsapp_float_enabled,
             "whatsappFloatReady": cfg.whatsapp_float_ready,
         },

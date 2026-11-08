@@ -72,6 +72,7 @@ def site_payload(request) -> dict:
         "ordersEnabled": cfg.orders_enabled,
         "plansPublic": cfg.plans_public,
         "darkModeEnabled": cfg.dark_mode_enabled,
+        "translationEnabled": cfg.translation_enabled,
         "templatesMobileColumns": cfg.templates_mobile_columns,
         "whatsapp": {
             # الزر العائم: رابط جاهز + الأساس والرسالة لنافذة الشات

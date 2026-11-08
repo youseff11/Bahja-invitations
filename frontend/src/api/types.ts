@@ -21,6 +21,8 @@ export interface SiteInfo {
   plansPublic: boolean
   /** مقفول = الموقع فاتح دايماً وزرار المظهر مخفي */
   darkModeEnabled: boolean
+  /** مقفول = الموقع عربي بس وزرار اللغة مخفي */
+  translationEnabled: boolean
   /** عدد القوالب في الصف على التلفون في الرئيسية: ١ أو ٢ */
   templatesMobileColumns: 1 | 2
   whatsapp: {

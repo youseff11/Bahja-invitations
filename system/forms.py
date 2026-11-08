@@ -325,6 +325,7 @@ class SiteSettingForm(forms.ModelForm):
         fields = [
             "plans_public",
             "dark_mode_enabled",
+            "translation_enabled",
             "templates_mobile_columns",
             "orders_enabled",
             "whatsapp_enabled", "whatsapp_number",

@@ -27,6 +27,7 @@ export function SitePage() {
     const body: SiteValues = {
       plansPublic: flag('plansPublic'),
       darkModeEnabled: flag('darkModeEnabled'),
+      translationEnabled: flag('translationEnabled'),
       templatesMobileColumns: str(values, 'templatesMobileColumns') === '2' ? 2 : 1,
       ordersEnabled: flag('ordersEnabled'),
       whatsappEnabled: flag('whatsappEnabled'),
@@ -96,6 +97,11 @@ export function SitePage() {
                   name="darkModeEnabled"
                   label={t('dashboard.site.fields.darkModeEnabled')}
                   defaultChecked={values.darkModeEnabled}
+                />
+                <CheckField
+                  name="translationEnabled"
+                  label={t('dashboard.site.fields.translationEnabled')}
+                  defaultChecked={values.translationEnabled}
                 />
                 <SelectField
                   name="templatesMobileColumns"

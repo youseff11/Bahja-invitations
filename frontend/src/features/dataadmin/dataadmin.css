@@ -206,14 +206,17 @@ details > summary { cursor: pointer; padding: 8px 12px; border: 1px dashed var(-
 .hp-art::after { content: ""; position: absolute; inset-inline: 0; bottom: -1px; height: 16%; background: linear-gradient(to bottom, transparent, var(--hp-bg)); }
 .hp-copy { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 6% 8% 3%; }
 .hp-copy p { margin: 0; }
-.hp-main { font-family: 'Amiri', var(--font-display); font-weight: 400; font-size: 5.8cqw; line-height: 1.35; color: var(--hp-text); text-wrap: balance; max-width: 90%; }
+.hp-top { font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 500; font-size: 1.55cqw; letter-spacing: .5em; text-transform: uppercase; opacity: .8; }
+.hp-orn { display: block; width: 21cqw; height: 1px; margin: 1.2cqw auto 0; background: linear-gradient(to right, transparent, var(--hp-accent) 22%, var(--hp-accent) 78%, transparent); }
+.hp-main { font-family: 'Aref Ruqaa', 'Amiri', var(--font-display); font-weight: 700; font-size: 6.6cqw; line-height: 1.45; color: var(--hp-text); text-wrap: balance; max-width: 90%; }
 .hp-stage[dir="ltr"] .hp-main { font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-weight: 500; font-size: 7cqw; line-height: 1.08; }
-.hp-sub { margin-top: 1.4cqw !important; font-size: 1.7cqw; line-height: 1.7; max-width: 60%; opacity: .78; }
-.hp-stage--phone .hp-sub { margin-top: 3cqw !important; font-size: 3.8cqw; max-width: 80%; }
+.hp-sub { margin-top: .4cqw !important; font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 500; font-size: 1.3cqw; letter-spacing: .26em; text-transform: uppercase; line-height: 1.6; max-width: 94%; opacity: .8; }
+.hp-stage--phone .hp-sub { margin-top: 2cqw !important; font-size: 2.6cqw; letter-spacing: .2em; max-width: 86%; }
 .hp-actions { display: flex; justify-content: center; margin-top: 3.2cqw; }
 .hp-btn { padding: .9cqw 2.4cqw; border-radius: .9cqw; border: 1px solid var(--hp-accent); color: var(--hp-accent); font-size: 1.6cqw; }
 .hp-btn--gold { background: var(--hp-accent); color: var(--hp-on-accent); }
-.hp-stage--phone .hp-main { font-family: 'Amiri', var(--font-display); font-weight: 400; font-size: 5.8cqw; line-height: 1.35; color: var(--hp-text); text-wrap: balance; max-width: 90%; }
+.hp-stage--phone .hp-top { font-size: 3.2cqw; }
+.hp-stage--phone .hp-main { font-family: 'Aref Ruqaa', 'Amiri', var(--font-display); font-weight: 700; font-size: 13.5cqw; line-height: 1.35; color: var(--hp-text); text-wrap: balance; max-width: 90%; }
 .hp-stage[dir="ltr"] .hp-main { font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-weight: 500; font-size: 7cqw; line-height: 1.08; }
 .hp-stage--phone .hp-stage--phone .hp-actions { margin-top: 9cqw; }
 .hp-stage--phone .hp-btn { padding: 3.2cqw 8cqw; border-radius: 3cqw; font-size: 4.6cqw; }

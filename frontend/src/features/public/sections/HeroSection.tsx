@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
 
 import type { HeroInfo } from '@/api/types'
 
@@ -71,20 +70,14 @@ export function HeroSection({ hero }: { hero?: HeroInfo }) {
         <ShootingStars idle={idle} />
       </div>
       <div className="hero-copy">
-        {/* جملة كبيرة + فاصل صغير + جملة صغيرة تحتها + زرار واحد. السطر الصغير اللي فوق
-            وأرقام الثقة اتشالوا عن قصد: الصورة بتتكلم، والكلام الكتير كان بيزحمها. */}
+        {/* زي تصميم الهيرو بالظبط: «BAHJA INVITATIONS» صغير ومتباعد فوق، فاصل ذهبي
+            بمعين، الجملة الكبيرة بخط رقعة، وسطر إنجليزي متباعد تحتها — من غير زرار.
+            السطرين الصغيرين ‎dir="auto"‎: الافتراضي إنجليزي، ولو اتكتبوا عربي من اللوحة يمشوا صح. */}
         <div className="hero-copy-in" data-reveal>
-          <h1>{text(custom?.main, 'main')}</h1>
+          <p className="hero-top" dir="auto">{text(custom?.top, 'top')}</p>
           <span className="hero-orn" aria-hidden="true" />
-          <p className="hero-sub">{text(custom?.sub, 'sub')}</p>
-          <div className="hero-actions">
-            <Link className="btn btn--gold btn--lg btn--shine" to={{ pathname: '/', hash: '#templates' }}>
-              <span>{text(custom?.cta, 'templates')}</span>
-              <svg className="btn-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <path d="M5 12h13m0 0-5-5m5 5-5 5" />
-              </svg>
-            </Link>
-          </div>
+          <h1>{text(custom?.main, 'main')}</h1>
+          <p className="hero-sub" dir="auto">{text(custom?.sub, 'sub')}</p>
         </div>
       </div>
     </section>

@@ -92,7 +92,7 @@ export function HeroPreview({
       const custom = values[`${name}_${lang}`]
       return (typeof custom === 'string' && custom.trim()) || String(i18n.t(`public.hero.${defaultKey}`, { lng: lang }))
     }
-    return { main: word('main', 'main'), sub: word('sub', 'sub'), cta: word('cta', 'templates') }
+    return { top: word('top', 'top'), main: word('main', 'main'), sub: word('sub', 'sub') }
   }, [values, lang, i18n])
 
   const mark = (name: string) => (active === name ? 'hp-mark is-active' : 'hp-mark')
@@ -134,11 +134,10 @@ export function HeroPreview({
           )}
         </div>
         <div className="hp-copy">
+          <p className={`hp-top ${mark('top')}`} dir="auto">{text.top}</p>
+          <span className="hp-orn" aria-hidden="true" />
           <p className={`hp-main ${mark('main')}`}>{text.main}</p>
-          <p className={`hp-sub ${mark('sub')}`}>{text.sub}</p>
-          <div className="hp-actions">
-            <span className={`hp-btn hp-btn--gold ${mark('cta')}`}>{text.cta}</span>
-          </div>
+          <p className={`hp-sub ${mark('sub')}`} dir="auto">{text.sub}</p>
         </div>
       </div>
       <p className="hp-hint muted">{active ? t('dataadmin.hero.editing', { field: focusLabel }) : t('dataadmin.hero.hint')}</p>

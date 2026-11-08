@@ -1,6 +1,7 @@
 """ميدل‑وير خاص بالمشروع."""
 
 from django.conf import settings
+from django.utils import translation
 
 
 class DefaultLanguageMiddleware:
@@ -27,4 +28,28 @@ class DefaultLanguageMiddleware:
         )
         if not chosen:
             request.META.pop("HTTP_ACCEPT_LANGUAGE", None)
+        return self.get_response(request)
+
+
+class TranslationLockMiddleware:
+    """لو الترجمة مقفولة من «إعدادات الموقع» الموقع كله بيفضل عربي.
+
+    بتيجي بعد LocaleMiddleware وبتغلب اختيار الزائر (الجلسة/الكوكي) من غير
+    ما تمسحه — فلو الترجمة اتفتحت تاني كل زائر يرجع للغة اللي كان مختارها.
+    الملفات الثابتة مالهاش لغة، فبنعدّيها من غير استعلام.
+    """
+
+    SKIP = ("/static/", "/media/")
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        if not request.path.startswith(self.SKIP):
+            from .models import SiteSetting  # بدري على مستوى الملف = AppRegistryNotReady
+
+            if not SiteSetting.load().translation_enabled:
+                lang = settings.LANGUAGE_CODE
+                translation.activate(lang)
+                request.LANGUAGE_CODE = translation.get_language()
         return self.get_response(request)
