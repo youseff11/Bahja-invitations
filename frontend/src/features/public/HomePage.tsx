@@ -16,6 +16,7 @@ import { PlansSection } from './sections/PlansSection'
 import { HomeFooter } from './sections/SiteFooter'
 import { StepsSection } from './sections/StepsSection'
 import { TemplatesSection } from './sections/TemplatesSection'
+import { prefersReducedMotion } from './motion'
 import { pick, useLang } from './text'
 import { useReveal } from './useReveal'
 
@@ -41,6 +42,51 @@ function useHashScroll(ready: boolean) {
   }, [ready, hash, key, type])
 }
 
+// مرة واحدة بس في كل تحميل للموقع — الرجوع للرئيسية من جوّه الموقع مابينزّلش تاني
+let autoScrolled = false
+/** المهلة قبل النزول: الزائر يلمح الهيرو الأول وبعدين يتنقل للقوالب */
+const AUTO_SCROLL_DELAY = 900
+
+/**
+ * أول ما الزائر يدخل الرئيسية الصفحة بتنزل لوحدها لقسم القوالب.
+ * مابتشتغلش لو الرابط فيه ‎#قسم‎، أو رجوع بالسهم، أو لو الصفحة مش فوق خالص
+ * (تحديث رجّع مكان قديم أو الزائر بدأ ينزل بنفسه) — مانشدّهوش من مكان هو اختاره.
+ */
+function useAutoScrollToTemplates(ready: boolean) {
+  const { pathname, hash } = useLocation()
+  useEffect(() => {
+    if (!ready || autoScrolled) return
+    // العلامة بتتحط لما القرار يتاخد (مش أول ما الـeffect يشتغل): StrictMode بيشغّله
+    // مرتين وبيلغي المؤقت الأول، فلو اتحطت بدري المرة التانية كانت هتتجاهل
+    // الرجوع بالسهم من صفحة كاملة (معاينة قالب) بيرجّع المكان المحفوظ — مش وقت نزول.
+    // مابنعتمدش على ‎POP‎ بتاع الراوتر: أول تحميل للموقع نفسه بيتسجّل POP
+    const nav = performance.getEntriesByType?.('navigation')[0] as PerformanceNavigationTiming | undefined
+    if (hash || pathname.replace(/\/+$/, '') !== '' || nav?.type === 'back_forward') {
+      autoScrolled = true
+      return
+    }
+
+    let cancelled = false
+    const cancel = () => {
+      cancelled = true
+      autoScrolled = true
+    }
+    const events = ['wheel', 'touchstart', 'keydown'] as const
+    events.forEach((name) => window.addEventListener(name, cancel, { once: true, passive: true }))
+    const timer = window.setTimeout(() => {
+      autoScrolled = true
+      if (cancelled || window.scrollY > 40) return
+      document
+        .getElementById('templates')
+        ?.scrollIntoView?.({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'start' })
+    }, AUTO_SCROLL_DELAY)
+    return () => {
+      window.clearTimeout(timer)
+      events.forEach((name) => window.removeEventListener(name, cancel))
+    }
+  }, [ready, pathname, hash])
+}
+
 /** الصفحة الرئيسية للموقع العام: الهيرو، القوالب، المميزات، الباقات، الخطوات، الأسئلة، التواصل. */
 export function HomePage() {
   const { t } = useTranslation()
@@ -50,6 +96,7 @@ export function HomePage() {
 
   useReveal()
   useHashScroll(!!home.data)
+  useAutoScrollToTemplates(!!home.data)
   useDocumentTitle(site ? t('public.title.home', { name: pick(lang, site.name.ar, site.name.en) }) : '')
 
   // الإعدادات (مفاتيح الإظهار) جاية مع الصفحة نفسها فالهيكل بيتعرض قبل البيانات
