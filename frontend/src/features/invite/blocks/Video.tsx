@@ -79,9 +79,16 @@ function FileVideo({
     v.setAttribute('controlsList', 'nodownload noplaybackrate noremoteplayback')
     v.disablePictureInPicture = true
     v.preload = poster ? 'none' : 'metadata'
+    // لو فيه افتتاحية لسه قدّام الضيف، الفيديو بيتحمّل ورا الشاشة بس مابيشتغلش
+    // إلا لما تتفتح: وإلا كان بيخلّص أول ثواني منه والضيف بيتفرّج على الافتتاحية.
+    // ده يشمل معاينة القالب (‎demo‎) لأن ‎/templates/<slug>/preview/‎ بتعرض الافتتاحية.
+    // الحكم بالـDOM: لو مفيش ‎.lb-intro‎ مقفولة قدّام الضيف، يشتغل على طول.
+    const introUp = Boolean(hasIntro && document.querySelector('.lb-intro:not(.is-open)'))
     if (autoplay && !withSound) {
       v.muted = true
-      v.autoplay = true
+      // خاصية ‎autoplay‎ كانت بتشغّله أول ما يحمّل — ورا الافتتاحية، من غير ما
+      // يستنّى المراقب. وهي مستنّية بنسيبها للمراقب بعد ‎lb:intro-open‎.
+      v.autoplay = !introUp
       v.preload = 'auto'
       // وضع التوفير في iOS بيرفض حتى ده: نحجزه في طابور فكّ القفل
       queueMedia(v)
@@ -106,6 +113,15 @@ function FileVideo({
       })
     }
 
+    // الفيديو اللي من غير تكرار خلص مرة = خلص: المراقب مايعيدوش من الأول كل ما
+    // القسم يرجع للشاشة. اللمسة المقصودة على الفيديو بس هي اللي بتعيده (‎onClick‎ تحت).
+    let finished = false
+    const onEnded = () => {
+      if (!v.loop) finished = true
+    }
+    v.addEventListener('ended', onEnded)
+    cleanup.push(() => v.removeEventListener('ended', onEnded))
+
     // مانشغّلش كل فيديوهات الدعوة مع بعض: بيبدأ لما القسم يوصل للشاشة ويقف لما يعدّي
     const watch = () => {
       if (typeof IntersectionObserver !== 'function') {
@@ -117,6 +133,7 @@ function FileVideo({
         (entries) => {
           entries.forEach((en) => {
             if (en.isIntersecting) {
+              if (finished) return
               setWanted(v, true)
               tryPlay()
             } else {
@@ -157,13 +174,19 @@ function FileVideo({
       document.addEventListener('lb:intro-open', onOpen, { once: true })
       cleanup.push(() => document.removeEventListener('lb:intro-open', onOpen))
     } else if (autoplay) {
-      watch()
+      if (introUp) {
+        document.addEventListener('lb:intro-open', watch, { once: true })
+        cleanup.push(() => document.removeEventListener('lb:intro-open', watch))
+      } else {
+        watch()
+      }
     }
 
     // الفيديو من غير شريط تحكم دايماً: اللمسة عليه بتشغّله لو واقف (الفيديو غير التلقائي
     // ملوش طريقة تانية) — لكن مابتوقّفوش: الضغطة على فيديو شغّال ماتعملش حاجة
     const onClick = () => {
       if (!v.paused) return
+      finished = false
       setWanted(v, true)
       tryPlay()
     }
