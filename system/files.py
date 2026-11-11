@@ -104,7 +104,7 @@ def share_image(request, path):
     from django.http import FileResponse
 
     # الرابط الجديد بيضيف ‎.jpg‎ في الآخر؛ والقديم (من غيرها) يفضل شغال.
-    # ملفات jpg/png الأصلية ماتعديش من هنا أصلاً (_SHARE_DIRECT_EXT).
+    # صورة أصلها ‎x.jpg‎ رابطها ‎x.jpg.jpg‎: الشرط ده بيشيل الزيادة بس.
     if path.lower().endswith(".jpg") and not _share_source(path):
         path = path[:-4]
     made = _share_jpeg(path)

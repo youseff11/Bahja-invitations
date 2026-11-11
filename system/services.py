@@ -150,8 +150,9 @@ def _share_image(request, *candidates) -> dict:
     return {"url": "", "width": 0, "height": 0}
 
 
-# jpeg وpng بيتخدموا من ‎/media/‎ مباشرة ورد السيرفر فيه نوعهم صح.
-_SHARE_DIRECT_EXT = {".jpg", ".jpeg", ".png"}
+# نسخة شكل صورة المشاركة — زوّدها لما ‎images.share_jpeg‎ يتغيّر.
+# ‎2‎: الصورة كاملة جوّه إطار 1200×630 بدل ما ماسنجر يقصّها.
+SHARE_FORMAT = 2
 
 
 def _share_source(rel: str):
@@ -176,7 +177,10 @@ def _share_jpeg(rel: str):
     if not found:
         return None
     root, src = found
-    key = hashlib.sha1(f"{rel}|{src.stat().st_mtime_ns}".encode()).hexdigest()[:16]
+    # ‎SHARE_FORMAT‎ جوّه البصمة: لما شكل الصورة يتغيّر (زي إطار 1200×630)
+    # الروابط كلها بتتغيّر وميتا بتجيب الجديدة بدل اللي في الكاش.
+    key = hashlib.sha1(
+        f"{rel}|{src.stat().st_mtime_ns}|{SHARE_FORMAT}".encode()).hexdigest()[:16]
     dest = root / "_share" / f"{key}.jpg"
     try:
         if dest.is_file():
@@ -192,7 +196,10 @@ def _share_jpeg(rel: str):
 
 
 def _share_jpeg_url(request, url: str):
-    """رابط نسخة JPEG لصورة محلية مش jpeg/png، أو None لو مش لازم."""
+    """رابط نسخة JPEG ‎1200×630‎ لصورة محلية تحت ‎/media/‎، أو None.
+
+    حتى jpg/png بتعدّي من هنا: الأصل بنسبته هو بيتقص في ماسنجر.
+    """
     from urllib.parse import unquote, urlsplit
 
     parts = urlsplit(url)
@@ -203,8 +210,6 @@ def _share_jpeg_url(request, url: str):
     if not path.startswith(media):
         return None
     rel = path[len(media):]
-    if Path(rel).suffix.lower() in _SHARE_DIRECT_EXT:
-        return None
     made = _share_jpeg(rel)
     if not made:
         return None

@@ -276,6 +276,37 @@ class SharePreviewTests(BaseAppTest):
             self.assertEqual(self.client.get(old).status_code, 200)
             self.assertEqual(self.client.get("/share-image/../settings.py").status_code, 404)
 
+    def test_share_image_keeps_whole_cover_inside_1200x630(self):
+        """ماسنجر بيقص ‎og:image‎ لـ1.91:1 — الغلاف لازم يدخل كامل في الإطار."""
+        import io
+        import shutil
+        import tempfile
+        from PIL import Image
+        from django.test import override_settings
+
+        root = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, root, True)
+        folder = Path(root) / "covers"
+        folder.mkdir()
+        # غلاف طولي أحمر: لو اتقص هيملا الإطار كله أحمر
+        Image.new("RGB", (900, 1600), (220, 20, 20)).save(folder / "tall.jpg", "JPEG")
+        with override_settings(MEDIA_ROOT=root):
+            self.template.cover_url = "/media/covers/tall.jpg"
+            self.template.save()
+            html = self.client.get(f"/i/{self.inv.slug}/").content.decode()
+            m = re.search(r'property="og:image" content="([^"]+)"', html)
+            self.assertIn("/share-image/covers/tall.jpg.jpg?v=", m.group(1))
+            self.assertIn('property="og:image:height" content="630"', html)
+            res = self.client.get(m.group(1).replace("http://testserver", ""))
+            self.assertEqual(res.status_code, 200)
+            img = Image.open(io.BytesIO(b"".join(res.streaming_content))).convert("RGB")
+            self.assertEqual(img.size, (1200, 630))
+            # النص هو الغلاف، والأطراف خلفية أغمق منه (مش قص)
+            center = img.getpixel((600, 315))
+            edge = img.getpixel((40, 315))
+            self.assertGreater(center[0], 190)
+            self.assertLess(edge[0], center[0] - 30)
+
     def test_invitation_page_has_absolute_og_image(self):
         self.template.cover_url = "/static/img/cover.jpg"
         self.template.save()

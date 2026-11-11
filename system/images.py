@@ -64,22 +64,52 @@ def _as_upload(img, name: str, quality: int) -> InMemoryUploadedFile:
     return InMemoryUploadedFile(buf, "ImageField", name, "image/webp", size, None)
 
 
-SHARE_EDGE = 1200        # مقاس صورة معاينة اللينك المعتاد في فيسبوك/ميتا
+SHARE_SIZE = (1200, 630)  # إطار معاينة اللينك في فيسبوك/ماسنجر/واتساب (1.91:1)
 SHARE_QUALITY = 86
 
 
+def _share_canvas(img):
+    """يحط الصورة **كاملة** جوّه إطار ‎1200×630‎ من غير قص.
+
+    ماسنجر وفيسبوك بيقصّوا أي ‎og:image‎ لنسبة 1.91:1 من النص، فالغلاف
+    كان بيطلع مقطوع من فوق وتحت. فبنصغّر الصورة لحد ما تدخل كلها في
+    الإطار، ونملا الفاضي بنسخة منها مكبّرة ومموّهة وأغمق شوية — شكلها
+    مقصود مش شرايط بيضا.
+    """
+    from PIL import Image, ImageEnhance, ImageFilter
+
+    cw, ch = SHARE_SIZE
+    w, h = img.size
+    # الصورة قريبة من نسبة الإطار أصلاً: تصغير مباشر من غير خلفية
+    if abs((w / h) / (cw / ch) - 1) < 0.03:
+        return img.resize(SHARE_SIZE, Image.LANCZOS)
+
+    cover = max(cw / w, ch / h)
+    bg = img.resize((max(cw, round(w * cover)), max(ch, round(h * cover))), Image.LANCZOS)
+    left, top = (bg.width - cw) // 2, (bg.height - ch) // 2
+    bg = bg.crop((left, top, left + cw, top + ch))
+    bg = bg.filter(ImageFilter.GaussianBlur(28))
+    bg = ImageEnhance.Brightness(bg).enhance(0.72)
+
+    fit = min(cw / w, ch / h)
+    fg = img.resize((max(1, round(w * fit)), max(1, round(h * fit))), Image.LANCZOS)
+    bg.paste(fg, ((cw - fg.width) // 2, (ch - fg.height) // 2))
+    return bg
+
+
 def share_jpeg(src, dest) -> tuple[int, int]:
-    """يحوّل صورة لـJPEG مناسب لمعاينة الرابط ويحفظه في ``dest``.
+    """يحوّل صورة لـJPEG ‎1200×630‎ لمعاينة الرابط ويحفظه في ``dest``.
 
     ميتا بترفض ‎og:image‎ لو رد السيرفر من غير ‎Content-Type‎، وده اللي
-    بيحصل لملفات ‎.webp‎ على الاستضافة. فبنخدم نسخة JPEG من عندنا.
+    بيحصل لملفات ‎.webp‎ على الاستضافة. فبنخدم نسخة JPEG من عندنا،
+    والصورة كاملة جوّه الإطار (``_share_canvas``) عشان ماتتقصّش.
     بيرجّع ``(العرض, الارتفاع)``.
     """
     import os
     from PIL import Image
 
     with open(src, "rb") as fh:
-        img = _fit(_open_upright(fh), SHARE_EDGE)
+        img = _open_upright(fh)
         if img.mode in ("RGBA", "LA", "P"):
             img = img.convert("RGBA")
             flat = Image.new("RGB", img.size, (255, 255, 255))
@@ -87,6 +117,7 @@ def share_jpeg(src, dest) -> tuple[int, int]:
             img = flat
         elif img.mode != "RGB":
             img = img.convert("RGB")
+        img = _share_canvas(img)
         dest.parent.mkdir(parents=True, exist_ok=True)
         tmp = dest.with_name(dest.name + ".tmp")
         img.save(tmp, "JPEG", quality=SHARE_QUALITY, optimize=True)
