@@ -6,7 +6,7 @@ import { useSite } from '@/api/hooks'
 import { useTheme } from '@/lib/theme'
 
 import { startAutosave } from './autosave'
-import { IntroButton } from './frame/IntroButton'
+import { IntroButton, IntroTrialButton } from './frame/IntroButton'
 import { OverlayButtons } from './frame/OverlayButtons'
 import { PreviewPane } from './frame/PreviewPane'
 import { BlocksPanel } from './panels/BlocksPanel'
@@ -131,6 +131,7 @@ export function EditorShell({ schema }: { schema: EditorSchema }) {
               ⋯
             </button>
             <div className="ed-more-menu">
+              <IntroTrialButton />
               {mode === 'invitation' && <SaveTemplateButton />}
               {meta?.publicUrl && (
                 <a className="ed-btn ed-btn--sm" href={meta.publicUrl} target="_blank" rel="noopener" title={t('editor.top.preview')}>

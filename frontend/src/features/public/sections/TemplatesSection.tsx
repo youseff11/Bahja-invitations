@@ -9,14 +9,19 @@ import { ScrollChips } from '../ScrollChips'
 import { firstChar, pick, truncateChars, useLang } from '../text'
 import type { PublicTemplate } from '../types'
 
-/** الغلاف: صورة لو فيه، وإلا أول حرف من الاسم. ‎JSON.stringify‎ بيهرّب أي علامة اقتباس في الرابط. */
+/**
+ * الغلاف: صورة لو فيه، وإلا أول حرف من الاسم. ‎JSON.stringify‎ بيهرّب أي علامة اقتباس في الرابط.
+ * القالب اللي اتضاف من أقل من أسبوع عليه شريط «جديد» مايل في الركن.
+ */
 function Cover({ template, name }: { template: PublicTemplate; name: string }) {
+  const { t } = useTranslation()
   return (
     <div
-      className="tpl-cover"
+      className={template.isNew ? 'tpl-cover tpl-cover--new' : 'tpl-cover'}
       style={template.cover ? { backgroundImage: `url(${JSON.stringify(template.cover)})` } : undefined}
     >
       {!template.cover && firstChar(name)}
+      {template.isNew && <span className="tpl-ribbon">{t('public.templates.new')}</span>}
     </div>
   )
 }

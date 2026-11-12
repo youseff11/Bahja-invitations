@@ -21,6 +21,7 @@
   "share": {
     "copied": "Copied",
     "native": "Share",
+    "copyLink": "Copy invitation link",
     "prompt": "Copy the link"
   },
   "rsvp": {

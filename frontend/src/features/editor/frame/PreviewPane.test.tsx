@@ -6,7 +6,7 @@ import { initI18n } from '@/i18n'
 import { resetEditor, useEditor } from '../store'
 import type { Bootstrap, PreviewPayload } from '../types'
 import { EditorUiProvider } from '../ui'
-import { IntroButton } from './IntroButton'
+import { IntroButton, IntroTrialButton } from './IntroButton'
 import { useIntroBus } from './introBus'
 import { PreviewPane, PREVIEW_WAIT } from './PreviewPane'
 
@@ -33,6 +33,7 @@ function mount() {
   const view = render(
     <EditorUiProvider>
       <IntroButton />
+      <IntroTrialButton />
       <PreviewPane onKey={() => {}} />
     </EditorUiProvider>,
   )
@@ -173,7 +174,7 @@ describe('PreviewPane', () => {
     expect(skip()).toBeNull()
   })
 
-  it('the try button next to skip starts and ends the trial in the frame, and ends with the intro', async () => {
+  it('the top-bar try button starts the trial in one click (intro enabled only), ends it, and ends with the intro', async () => {
     const { iframe, ready } = mount()
     ready()
     const post = vi.spyOn(iframe.contentWindow!, 'postMessage')
@@ -182,10 +183,15 @@ describe('PreviewPane', () => {
         window.dispatchEvent(new MessageEvent('message', { data, origin: window.location.origin, source: iframe.contentWindow }))
       })
 
-    expect(screen.queryByRole('button', { name: 'تجربة الافتتاحية' })).toBeNull()
-    fromFrame({ type: 'lb-editor:intro-visible', visible: true })
+    // ظاهر على طول، بس من غير افتتاحية مفعّلة مابيبعتش حاجة
+    fireEvent.click(screen.getByRole('button', { name: 'تجربة الافتتاحية' }))
+    expect(useIntroBus.getState().trying).toBe(false)
+    expect(post).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'lb-editor:intro-try' }), expect.anything())
+
+    act(() => useEditor.getState().setSetting('intro_enabled', true))
     fireEvent.click(screen.getByRole('button', { name: 'تجربة الافتتاحية' }))
     await waitFor(() => expect(post).toHaveBeenCalledWith({ type: 'lb-editor:intro-try', on: true }, window.location.origin))
+    fromFrame({ type: 'lb-editor:intro-visible', visible: true })
 
     fireEvent.click(screen.getByRole('button', { name: 'إنهاء التجربة' }))
     await waitFor(() => expect(post).toHaveBeenCalledWith({ type: 'lb-editor:intro-try', on: false }, window.location.origin))

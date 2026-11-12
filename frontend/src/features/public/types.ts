@@ -15,6 +15,8 @@ export interface PublicTemplate {
   categoryLabel: string
   collection: string
   cover: string | null
+  /** اتضاف من أقل من أسبوع: الكارت عليه شريط «جديد» */
+  isNew?: boolean
 }
 
 export interface PlanAddon {

@@ -21,6 +21,7 @@
   "share": {
     "copied": "تم النسخ",
     "native": "مشاركة",
+    "copyLink": "نسخ رابط الدعوة",
     "prompt": "انسخ الرابط"
   },
   "rsvp": {
@@ -55,7 +56,7 @@
     "play": "تشغيل التمرير التلقائي"
   },
   "back": {
-    "toSite": "عودة للموقع"
+    "toSite": "الرجوع للموقع"
   },
   "lang": {
     "toEn": "View in English",

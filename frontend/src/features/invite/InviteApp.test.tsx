@@ -52,34 +52,28 @@ describe('InviteApp', () => {
     const { unmount } = render(
       <InviteApp boot={{ mode: 'view', ...payload({ kind: 'template', siteUrl: 'https://site.test/', blocks: [hero('ليلى')] }) }} />,
     )
-    expect(screen.getByRole('link', { name: /عودة للموقع/ })).toHaveAttribute('href', 'https://site.test/#templates')
+    expect(screen.getByRole('link', { name: /الرجوع للموقع/ })).toHaveAttribute('href', 'https://site.test/#templates')
     unmount()
     render(<InviteApp boot={{ mode: 'view', ...payload({ blocks: [hero('ليلى')] }) }} />)
-    expect(screen.queryByRole('link', { name: /عودة للموقع/ })).toBeNull()
+    expect(screen.queryByRole('link', { name: /الرجوع للموقع/ })).toBeNull()
   })
 
-  it('shows a share button in the template preview only, and shares the page link', () => {
+  it('shows a copy-link button in the template preview only, and copies the link without the device share sheet', async () => {
     const share = vi.fn().mockResolvedValue(undefined)
     Object.defineProperty(navigator, 'share', { value: share, configurable: true })
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true })
     const { unmount } = render(
       <InviteApp boot={{ mode: 'view', ...payload({ kind: 'template', siteUrl: 'https://site.test/', blocks: [hero('ليلى')] }) }} />,
     )
-    fireEvent.click(screen.getByRole('button', { name: /مشاركة/ }))
-    expect(share).toHaveBeenCalledWith(expect.objectContaining({ url: location.href }))
+    fireEvent.click(screen.getByRole('button', { name: /نسخ رابط الدعوة/ }))
+    expect(share).not.toHaveBeenCalled()
+    expect(writeText).toHaveBeenCalledWith(location.href.replace(/#.*$/, ''))
+    expect(await screen.findByRole('button', { name: /تم النسخ/ })).toBeInTheDocument()
     unmount()
     render(<InviteApp boot={{ mode: 'view', ...payload({ blocks: [hero('ليلى')] }) }} />)
-    expect(screen.queryByRole('button', { name: /مشاركة/ })).toBeNull()
+    expect(screen.queryByRole('button', { name: /نسخ رابط الدعوة/ })).toBeNull()
     Object.defineProperty(navigator, 'share', { value: undefined, configurable: true })
-  })
-
-  it('copies the link when the device has no native share', async () => {
-    Object.defineProperty(navigator, 'share', { value: undefined, configurable: true })
-    const writeText = vi.fn().mockResolvedValue(undefined)
-    Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true })
-    render(<InviteApp boot={{ mode: 'view', ...payload({ kind: 'template', siteUrl: 'https://site.test/', blocks: [hero('ليلى')] }) }} />)
-    fireEvent.click(screen.getByRole('button', { name: /مشاركة/ }))
-    expect(writeText).toHaveBeenCalledWith(location.href)
-    expect(await screen.findByRole('button', { name: /تم النسخ/ })).toBeInTheDocument()
   })
 
   it('skips unknown block types instead of crashing', () => {

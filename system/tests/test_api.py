@@ -156,6 +156,17 @@ class PublicApiTests(ApiTestCase):
         self.assertNotIn("document", card)
         self.assertNotIn("runtime_scripts", card)
 
+    def test_templates_cards_mark_new_for_one_week(self):
+        from datetime import timedelta
+        from django.utils import timezone
+        Template.objects.create(name="جديد", category="wedding")
+        old = Template.objects.create(name="قديم", category="wedding")
+        # created_at بيتملى تلقائي، فبنرجّعه لورا بـupdate
+        Template.objects.filter(pk=old.pk).update(created_at=timezone.now() - timedelta(days=8))
+        cards = {t["name"]: t for t in self.client.get("/api/v1/templates/").json()["results"]}
+        self.assertTrue(cards["جديد"]["isNew"])
+        self.assertFalse(cards["قديم"]["isNew"])
+
     def test_unknown_api_path_returns_404(self):
         self.assertEqual(self.client.get("/api/v1/nope/").status_code, 404)
 

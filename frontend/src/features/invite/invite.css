@@ -2018,12 +2018,13 @@ a.lb-social:hover { transform: translateY(-2px); opacity: .85; }
 .lb-back {
   position: fixed; z-index: 95;
   inset-block-start: 16px; inset-inline-start: 16px;
-  inline-size: 42px; block-size: 42px; padding: 0;
+  block-size: 42px; padding: 0 16px 0 14px; gap: 7px;
   display: inline-flex; align-items: center; justify-content: center;
-  border: 1px solid var(--border); border-radius: 50%;
+  border: 1px solid var(--border); border-radius: 999px;
   background: color-mix(in srgb, var(--surface) 86%, transparent);
   backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
   color: var(--text);
+  font-size: 14px; font-weight: 600; line-height: 1; white-space: nowrap;
   text-decoration: none;
   box-shadow: 0 8px 22px -12px rgba(0, 0, 0, .45);
   transition: transform .18s ease, background .18s ease;
@@ -2033,7 +2034,7 @@ a.lb-social:hover { transform: translateY(-2px); opacity: .85; }
 [dir="ltr"] .lb-back-arrow { transform: scaleX(-1); }
 .lb-doc:has(.lb-lang) .lb-back { inset-inline-start: 70px; }
 @media (max-width: 480px) {
-  .lb-back { inset-block-start: 12px; inset-inline-start: 12px; inline-size: 38px; block-size: 38px; }
+  .lb-back { inset-block-start: 12px; inset-inline-start: 12px; block-size: 38px; padding: 0 13px 0 11px; font-size: 13px; }
   .lb-doc:has(.lb-lang) .lb-back { inset-inline-start: 62px; }
 }
 @media print { .lb-back { display: none !important; } }

@@ -70,7 +70,7 @@ describe('SpaTemplatePreview', () => {
   it('leaves for the home page without a reload when "back to site" is clicked', async () => {
     mockPreview({ blocks: [hero], siteUrl: 'https://site.test/' })
     renderRoute()
-    const back = await screen.findByRole('link', { name: /عودة للموقع/ })
+    const back = await screen.findByRole('link', { name: /الرجوع للموقع/ })
     back.click()
     await waitFor(() => expect(screen.getByText('home')).toBeInTheDocument())
     expect(document.body.classList.contains('lb-doc')).toBe(false)

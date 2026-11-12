@@ -80,3 +80,19 @@ describe('TemplatesSection categories', () => {
     expect(screen.queryByRole('button', { name: 'الكل' })).toBeNull()
   })
 })
+
+describe('TemplatesSection new ribbon', () => {
+  it('puts a «جديد» ribbon only on templates the server marks as new', () => {
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <MemoryRouter>
+          <TemplatesSection templates={[{ ...card(1, 'قالب جديد', 'wedding'), isNew: true }, card(2, 'قالب قديم', 'wedding')]} categories={[]} error={null} />
+        </MemoryRouter>
+      </QueryClientProvider>,
+    )
+    const ribbons = document.querySelectorAll('.tpl-ribbon')
+    expect(ribbons).toHaveLength(1)
+    expect(ribbons[0]).toHaveTextContent('جديد')
+    expect(screen.getByText('قالب جديد').closest('.tpl-card')?.querySelector('.tpl-ribbon')).not.toBeNull()
+  })
+})

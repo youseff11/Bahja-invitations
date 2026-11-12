@@ -46,17 +46,18 @@ export function BackToSite({ siteUrl }: { siteUrl: string }) {
   // الرابط المطلق جاي من السيرفر؛ لو فاضي نرجع للجذر
   const home = `${siteUrl.replace(/#.*$/, '') || '/'}#templates`
   return (
-    <a className="lb-back" data-back-to-site href={home} aria-label={t('back.toSite')} title={t('back.toSite')}>
-      <svg className="lb-back-arrow" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <a className="lb-back" data-back-to-site href={home}>
+      <svg className="lb-back-arrow" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <path d="M5 12h14M13 6l6 6-6 6" />
       </svg>
+      <span className="lb-back-label">{t('back.toSite')}</span>
     </a>
   )
 }
 
 /**
- * زرار «مشاركة» في معاينة القالب — فوق على الناحية المقابلة لزرار الرجوع. بيفتح
- * مشاركة الجهاز (‎navigator.share‎) لو موجودة، وإلا بينسخ الرابط ويكتب «تم النسخ».
+ * زرار «نسخ رابط الدعوة» في معاينة القالب — فوق على الناحية المقابلة لزرار الرجوع.
+ * بينسخ الرابط بس (من غير قائمة مشاركة الجهاز) ويقلب لعلامة صح لحظة.
  */
 export function ShareTemplate() {
   const { t } = useInvite()
@@ -65,11 +66,7 @@ export function ShareTemplate() {
   useEffect(() => () => window.clearTimeout(timer.current), [])
 
   const onShare = () => {
-    const url = location.href
-    if (navigator.share) {
-      navigator.share({ title: document.title, url }).catch(() => {})
-      return
-    }
+    const url = location.href.replace(/#.*$/, '')
     const write = navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject(new Error('no clipboard'))
     write
       .then(() => {
@@ -83,17 +80,15 @@ export function ShareTemplate() {
   }
 
   return (
-    <button type="button" className="lb-share-fab" data-share-template onClick={onShare} aria-label={copied ? t('share.copied') : t('share.native')} title={t('share.native')}>
+    <button type="button" className="lb-share-fab" data-share-template onClick={onShare} aria-label={copied ? t('share.copied') : t('share.copyLink')} title={t('share.copyLink')}>
       {copied ? (
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <path d="m5 12.5 4.5 4.5L19 7.5" />
         </svg>
       ) : (
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <circle cx="18" cy="5" r="3" />
-          <circle cx="6" cy="12" r="3" />
-          <circle cx="18" cy="19" r="3" />
-          <path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4" />
+          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
         </svg>
       )}
     </button>

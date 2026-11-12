@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+from datetime import timedelta
+
 from django.conf import settings
 from django.db import DatabaseError
+from django.utils import timezone
 from django.utils.translation import get_language
 
 from ..models import HomeHero, SiteSetting, Template
@@ -90,6 +93,15 @@ def site_payload(request) -> dict:
     }
 
 
+# القالب بيتعلّم «جديد» (شريط على الكارت) طول أول أسبوع من إضافته
+NEW_TEMPLATE_DAYS = 7
+
+
+def is_new_template(template: Template) -> bool:
+    created = getattr(template, "created_at", None)
+    return bool(created) and created >= timezone.now() - timedelta(days=NEW_TEMPLATE_DAYS)
+
+
 def template_card(template: Template) -> dict:
     """بطاقة قالب لمعرض القوالب — من غير المستند التقيل."""
     return {
@@ -104,4 +116,5 @@ def template_card(template: Template) -> dict:
         "category": template.category,
         "collection": template.collection,
         "cover": template.cover_src or None,
+        "isNew": is_new_template(template),
     }
