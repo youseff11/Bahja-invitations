@@ -1268,17 +1268,18 @@ html[lang="en"] .feature-en { display: inline; }
 .tpl-card:hover .tpl-cover::after { opacity: 1; }
 
 /* شريط «جديد» — قالب اتضاف من أقل من أسبوع (‎isNew‎ من السيرفر). مايل في الركن العلوي
-   ناحية بداية القراءة (يمين في العربي، شمال في الإنجليزي)، دهبي على حبر. */
-.tpl-cover--new { overflow: hidden; }
+   ناحية بداية القراءة (يمين في العربي، شمال في الإنجليزي)، دهبي على حبر.
+   مقاسه بنسبة من عرض الغلاف (‎cqi‎) عشان مايكلش التصميم في كروت التليفون الصغيرة. */
+.tpl-cover--new { overflow: hidden; container-type: inline-size; }
 .tpl-ribbon {
   position: absolute; z-index: 3; pointer-events: none;
-  top: 24px; inset-inline-start: -44px; inline-size: 170px; padding: 8px 0;
+  top: 8cqi; inset-inline-start: -14cqi; inline-size: 54cqi; padding: 1.6cqi 0;
   transform: rotate(-45deg);
   background: linear-gradient(135deg, #f6e6b4 0%, #d8b25e 45%, #a87b2c 100%);
   color: #1d1610;
-  font-family: var(--font-body, inherit); font-size: 14px; font-weight: 800; line-height: 1;
-  letter-spacing: .04em; text-align: center; white-space: nowrap;
-  box-shadow: 0 6px 14px -6px rgba(20, 12, 4, .55), inset 0 1px 0 rgba(255, 255, 255, .55), inset 0 -1px 0 rgba(90, 60, 15, .35);
+  font-family: var(--font-body, inherit); font-size: clamp(10.5px, 5.4cqi, 13px); font-weight: 800; line-height: 1.15;
+  letter-spacing: .03em; text-align: center; white-space: nowrap;
+  box-shadow: 0 4px 10px -5px rgba(20, 12, 4, .55), inset 0 1px 0 rgba(255, 255, 255, .55), inset 0 -1px 0 rgba(90, 60, 15, .35);
   text-shadow: 0 1px 0 rgba(255, 255, 255, .35);
 }
 [dir="rtl"] .tpl-ribbon { transform: rotate(45deg); }
