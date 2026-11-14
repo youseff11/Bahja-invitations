@@ -618,6 +618,15 @@ class ClientFollowupApiTests(GuestsApiCase):
             with self.subTest(token=token):
                 self.assertEqual(self.client.get(self.url(token=token)).status_code, 404)
 
+    def test_short_code_from_the_shared_link_works(self):
+        self.assertEqual(self.client.get(self.url(token=self.inv.client_token[:12])).status_code, 200)
+
+    def test_short_code_must_be_exact_and_long_enough(self):
+        code = self.inv.client_token[:12]
+        for token in [code[:11], code.swapcase(), code[:11] + "-"]:
+            with self.subTest(token=token):
+                self.assertEqual(self.client.get(self.url(token=token)).status_code, 404)
+
     def test_token_length_bounds(self):
         for token in ["a" * 19, "a" * 65]:
             with self.subTest(length=len(token)):

@@ -481,9 +481,30 @@ class Invitation(TimeStampedModel):
     def get_absolute_url(self) -> str:
         return reverse("invitation_public", kwargs={"slug": self.slug})
 
+    # طول الكود اللي بيظهر في رابط متابعة الردود. ‎12‎ حرف من ‎[A-Za-z0-9]‎ ≈ ‎71‎ بت —
+    # مستحيل يتخمّن، والبحث دايماً متقيّد بالـslug فمفيش تصادم بين دعوتين.
+    CLIENT_CODE_LENGTH = 12
+
+    @property
+    def client_code(self) -> str:
+        return (self.client_token or "")[: self.CLIENT_CODE_LENGTH]
+
+    @classmethod
+    def by_client_code(cls, slug: str, code: str, queryset=None):
+        """الدعوة من رابط المتابعة: الكود القصير (‎/responses/‎) أو الرمز الكامل (‎/client/‎ القديم)."""
+        code = (code or "").strip()
+        if not (cls.CLIENT_CODE_LENGTH <= len(code) <= 64) or not code.isalnum():
+            return None
+        qs = (queryset if queryset is not None else cls.objects).filter(slug=slug)
+        invitation = qs.filter(client_token__startswith=code).first()
+        if invitation is None or not invitation.client_token.startswith(code):
+            return None             # ‎startswith‎ على SQLite مش حسّاس لحالة الحروف
+        return invitation
+
     def get_client_followup_url(self) -> str:
-        return reverse("invitation_client_followup", kwargs={
-            "slug": self.slug, "token": self.client_token,
+        """رابط متابعة الردود اللي بيتبعت لصاحب الدعوة: ‎/i/<slug>/responses/<code>/‎."""
+        return reverse("invitation_client_responses", kwargs={
+            "slug": self.slug, "token": self.client_code,
         })
 
     def get_venue_url(self) -> str:

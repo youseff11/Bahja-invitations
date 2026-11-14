@@ -45,3 +45,53 @@ def spa_shell(request, *args, **kwargs):
     if noindex:
         response["X-Robots-Tag"] = "noindex, nofollow"
     return response
+
+
+def _client_head(request, invitation) -> dict:
+    """معاينة رابط متابعة الردود: لما صاحب الدعوة يستلمه على واتساب/ماسنجر يبان
+    من العنوان والوصف إنه لوحة الردود — مش الدعوة نفسها ولا الصفحة الرئيسية."""
+    from django.utils.translation import get_language
+    from . import services
+
+    en = (get_language() or "").startswith("en")
+    names = (" & " if en else " و ").join(
+        n for n in [invitation.name_one, invitation.name_two] if n) or invitation.title
+    if en:
+        title = f"RSVP Tracker · {names}"
+        description = ("Private link for the hosts — follow guest confirmations, "
+                       "headcount and wishes live as they arrive.")
+    else:
+        title = f"متابعة ردود الضيوف · {names}"
+        description = ("رابط خاص بأصحاب الدعوة — تابع تأكيدات الحضور وعدد الضيوف "
+                       "ورسائل التهنئة أولاً بأول.")
+    s = (invitation.get_document() or {}).get("settings") or {}
+    template = getattr(invitation, "template", None)
+    image = services._share_image(  # noqa: SLF001
+        request, s.get("share_image"),
+        getattr(template, "cover_image", None), getattr(template, "cover_url", ""),
+    )
+    return {
+        "title": title,
+        "description": description,
+        "image": image,
+        "url": request.build_absolute_uri(invitation.get_client_followup_url()),
+    }
+
+
+@ensure_csrf_cookie
+@never_cache
+@require_safe
+def client_followup_page(request, slug, token):
+    """‎/i/<slug>/responses/<code>/‎ (و‎/client/<token>/‎ القديم): نفس الـshell
+    بس بميتا خاصة بلوحة الردود. الصفحة سرّية فدايماً noindex."""
+    from .models import Invitation
+
+    invitation = Invitation.by_client_code(slug, token)
+    response = render(request, "spa/shell.html", {
+        "boot": boot_payload(request),
+        "noindex": True,
+        "head": _client_head(request, invitation) if invitation else None,
+    })
+    response["X-Robots-Tag"] = "noindex, nofollow"
+    response["Referrer-Policy"] = "no-referrer"
+    return response

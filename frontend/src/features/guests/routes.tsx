@@ -31,6 +31,12 @@ export const guestPublicRoutes: RouteObject[] = [
     lazy: async () => ({ Component: (await import('./components/VenuePage')).VenuePage }),
   },
   {
+    // الرابط القصير اللي بيتبعت لصاحب الدعوة
+    path: 'i/:slug/responses/:token',
+    lazy: async () => ({ Component: (await import('./components/ClientFollowupPage')).ClientFollowupPage }),
+  },
+  {
+    // القديم (الرمز الكامل) — فاضل شغّال للروابط اللي اتبعتت قبل كده
     path: 'i/:slug/client/:token',
     lazy: async () => ({ Component: (await import('./components/ClientFollowupPage')).ClientFollowupPage }),
   },

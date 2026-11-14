@@ -10,7 +10,7 @@ from django.test import override_settings
 from django.urls import clear_url_caches, resolve, reverse
 
 from system.api.invite_page import invitation_page, template_page
-from system.spa import spa_shell
+from system.spa import client_followup_page, spa_shell
 from system.tests.test_api_invite import InviteBase
 
 
@@ -42,6 +42,7 @@ class CutoverTests(InviteBase):
         self.assertEqual(reverse("invitation_guest", kwargs={"slug": slug, "token": token}), f"/i/{slug}/g/{token}/")
         self.assertEqual(reverse("guest_pass", kwargs={"slug": slug, "token": token}), f"/i/{slug}/g/{token}/pass/")
         self.assertEqual(reverse("invitation_client_followup", kwargs={"slug": slug, "token": "c"}), f"/i/{slug}/client/c/")
+        self.assertEqual(reverse("invitation_client_responses", kwargs={"slug": slug, "token": "c"}), f"/i/{slug}/responses/c/")
         self.assertEqual(reverse("invitation_venue", kwargs={"slug": slug, "token": "v"}), f"/i/{slug}/venue/v/")
         self.assertEqual(reverse("template_demo", kwargs={"slug": "golden-t"}), "/templates/golden-t/preview/")
         self.assertEqual(reverse("template_gallery"), "/templates/")
@@ -49,7 +50,8 @@ class CutoverTests(InviteBase):
 
     def test_models_still_build_the_shared_urls(self):
         self.assertEqual(self.inv.get_absolute_url(), f"/i/{self.inv.slug}/")
-        self.assertIn(f"/i/{self.inv.slug}/client/", self.inv.get_client_followup_url())
+        self.assertEqual(self.inv.get_client_followup_url(),
+                         f"/i/{self.inv.slug}/responses/{self.inv.client_token[:12]}/")
         self.assertIn(f"/i/{self.inv.slug}/venue/", self.inv.get_venue_url())
 
     def test_pages_are_served_by_react(self):
@@ -59,9 +61,12 @@ class CutoverTests(InviteBase):
         self.assertIs(resolve(f"/i/{slug}/g/{token}/").func, invitation_page)
         self.assertIs(resolve(f"/templates/{self.template.slug}/preview/").func, template_page)
         for path in ("/", "/login/", "/templates/", "/dashboard/", "/dashboard/invitations/1/editor",
-                     f"/i/{slug}/g/{token}/pass/", f"/i/{slug}/client/c/", f"/i/{slug}/venue/v/", "/anything/else"):
+                     f"/i/{slug}/g/{token}/pass/", f"/i/{slug}/venue/v/", "/anything/else"):
             with self.subTest(path=path):
                 self.assertIs(resolve(path).func, spa_shell)
+        for path in (f"/i/{slug}/client/c/", f"/i/{slug}/responses/c/"):
+            with self.subTest(path=path):
+                self.assertIs(resolve(path).func, client_followup_page)
 
     # -------------------------------------------------------------- طلبات حقيقية
     def test_old_shared_links_answer(self):
@@ -70,6 +75,21 @@ class CutoverTests(InviteBase):
         self.assertEqual(self.client.get(f"/i/{slug}/g/{token}/").status_code, 200)
         self.assertEqual(self.client.get(f"/i/{slug}/g/{token}/pass/").status_code, 200)
         self.assertEqual(self.client.get(f"/i/{slug}/client/{self.inv.client_token}/").status_code, 200)
+
+    def test_client_link_preview_says_it_is_the_responses_page(self):
+        slug, code = self.inv.slug, self.inv.client_token[:12]
+        for path in (f"/i/{slug}/responses/{code}/", f"/i/{slug}/client/{self.inv.client_token}/"):
+            with self.subTest(path=path):
+                response = self.client.get(path)
+                self.assertEqual(response.status_code, 200)
+                html = response.content.decode()
+                self.assertIn('<meta property="og:title" content="متابعة ردود الضيوف', html)
+                self.assertIn(f'content="http://testserver/i/{slug}/responses/{code}/"', html)
+                self.assertIn('<meta name="robots" content="noindex, nofollow">', html)
+                self.assertEqual(response["X-Robots-Tag"], "noindex, nofollow")
+        # كود غلط: نفس الصفحة العامة من غير أي بيانات من الدعوة
+        html = self.client.get(f"/i/{slug}/responses/{'z' * 12}/").content.decode()
+        self.assertNotIn("متابعة ردود الضيوف", html)
 
     def test_qr_images_are_still_django(self):
         slug, token = self.inv.slug, self.guest.token

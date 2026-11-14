@@ -251,7 +251,7 @@ class InvitationTests(DashboardApiCase):
         self.assertEqual([r["id"] for r in data["results"]], [other.pk, self.invitation.pk])
         row = data["results"][1]
         self.assertEqual(row["url"], f"/i/{self.invitation.slug}/")
-        self.assertTrue(row["clientUrl"].startswith(f"/i/{self.invitation.slug}/client/"))
+        self.assertTrue(row["clientUrl"].startswith(f"/i/{self.invitation.slug}/responses/"))
         self.assertTrue(row["venueUrl"].startswith(f"/i/{self.invitation.slug}/venue/"))
         self.assertEqual(data["templateChoices"], [{"id": self.template.pk, "name": "ذهبي كلاسيكي"}])
         self.assertEqual([c["value"] for c in data["statusChoices"]],

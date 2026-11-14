@@ -16,7 +16,7 @@ from django.urls import path, re_path
 
 from . import files
 from .api import invite_page
-from .spa import spa_shell
+from .spa import client_followup_page, spa_shell
 
 
 def app_prefix_redirect(request, rest=""):
@@ -45,7 +45,9 @@ urlpatterns = [
     path("i/<slug:slug>/", invite_page.invitation_page, name="invitation_public"),
     path("i/<slug:slug>/g/<str:token>/", invite_page.invitation_page, name="invitation_guest"),
     path("templates/<slug:slug>/preview/", invite_page.template_page, name="template_demo"),
-    path("i/<slug:slug>/client/<str:token>/", spa_shell, name="invitation_client_followup"),
+    # رابط متابعة الردود: القصير هو اللي بيتبعت، والقديم الطويل فاضل شغّال للي اتبعت قبل كده
+    path("i/<slug:slug>/responses/<str:token>/", client_followup_page, name="invitation_client_responses"),
+    path("i/<slug:slug>/client/<str:token>/", client_followup_page, name="invitation_client_followup"),
     path("i/<slug:slug>/venue/<str:token>/", spa_shell, name="invitation_venue"),
     path("i/<slug:slug>/g/<str:token>/pass/", spa_shell, name="guest_pass"),
     path("templates/", spa_shell, name="template_gallery"),

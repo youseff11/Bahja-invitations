@@ -3,13 +3,30 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>{{ SITE_NAME }} — {{ SITE_TAGLINE }}</title>
+{% if head %}{# صفحة ليها معاينة خاصة (زي رابط متابعة الردود) #}<title>{{ head.title }} — {{ SITE_NAME }}</title>
+<meta name="description" content="{{ head.description }}">
+{% else %}<title>{{ SITE_NAME }} — {{ SITE_TAGLINE }}</title>
 <meta name="description" content="{{ SEO_DESC }}">
-{% if noindex %}<meta name="robots" content="noindex, nofollow">
+{% endif %}{% if noindex %}<meta name="robots" content="noindex, nofollow">
 {% endif %}<meta property="og:type" content="website">
 <meta property="og:site_name" content="{{ SITE_NAME }}">
 <meta property="og:locale" content="{{ SEO_LOCALE }}">
-<meta property="og:title" content="{{ SITE_NAME }} — {{ SITE_TAGLINE }}">
+{% if head %}<meta property="og:title" content="{{ head.title }}">
+<meta property="og:description" content="{{ head.description }}">
+<meta property="og:url" content="{{ head.url }}">
+{% if head.image.url %}<meta property="og:image" content="{{ head.image.url }}">
+{% if head.image.width %}<meta property="og:image:width" content="{{ head.image.width }}">
+<meta property="og:image:height" content="{{ head.image.height }}">
+{% endif %}{% else %}<meta property="og:image" content="{{ SEO_IMAGE }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+{% endif %}<meta property="og:image:alt" content="{{ head.title }}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ head.title }}">
+<meta name="twitter:description" content="{{ head.description }}">
+<meta name="twitter:image" content="{% if head.image.url %}{{ head.image.url }}{% else %}{{ SEO_IMAGE }}{% endif %}">
+<meta name="twitter:image:alt" content="{{ head.title }}">
+{% else %}<meta property="og:title" content="{{ SITE_NAME }} — {{ SITE_TAGLINE }}">
 <meta property="og:description" content="{{ SEO_DESC }}">
 <meta property="og:url" content="{{ SEO_CANONICAL }}">
 <meta property="og:image" content="{{ SEO_IMAGE }}">
@@ -22,7 +39,7 @@
 <meta name="twitter:title" content="{{ SITE_NAME }} — {{ SITE_TAGLINE }}">
 <meta name="twitter:description" content="{{ SEO_DESC }}">
 <meta name="twitter:image" content="{{ SEO_IMAGE }}">
-<script>
+{% endif %}<script>
 /* يضبط المظهر قبل رسم الصفحة — نفس مفتاح الموقع القديم (leila-theme)،
    فاختيار الزائر بيمشي بين النسختين. من غير متغيّرات Django عمداً:
    لو الدارك مقفول من إعدادات الموقع السيرفر بيحط data-dark-off على

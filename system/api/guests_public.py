@@ -168,13 +168,12 @@ def client_followup(request, slug, token):
     للقراءة فقط، وتعرض الوحدة التي أضيفت فعلاً إلى مستند الدعوة:
     الحضور، رموز QR، ورسائل التهنئة.
     """
-    token = (token or "").strip()
-    if not (20 <= len(token) <= 64):
-        raise Http404("رابط المتابعة غير صالح.")
-    invitation = get_object_or_404(
+    invitation = Invitation.by_client_code(
+        slug, token,
         Invitation.objects.select_related("customer", "template", "plan"),
-        slug=slug, client_token=token,
     )
+    if invitation is None:
+        raise Http404("رابط المتابعة غير صالح.")
 
     document = invitation.get_document()
     visible_types = {

@@ -9,7 +9,10 @@
 
 export const personalPath = (slug: string, token: string) => `/i/${slug}/g/${token}/`
 export const venuePath = (slug: string, token: string) => `/i/${slug}/venue/${token}/`
-export const clientPath = (slug: string, token: string) => `/i/${slug}/client/${token}/`
+/** رابط متابعة الردود: أول ‎12‎ حرف من الرمز بس (نفس ‎Invitation.client_code‎ في Django). */
+export const CLIENT_CODE_LENGTH = 12
+export const clientPath = (slug: string, token: string) =>
+  `/i/${slug}/responses/${token.slice(0, CLIENT_CODE_LENGTH)}/`
 export const passPath = (slug: string, token: string) => `/i/${slug}/g/${token}/pass/`
 
 /** صور الـQR بيقدّمها Django زي ما هي. */
