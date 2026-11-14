@@ -4,6 +4,7 @@
 .client-followup-page {
   background: var(--bg);
   min-height: 100vh;
+  overflow-x: clip;   /* أي عنصر يعرض بالغلط مايزقّش الصفحة كلها لبرّه الشاشة */
 }
 
 /* قواعد الجداول العامة اللي كانت في site.css — متحدّدة هنا بس */
@@ -74,7 +75,9 @@
   display: flex; flex-direction: column; align-items: center;
   text-align: center; gap: 10px; margin-bottom: 28px;
 }
-.client-followup .client-followup-logo { height: 110px; margin-inline: auto; }
+/* العرض هو اللي بيتحدّد والارتفاع من نسبة 7:1 — لو الارتفاع ثابت (كان 84px على
+   الموبايل) العرض بيطلع 588px والصفحة كلها بتعرض أكتر من الشاشة وتتزق لليمين. */
+.client-followup .client-followup-logo { height: auto; width: min(100%, 460px); margin-inline: auto; }
 .client-followup-welcome h1 { font-size: clamp(24px, 2.8vw, 34px); }
 .client-followup-welcome .client-followup-subtitle {
   margin: 0; max-width: 46ch;
@@ -123,7 +126,7 @@
 }
 .client-followup-stat-icon--ok { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 55%, var(--line)); }
 .client-followup-stat-label { color: var(--muted); font-size: 12px; }
-.client-followup-stat strong { color: var(--text); font-family: "Cormorant Garamond", serif; font-size: 31px; line-height: 1; }
+.client-followup-stat strong { color: var(--text); font-family: "Cormorant Garamond", serif; font-size: 31px; line-height: 1; font-variant-numeric: lining-nums tabular-nums; }
 .client-followup-section {
   margin-top: 22px; border: 1px solid var(--line); border-radius: var(--radius);
   background: var(--surface); box-shadow: var(--shadow); overflow: hidden;
@@ -167,7 +170,7 @@
 @media (max-width: 680px) {
   .client-followup { width: min(100% - 24px, 560px); padding-top: 26px; }
   .client-followup-head { flex-direction: column; gap: 12px; }
-  .client-followup .client-followup-logo { height: 84px; }
+  .client-followup .client-followup-logo { height: auto; width: min(90%, 340px); }
   .client-followup-welcome { margin-bottom: 20px; }
   .client-followup-link-row { flex-direction: column; align-items: stretch; }
   .client-followup-link-row input { width: 100%; }
