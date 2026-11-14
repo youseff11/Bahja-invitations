@@ -289,13 +289,11 @@ SITE_URL = env("SITE_URL", "https://www.bahja-invitations.com").rstrip("/")
 # الوصف اللي بيظهر مع الرابط لما يتبعت (واتساب/فيسبوك/تويتر) وتحت العنوان في المتصفح.
 SEO_DESCRIPTION_AR = env(
     "SEO_DESCRIPTION_AR",
-    "بهجة — دعوات فرح رقمية فاخرة بتصاميم راقية. اختار القالب، ضيف تفاصيل فرحك، "
-    "وابعت لينك واحد لكل ضيوفك.",
+    "دعوة عمرك ما تنساها",
 )
 SEO_DESCRIPTION_EN = env(
     "SEO_DESCRIPTION_EN",
-    "Bahja Invitations — luxury digital wedding invitations. Pick a template, add your "
-    "details, and share one link with every guest.",
+    "An invitation you'll never forget",
 )
 
 # حدود استيراد القوالب — حماية من ZIP bomb.
