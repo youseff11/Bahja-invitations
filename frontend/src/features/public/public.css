@@ -1685,8 +1685,50 @@ html[dir="ltr"] .steps { --pz-start: left; }
   .step h3 { font-size: 18px; }
   .step p { font-size: 13.5px; }
 }
+/* ---- أنيميشن التركيب: القطع متبعترة ومايلة، وأول ما الشبكة تدخل الشاشة
+   كل قطعة بتطير لمكانها وبتتعشّق في اللي قبلها بـ«تكّة» صغيرة،
+   وبعد آخر قطعة لمعة دهب بتعدّي على القطعة الملوّنة: اللغز اكتمل.
+   transform + opacity بس؛ قبل ‎is-in‎ القطع مستخبية عشان ما تتنططش. */
+.steps[data-reveal] .step { --sx: 0px; --sy: 0px; --sr: 0deg; }
+.steps[data-reveal] .step:nth-child(1) { --sx: 60px;  --sy: -70px; --sr: -14deg; }
+.steps[data-reveal] .step:nth-child(2) { --sx: -30px; --sy: 90px;  --sr: 11deg; }
+.steps[data-reveal] .step:nth-child(3) { --sx: 40px;  --sy: -95px; --sr: -9deg; }
+.steps[data-reveal] .step:nth-child(4) { --sx: -70px; --sy: 70px;  --sr: 16deg; }
+html[dir="rtl"] .steps[data-reveal] .step { --sx-dir: -1; }
+.steps[data-reveal]:not(.is-in) .step { opacity: 0; }
+.steps.is-in .step { animation: pz-assemble .85s cubic-bezier(.2, .9, .25, 1.15) both; }
+.steps.is-in .step:nth-child(2) { animation-delay: .32s; }
+.steps.is-in .step:nth-child(3) { animation-delay: .64s; }
+.steps.is-in .step:nth-child(4) { animation-delay: .96s; }
+@keyframes pz-assemble {
+  0%   { opacity: 0; transform: translate(calc(var(--sx) * var(--sx-dir, 1)), var(--sy)) rotate(var(--sr)) scale(.86); }
+  35%  { opacity: 1; }
+  78%  { transform: translate(0, 0) rotate(0) scale(1.035); }   /* التكّة */
+  100% { opacity: 1; transform: none; }
+}
+/* لمعة «اكتمل» على القطعة الأخيرة بعد ما تركب */
+.step:last-child::after {
+  content: ""; position: absolute; inset: 0; z-index: -1; border-radius: 14px; pointer-events: none;
+  background: linear-gradient(105deg, transparent 35%, rgba(255, 230, 185, .45) 50%, transparent 65%) no-repeat;
+  background-size: 250% 100%; background-position: 150% 0; opacity: 0;
+}
+.steps.is-in .step:last-child::after { animation: pz-done 1.3s ease-out 1.9s both; }
+@keyframes pz-done {
+  0%   { opacity: 1; background-position: 150% 0; }
+  100% { opacity: 1; background-position: -60% 0; }
+}
+/* الموبايل: القطع بتيجي من اليمين والشمال بالتبادل وتنزل فوق بعض */
+@media (max-width: 760px) {
+  .steps[data-reveal] .step:nth-child(odd)  { --sx: 90px;  --sy: 30px; }
+  .steps[data-reveal] .step:nth-child(even) { --sx: -90px; --sy: 30px; }
+  .steps.is-in .step:nth-child(2) { animation-delay: .22s; }
+  .steps.is-in .step:nth-child(3) { animation-delay: .44s; }
+  .steps.is-in .step:nth-child(4) { animation-delay: .66s; }
+  .steps.is-in .step:last-child::after { animation-delay: 1.4s; }
+}
 @media (prefers-reduced-motion: reduce) {
   .step, .step-number { transition: none; }
+  .steps .step, .steps.is-in .step, .steps.is-in .step:last-child::after { animation: none; opacity: 1; }
 }
 
 

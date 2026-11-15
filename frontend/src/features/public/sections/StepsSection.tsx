@@ -11,9 +11,10 @@ export function StepsSection() {
           <p className="eyebrow">{t('public.steps.eyebrow')}</p>
           <h2>{t('public.steps.title')}</h2>
         </div>
-        <div className="grid grid--4 steps">
+        {/* ‎data-reveal‎ على الشبكة كلها: أول ما تدخل الشاشة القطع بتتركّب مع بعض */}
+        <div className="grid grid--4 steps" data-reveal>
           {STEPS.map((step, i) => (
-            <div className="step" key={step} data-reveal data-reveal-stagger>
+            <div className="step" key={step}>
               <span className="step-number">{String(i + 1).padStart(2, '0')}</span>
               <h3>{t(`public.steps.${step}.title`)}</h3>
               <p className="muted">{t(`public.steps.${step}.text`)}</p>
