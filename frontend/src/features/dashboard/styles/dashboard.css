@@ -2129,3 +2129,56 @@ html[lang='en'] .dash-root .tpl-meta {
   flex: 1;
   min-width: 0;
 }
+
+/* علامة الترويسة بنفس شكل ومقاس ترويسة الهوم (.brand-word / .brand-mono في public.css):
+   كلمة الاسم بحروف متباعدة + المونوجرام الدهبي بدل صورة اللوجو الصغيرة */
+.dash-root .brand.brand--word,
+.dash-root .nav.is-stuck .brand.brand--word {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  height: auto;
+  aspect-ratio: auto;
+  background: none;
+  margin-inline-start: 14px;
+}
+.dash-root .brand-word {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 600;
+  font-size: 21px;
+  letter-spacing: 0.3em;
+  margin-inline-end: -0.3em;
+  line-height: 1;
+  color: var(--text);
+  direction: ltr;
+}
+.dash-root .brand-mono {
+  display: block;
+  width: 46px;
+  height: 55px;
+  flex: none;
+  margin-block: -6px;
+  background: url('/static/images/bahja-mark.webp') center / contain no-repeat;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.25));
+}
+/* الروابط كتير في الداشبورد: في العرض المتوسط الكلمة بتستخبى ويفضل المونوجرام */
+@media (max-width: 1180px) {
+  .dash-root .brand-word {
+    display: none;
+  }
+}
+@media (max-width: 780px) {
+  .dash-root .brand.brand--word,
+  .dash-root .nav.is-stuck .brand.brand--word {
+    margin-inline-start: 8px;
+    gap: 8px;
+  }
+  .dash-root .brand-word {
+    display: block;
+    font-size: 16px;
+  }
+  .dash-root .brand-mono {
+    width: 38px;
+    height: 45px;
+  }
+}

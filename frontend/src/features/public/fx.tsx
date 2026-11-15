@@ -15,19 +15,29 @@ interface Star {
   delay: number
   drift: number
   peak: number
-  spark: boolean
+  spin: number
+  kind: 'leaf' | 'spark' | 'glint'
 }
 
+/** ورقة دهب، نجمة رباعية منحنية، ولمعة صغيرة — بالتناوب عشان المشهد ما يبقاش مكرر */
+const KINDS = ['leaf', 'spark', 'glint'] as const
+const SIZES = { leaf: [7, 6], spark: [6, 6], glint: [2, 1.6] } as const // [أقل حجم، المدى]
+
 function makeStars(count: number): Star[] {
-  return Array.from({ length: count }, (_, i) => ({
-    left: Math.random() * 100,
-    size: Math.random() * 3 + 1.6, // 1.6 → 4.6px
-    duration: Math.random() * 9 + 9, // 9 → 18s
-    delay: -Math.random() * 18, // تبدأ متفرقة مش سوا
-    drift: Math.round((Math.random() - 0.5) * 120), // ميل يمين/شمال
-    peak: Math.random() * 0.45 + 0.4,
-    spark: i % 4 === 0,
-  }))
+  return Array.from({ length: count }, (_, i) => {
+    const kind = KINDS[i % KINDS.length]
+    const [min, range] = SIZES[kind]
+    return {
+      left: Math.random() * 100,
+      size: Math.random() * range + min,
+      duration: Math.random() * 9 + 11, // 11 → 20s
+      delay: -Math.random() * 20, // تبدأ متفرقة مش سوا
+      drift: Math.round((Math.random() - 0.5) * 140), // ميل يمين/شمال
+      peak: Math.random() * 0.35 + 0.5,
+      spin: Math.round((Math.random() < 0.5 ? -1 : 1) * (Math.random() * 260 + 160)),
+      kind,
+    }
+  })
 }
 
 interface StarFieldProps {
@@ -72,7 +82,7 @@ export function StarField({ count, scale, className, idle }: StarFieldProps) {
       {stars.map((star, i) => (
         <span
           key={i}
-          className={'fx-star' + (star.spark ? ' fx-star--spark' : '')}
+          className={'fx-star fx-star--' + star.kind}
           style={
             {
               insetInlineStart: `${star.left.toFixed(2)}%`,
@@ -81,6 +91,7 @@ export function StarField({ count, scale, className, idle }: StarFieldProps) {
               '--delay': `${star.delay.toFixed(1)}s`,
               '--drift': `${star.drift}px`,
               '--peak': star.peak.toFixed(2),
+              '--spin': `${star.spin}deg`,
             } as CSSProperties
           }
         />

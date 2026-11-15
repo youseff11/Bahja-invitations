@@ -92,7 +92,7 @@
 .ed-top-group--grow { flex: 1; min-width: 0; }
 
 .ed-brand {
-  display: flex; align-items: center; gap: 8px;
+  display: flex; align-items: center; gap: 12px;
   font-weight: 700; color: var(--e-text); text-decoration: none;
   white-space: nowrap;
 }
@@ -102,7 +102,7 @@
   letter-spacing: .3em; margin-inline-end: -.3em; line-height: 1; color: var(--e-text); direction: ltr;
 }
 .ed-brand-mono {
-  display: block; width: 52px; height: 62px; flex: none; margin-block: -4px;
+  display: block; width: 46px; height: 55px; flex: none; margin-block: -6px;
   background: url("/static/images/bahja-mark.webp") center / contain no-repeat;
   filter: drop-shadow(0 2px 6px rgba(0, 0, 0, .25));
 }

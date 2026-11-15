@@ -142,6 +142,8 @@ export function DashboardHeader() {
   const lang = (i18n.language as Lang) ?? 'ar'
   const next: Lang = lang === 'ar' ? 'en' : 'ar'
   const siteName = site?.name[lang] ?? ''
+  // نفس علامة ترويسة الهوم: كلمة الاسم بحروف متباعدة + المونوجرام الدهبي
+  const wordmark = (site?.name.en.trim().split(/\s+/)[0] || 'Bahja').toUpperCase()
   const switchTitle = lang === 'ar' ? 'Switch to English' : 'التبديل إلى العربية'
 
   // الترويسة بتتقلّص وتاخد ظل لما المستخدم ينزل بالصفحة
@@ -199,8 +201,12 @@ export function DashboardHeader() {
     <>
       <header className={stuck ? 'nav is-stuck' : 'nav'} id="site-nav">
         <div className="nav-shell">
-          <Link className="brand" to="/">
+          <Link className="brand brand--word" to="/">
             <span className="sr-only">{siteName}</span>
+            <span className="brand-word" aria-hidden="true">
+              {wordmark}
+            </span>
+            <span className="brand-mono" aria-hidden="true" />
           </Link>
 
           <nav
