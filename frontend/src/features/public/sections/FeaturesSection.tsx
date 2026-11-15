@@ -133,16 +133,17 @@ const ART: Record<string, () => ReactNode> = {
   ),
 }
 
-/** الترتيب والمقاس على الشبكة (٤ أعمدة): العريض بياخد عمودين. */
+/** الترتيب والمقاس على الشبكة (٤ أعمدة): العريض بياخد عمودين.
+    الترتيب ماشي مع رحلة الضيف: توصله الدعوة ← يأكد ← يتفرّج ← يوصل القاعة ← يدخل. */
 const TILES: { key: string; wide?: boolean; tone?: 'accent' | 'dark' }[] = [
+  { key: 'whatsapp' },
   { key: 'countdown', wide: true, tone: 'accent' },
   { key: 'rsvp' },
-  { key: 'whatsapp' },
-  { key: 'music' },
   { key: 'gallery', wide: true },
+  { key: 'music' },
+  { key: 'calendar' },
   { key: 'maps' },
   { key: 'qr' },
-  { key: 'calendar' },
   { key: 'venueQr', wide: true, tone: 'dark' },
 ]
 
@@ -157,7 +158,7 @@ export function FeaturesSection() {
           <p>{t('public.features.sub')}</p>
         </div>
         <div className="bento">
-          {TILES.map(({ key, wide, tone }) => (
+          {TILES.map(({ key, wide, tone }, index) => (
             <article
               key={key}
               className={['bento-tile', `bento-${key}`, wide && 'bento-wide', tone && `bento-${tone}`]
@@ -169,6 +170,9 @@ export function FeaturesSection() {
               <div className="bento-art" aria-hidden="true">
                 {ART[key]()}
               </div>
+              <span className="bento-num" aria-hidden="true">
+                {String(index + 1).padStart(2, '0')}
+              </span>
               <div className="bento-copy">
                 <h3>{t(`public.features.${key}.title`)}</h3>
                 <p>{t(`public.features.${key}.text`)}</p>
