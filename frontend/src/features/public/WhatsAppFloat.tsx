@@ -155,7 +155,22 @@ export function WhatsAppFloat() {
         </header>
 
         <div className="wa-chat-body">
+          {/* نجوم دهبي صغيرة بتلمع في الخلفية — زخرفة بحتة */}
+          <span className="wa-glints" aria-hidden="true">
+            <i />
+            <i />
+            <i />
+            <i />
+            <i />
+          </span>
+          {/* «بيكتب…» بيظهر لحظة وبعدين الرسالة بتنزل مكانه (CSS بس) */}
+          <span className="wa-typing" aria-hidden="true" title={t('public.whatsapp.typing')}>
+            <i />
+            <i />
+            <i />
+          </span>
           <div className="wa-bubble">
+            <strong className="wa-bubble-title">{t('public.whatsapp.greetingTitle')}</strong>
             <p>{t('public.whatsapp.greeting')}</p>
             <span className="wa-bubble-time">
               <CheckDoubleIcon />

@@ -51,8 +51,8 @@
   },
   "features": {
     "eyebrow": "What you get",
-    "title": "Everything your invitation needs, in one place",
-    "sub": "Considered details that make it easy for guests to arrive, reply and share.",
+    "title": "What every package includes",
+    "sub": "Details made with love, so your guests can find the venue, confirm they're coming and share your joy.",
     "units": { "days": "Days", "hours": "Hours", "minutes": "Min", "seconds": "Sec" },
     "countdown": { "title": "Day Counter", "text": "Counts down to the night of the wedding" },
     "gallery": { "title": "Photo Album", "text": "Show your favourite moments to guests" },
@@ -135,7 +135,9 @@
     "label": "Message us on WhatsApp",
     "close": "Close",
     "status": "Answers within minutes",
-    "greeting": "Congratulations ❤️ We'd love to help with all your event needs. How can we help you? 😊",
+    "greetingTitle": "Is your big day coming up? 💍",
+    "greeting": "Talk to us and we'll make you an invitation no one will ever forget ✨",
+    "typing": "typing…",
     "placeholder": "Type a message",
     "input": "Your message",
     "send": "Send"
