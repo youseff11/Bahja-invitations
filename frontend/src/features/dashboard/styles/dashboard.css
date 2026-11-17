@@ -824,6 +824,24 @@
   max-width: 1280px;
   margin-inline: auto;
 }
+/* مكتبة القوالب في الإدارة: ٥ كروت في الصف بالظبط، وبتقل على الشاشات الأصغر */
+.dash-root .grid--gallery.grid--admin-5 {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 22px;
+  max-width: none;
+}
+@media (max-width: 1200px) {
+  .dash-root .grid--gallery.grid--admin-5 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (max-width: 960px) {
+  .dash-root .grid--gallery.grid--admin-5 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 700px) {
+  .dash-root .grid--gallery.grid--admin-5 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+}
+@media (max-width: 440px) {
+  .dash-root .grid--gallery.grid--admin-5 { grid-template-columns: 1fr; }
+}
 .dash-root .card {
   background: var(--surface);
   border: 1px solid var(--line);

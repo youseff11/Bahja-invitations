@@ -205,7 +205,10 @@ export function TemplatesPage() {
   )
   const shown = useMemo(
     () =>
-      (rows ?? []).filter((row) => visibility === 'all' || (visibility === 'shown' ? row.isActive : !row.isActive)),
+      (rows ?? [])
+        .filter((row) => visibility === 'all' || (visibility === 'shown' ? row.isActive : !row.isActive))
+        // الأحدث فوق: الـid بيزيد مع كل قالب جديد
+        .sort((a, b) => b.id - a.id),
     [rows, visibility],
   )
 
@@ -317,7 +320,7 @@ export function TemplatesPage() {
 
       <QueryState loading={isPending} error={isError} />
       {data && (
-        <div className="grid grid--4 grid--gallery">
+        <div className="grid grid--4 grid--gallery grid--admin-5">
           {shown.map((template) => (
             <article className="tpl-card" key={template.id}>
               <div
