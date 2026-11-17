@@ -842,6 +842,44 @@
 @media (max-width: 440px) {
   .dash-root .grid--gallery.grid--admin-5 { grid-template-columns: 1fr; }
 }
+/* كارت الإدارة المضغوط: اسم + وصف سطرين + سطر صغير للأرقام + صف واحد للتصنيف والإجراءات */
+.dash-root .grid--admin-5 .tpl-card { padding: 8px; border-radius: 18px; }
+.dash-root .grid--admin-5 .tpl-cover { border-radius: 12px; overflow: hidden; }
+.dash-root .grid--admin-5 .tpl-badges {
+  position: absolute; top: 8px; inset-inline-start: 8px; z-index: 1;
+  display: flex; gap: 4px; flex-wrap: wrap;
+}
+.dash-root .grid--admin-5 .tpl-badges > * {
+  background: var(--surface); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+  font-size: 11px; padding: 2px 9px;
+}
+.dash-root .grid--admin-5 .tpl-body { padding: 12px 6px 4px; gap: 4px; }
+.dash-root .grid--admin-5 .tpl-body h3 { font-size: 16px; line-height: 1.35; }
+.dash-root .grid--admin-5 .tpl-body h3 .inline-edit {
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.dash-root .grid--admin-5 .inline-edit.tpl-desc {
+  font-size: 12.5px; line-height: 1.6;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
+  overflow: hidden; min-height: calc(2 * 1.6em + 6px);
+}
+.dash-root .grid--admin-5 .tpl-meta { font-size: 11.5px; opacity: 0.85; padding-inline: 6px; }
+.dash-root .grid--admin-5 .tpl-foot {
+  display: flex; align-items: center; gap: 6px;
+  margin-top: auto; padding-top: 10px; border-top: 1px solid var(--line);
+}
+.dash-root .grid--admin-5 .tpl-foot .tpl-category {
+  flex: 1; min-width: 0; padding: 6px 8px; font-size: 12.5px; border-radius: 10px;
+}
+.dash-root .grid--admin-5 .tpl-foot .tpl-action-menu { width: auto; position: static; }
+.dash-root .grid--admin-5 .tpl-card { position: relative; }
+.dash-root .grid--admin-5 .tpl-foot .tpl-action-trigger {
+  width: 34px; height: 34px; padding: 0; border-radius: 10px; font-size: 18px; line-height: 1;
+}
+.dash-root .grid--admin-5 .tpl-foot .tpl-action-trigger span {
+  position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+}
+.dash-root .grid--admin-5 .tpl-action-panel { inset-inline: 8px; bottom: 56px; }
 .dash-root .card {
   background: var(--surface);
   border: 1px solid var(--line);

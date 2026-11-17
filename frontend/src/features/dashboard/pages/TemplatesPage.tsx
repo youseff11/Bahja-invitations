@@ -328,6 +328,12 @@ export function TemplatesPage() {
                 style={template.cover ? { backgroundImage: `url('${template.cover}')` } : undefined}
               >
                 {!template.cover && template.name.slice(0, 1)}
+                {(!template.isActive || template.blocks === 0) && (
+                  <div className="tpl-badges">
+                    {!template.isActive && <Pill kind="archived">{t('dashboard.common.hidden')}</Pill>}
+                    {template.blocks === 0 && <Pill kind="archived">{t('dashboard.templates.empty')}</Pill>}
+                  </div>
+                )}
               </div>
               <div className="tpl-body">
                 <h3>
@@ -347,27 +353,23 @@ export function TemplatesPage() {
                   multiline
                   onSave={(description) => saveText(template, { description })}
                 />
-                <select
-                  className="tpl-category"
-                  aria-label={t('dashboard.templates.category')}
-                  value={template.category}
-                  disabled={update.isPending}
-                  onChange={(event) => void saveText(template, { category: event.target.value }).catch(() => {})}
-                >
-                  {data.categories.map((category) => (
-                    <option key={category.value} value={category.value}>
-                      {labels.category(category.value, category.label)}
-                    </option>
-                  ))}
-                </select>
-                <span className="tpl-meta">
-                  {template.category !== 'none' && `${labels.category(template.category, template.categoryLabel)} · `}
-                  {labels.source(template.source, template.sourceLabel)} ·{' '}
+                <span className="tpl-meta" title={labels.source(template.source, template.sourceLabel)}>
                   {t('dashboard.templates.meta', { blocks: template.blocks, uses: template.uses })}
                 </span>
-                {!template.isActive && <Pill kind="archived">{t('dashboard.common.hidden')}</Pill>}
-                {template.blocks === 0 && <Pill kind="archived">{t('dashboard.templates.empty')}</Pill>}
-                <div className="tpl-actions">
+                <div className="tpl-foot">
+                  <select
+                    className="tpl-category"
+                    aria-label={t('dashboard.templates.category')}
+                    value={template.category}
+                    disabled={update.isPending}
+                    onChange={(event) => void saveText(template, { category: event.target.value }).catch(() => {})}
+                  >
+                    {data.categories.map((category) => (
+                      <option key={category.value} value={category.value}>
+                        {labels.category(category.value, category.label)}
+                      </option>
+                    ))}
+                  </select>
                   <TemplateActionMenu template={template} />
                 </div>
               </div>
