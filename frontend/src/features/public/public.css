@@ -2373,3 +2373,6 @@ html[lang="en"] .nav--site .nav-cta { letter-spacing: .08em; font-size: 12.5px; 
 /* النزول للقوالب (أول دخول أو ‎#templates‎): مسافة فوق القسم عشان الكلمة الصغيرة
    «التصاميم» ماتستخبّاش ورا الترويسة العائمة */
 #templates { scroll-margin-top: 40px; }
+
+/* غلاف القالب رابط: من غير خط تحت، وبإيد الضغط */
+a.tpl-cover { text-decoration: none; cursor: pointer; }

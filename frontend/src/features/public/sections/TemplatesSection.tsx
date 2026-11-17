@@ -9,20 +9,35 @@ import { ScrollChips } from '../ScrollChips'
 import { firstChar, pick, truncateChars, useLang } from '../text'
 import type { PublicTemplate } from '../types'
 
+const previewPath = (template: PublicTemplate) => `/templates/${template.slug}/preview/`
+
+/** المعاينة بتتفتح جوّه التطبيق؛ التسخين على أول اقتراب بيخلّيها فورية. */
+const warmProps = (template: PublicTemplate) => ({
+  onPointerEnter: () => warmPreview(template.slug),
+  onFocus: () => warmPreview(template.slug),
+  onTouchStart: () => warmPreview(template.slug),
+})
+
 /**
  * الغلاف: صورة لو فيه، وإلا أول حرف من الاسم. ‎JSON.stringify‎ بيهرّب أي علامة اقتباس في الرابط.
  * القالب اللي اتضاف من أقل من أسبوع عليه شريط «جديد» مايل في الركن.
  */
 function Cover({ template, name }: { template: PublicTemplate; name: string }) {
   const { t } = useTranslation()
+  // الضغط على الصورة بيفتح المعاينة على طول (زي زرار «معاينة التصميم»).
+  // خارج الترتيب بالتاب: الزرار تحت هو نفس الرابط فمانكرّرش الوقفة.
   return (
-    <div
+    <Link
+      to={previewPath(template)}
       className={template.isNew ? 'tpl-cover tpl-cover--new' : 'tpl-cover'}
       style={template.cover ? { backgroundImage: `url(${JSON.stringify(template.cover)})` } : undefined}
+      tabIndex={-1}
+      aria-label={name}
+      {...warmProps(template)}
     >
       {!template.cover && firstChar(name)}
       {template.isNew && <span className="tpl-ribbon">{t('public.templates.new')}</span>}
-    </div>
+    </Link>
   )
 }
 
@@ -41,15 +56,6 @@ function Meta({ template }: { template: PublicTemplate }) {
     </span>
   )
 }
-
-const previewPath = (template: PublicTemplate) => `/templates/${template.slug}/preview/`
-
-/** المعاينة بتتفتح جوّه التطبيق؛ التسخين على أول اقتراب بيخلّيها فورية. */
-const warmProps = (template: PublicTemplate) => ({
-  onPointerEnter: () => warmPreview(template.slug),
-  onFocus: () => warmPreview(template.slug),
-  onTouchStart: () => warmPreview(template.slug),
-})
 
 /** كارت القالب في الرئيسية: زرار واحد بيفتح معاينة القالب. */
 export function HomeTemplateCard({ template }: { template: PublicTemplate }) {

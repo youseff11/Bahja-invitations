@@ -143,9 +143,9 @@ export function AutoScroll({ config }: { config: ScrollConfig }) {
   if (!enabled) return null
   return (
     <button ref={btn} type="button" className="lb-autoscroll" hidden>
-      <svg className="i-pause" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <path d="m6 7 6 6 6-6M6 13l6 6 6-6" />
-      </svg>
+      <span className="lb-wheel" aria-hidden="true">
+        <i />
+      </span>
       <svg className="i-play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
         <path d="M8 5.2v13.6L19 12 8 5.2Z" />
       </svg>

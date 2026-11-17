@@ -323,9 +323,12 @@ export function TemplatesPage() {
         <div className="grid grid--4 grid--gallery grid--admin-5">
           {shown.map((template) => (
             <article className="tpl-card" key={template.id}>
-              <div
+              {/* الضغط على الصورة بيفتح المحرر على طول */}
+              <Link
+                to={appPath(template.editorUrl)}
                 className="tpl-cover"
                 style={template.cover ? { backgroundImage: `url('${template.cover}')` } : undefined}
+                aria-label={template.name}
               >
                 {!template.cover && template.name.slice(0, 1)}
                 {(!template.isActive || template.blocks === 0) && (
@@ -334,7 +337,7 @@ export function TemplatesPage() {
                     {template.blocks === 0 && <Pill kind="archived">{t('dashboard.templates.empty')}</Pill>}
                   </div>
                 )}
-              </div>
+              </Link>
               <div className="tpl-body">
                 <h3>
                   <InlineEdit

@@ -2238,3 +2238,6 @@ html[lang='en'] .dash-root .tpl-meta {
     height: 45px;
   }
 }
+
+/* غلاف القالب رابط: من غير خط تحت، وبإيد الضغط */
+.dash-root a.tpl-cover { text-decoration: none; cursor: pointer; }
