@@ -49,12 +49,12 @@ class HomeApiTests(PublicApiTestCase):
         self.assertEqual(data["plans"][0]["bulletsEn"], ["a", "b"])
         self.assertEqual(data["faqs"][0]["questionEn"], "q?")
 
-    def test_home_templates_active_only_and_capped_at_twelve(self):
+    def test_home_templates_active_only_and_not_capped(self):
         for i in range(14):
             Template.objects.create(name=f"قالب {i}")
         Template.objects.create(name="مخفي", is_active=False)
         names = [t["name"] for t in self.client.get("/api/v1/public/home/").json()["templates"]]
-        self.assertEqual(len(names), public.HOME_TEMPLATES)
+        self.assertEqual(len(names), 14)
         self.assertNotIn("مخفي", names)
 
     def test_home_hides_inactive_plans_and_faqs(self):
