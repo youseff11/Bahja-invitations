@@ -22,7 +22,10 @@ const PHONE_H = 720
 /** أزرار المعاينة اللي بتخرّج برّه (رجوع، نسخ الرابط، شريط التواصل، التمرير التلقائي) بتستخبى جوه التلفون بس */
 const HIDE_IN_PHONE =
   '.lb-back,.lb-share-fab,.lb-cta,.lb-autoscroll{display:none!important}' +
-  'html{scrollbar-width:none}html::-webkit-scrollbar{display:none}'
+  'html{scrollbar-width:none}html::-webkit-scrollbar{display:none}' +
+  // المسافة اللي المعاينة بتسيبها تحت عشان شريط التواصل — الشريط مستخبي هنا، فآخر حاجة تبقى «صُممت بواسطة بهجة»
+  '.lb-doc .lb-stage{margin-block-end:0!important}' +
+  '.lb-doc .lb-music,.lb-doc .lb-autoscroll{inset-block-end:18px!important}.lb-doc .lb-intro-play{translate:none!important}'
 
 const previewPath = (slug: string) => `/templates/${slug}/preview/`
 
