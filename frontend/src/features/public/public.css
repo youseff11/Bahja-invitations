@@ -2428,7 +2428,7 @@ a.tpl-cover { text-decoration: none; cursor: pointer; }
     0 0 120px -30px color-mix(in srgb, var(--accent) 45%, transparent);
 }
 .cmp-island { position: absolute; top: 20px; left: 50%; z-index: 3; width: 84px; height: 24px; margin-left: -42px; border-radius: 14px; background: #070203; pointer-events: none; }
-.cmp-screen { position: relative; width: 100%; aspect-ratio: 390 / 844; overflow: hidden; border-radius: 36px; background: #fbf7f3; }
+.cmp-screen { position: relative; width: 100%; aspect-ratio: 390 / 720; overflow: hidden; border-radius: 36px; background: #fbf7f3; }
 .cmp-frame { position: absolute; left: 0; top: 0; border: 0; transform-origin: 0 0; background: #fff; }
 .cmp-loading {
   position: absolute; inset: 0; z-index: 2; display: grid; place-items: center; pointer-events: none;

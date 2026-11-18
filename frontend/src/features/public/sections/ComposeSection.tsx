@@ -12,7 +12,7 @@ import type { ComposeTemplate, PublicTemplate } from '../types'
  */
 
 const PHONE_W = 390 // عرض الشاشة اللي القالب بيترسم عليه جوه التلفون (زي الموبايل بالظبط)
-const PHONE_H = 844
+const PHONE_H = 720 // ارتفاع شاشة المتصفح الحقيقي على التلفون بعد شريط العنوان؛ الأقسام متصممة عليه
 const HIDE_IN_PHONE = '.lb-back,.lb-share-fab,.lb-cta,.lb-autoscroll{display:none!important}'
 
 const previewUrl = (slug: string) => `/templates/${slug}/preview/`
