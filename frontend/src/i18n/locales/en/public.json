@@ -69,6 +69,7 @@
     "title": "Try your invitation before you choose",
     "sub": "Every template runs right here on the phone exactly as your guests will see it: the intro, the motion, the music and every section.",
     "tip": "Tap inside the phone and scroll down to see every section",
+    "swipe": "Swipe to see all {{count}} templates",
     "pick": "Choose a template",
     "prev": "Previous template",
     "next": "Next template",

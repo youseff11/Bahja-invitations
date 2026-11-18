@@ -2489,10 +2489,37 @@ a.tpl-cover { text-decoration: none; cursor: pointer; }
 @media (max-width: 980px) {
   .sc { grid-template-columns: minmax(0, 1fr); gap: 22px; margin-top: 0; }
   .sc-panel { display: contents; }
+  .sc-rail-wrap { order: 0; position: relative; margin-inline: -16px; }
   .sc-rail {
-    order: 0; display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none;
-    margin-inline: -16px; padding: 4px 16px 8px;
+    display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none;
+    padding: 4px 16px 8px;
   }
+  /* الطرف اللي وراه كروت مستخبية بيبهت، فالكارت المقصوص بيقول «فيه كمان» */
+  .sc-rail-wrap.is-left .sc-rail { -webkit-mask-image: linear-gradient(to right, transparent, #000 16%); mask-image: linear-gradient(to right, transparent, #000 16%); }
+  .sc-rail-wrap.is-right .sc-rail { -webkit-mask-image: linear-gradient(to left, transparent, #000 16%); mask-image: linear-gradient(to left, transparent, #000 16%); }
+  .sc-rail-wrap.is-left.is-right .sc-rail {
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent);
+    mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent);
+  }
+  .sc-rail-btn {
+    all: unset; box-sizing: border-box; position: absolute; top: 50%; z-index: 2; display: grid; place-items: center;
+    width: 36px; height: 36px; margin-top: -32px; border-radius: 50%; cursor: pointer;
+    background: color-mix(in srgb, var(--surface) 94%, transparent); color: var(--accent);
+    border: 1px solid color-mix(in srgb, var(--sc-gold) 50%, var(--line));
+    box-shadow: 0 8px 20px -10px rgba(60, 10, 25, .55);
+    opacity: 0; pointer-events: none; transition: opacity .25s ease, transform .25s ease;
+  }
+  .sc-rail-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+  .sc-rail-btn--left { left: 6px; }
+  .sc-rail-btn--right { right: 6px; }
+  .sc-rail-wrap.is-left .sc-rail-btn--left, .sc-rail-wrap.is-right .sc-rail-btn--right { opacity: 1; pointer-events: auto; }
+  .sc-rail-wrap.is-left .sc-rail-btn--left { animation: sc-hint-l 1.6s ease-in-out 1.2s 2; }
+  .sc-rail-wrap.is-right .sc-rail-btn--right { animation: sc-hint-r 1.6s ease-in-out 1.2s 2; }
+  @keyframes sc-hint-r { 50% { transform: translateX(4px); } }
+  @keyframes sc-hint-l { 50% { transform: translateX(-4px); } }
+  .sc-rail-bar { position: relative; width: 84px; height: 3px; margin: 2px auto 0; border-radius: 3px; background: color-mix(in srgb, var(--sc-gold) 22%, transparent); overflow: hidden; }
+  .sc-rail-bar span { position: absolute; top: 0; bottom: 0; border-radius: 3px; background: var(--accent); transition: inset-inline-start .15s linear; }
+  .sc-rail-hint { margin: 7px 0 0; text-align: center; font-size: 12.5px; color: var(--muted); }
   .sc-rail::-webkit-scrollbar { display: none; }
   /* لو الكروت قليلة تتسنتر، ولو كتير تتسحب عادي من أولها */
   .sc-card:first-child { margin-inline-start: auto; }
@@ -2516,6 +2543,6 @@ a.tpl-cover { text-decoration: none; cursor: pointer; }
   .sc-arrow--next { inset-inline-end: -4px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .sc-card, .sc-loading, .sc-arrow { transition: none !important; }
+  .sc-card, .sc-loading, .sc-arrow, .sc-rail-btn { transition: none !important; animation: none !important; }
   .sc-spin { animation-duration: 2s; }
 }
