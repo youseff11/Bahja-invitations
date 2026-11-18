@@ -2457,7 +2457,8 @@ a.tpl-cover { text-decoration: none; cursor: pointer; }
 .sc-name { margin: 0; font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-weight: 600; font-size: clamp(34px, 3.6vw, 48px); line-height: 1.05; color: var(--accent); }
 .sc-cat { margin: 0; font-size: 13px; letter-spacing: .04em; color: var(--muted); }
 .sc-desc { margin: 2px 0 0; max-width: 46ch; color: var(--muted); line-height: 1.75; }
-.sc-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+.sc-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: -4px; }
+.sc-tip--below { display: none; }
 
 .sc-rail { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; }
 .sc-card {
@@ -2527,15 +2528,22 @@ a.tpl-cover { text-decoration: none; cursor: pointer; }
   .sc-card { flex: 0 0 104px; scroll-snap-align: center; padding: 4px; border-radius: 14px; }
   .sc-card:hover { transform: none; }
   .sc-card-name { font-size: 13.5px; }
-  .sc-stage { order: 1; position: relative; top: auto; justify-self: center; width: 100%; padding-inline: 0; }
+  .sc-stage { order: 2; position: relative; top: auto; justify-self: center; width: 100%; padding-inline: 0; }
   .sc-phone { width: min(300px, 70vw); border-radius: 44px; }
   .sc-screen { border-radius: 34px; }
   .sc-arrow { width: 38px; height: 38px; }
   .sc-arrow--prev { inset-inline-start: max(0px, calc(50% - min(150px, 35vw) - 48px)); }
   .sc-arrow--next { inset-inline-end: max(0px, calc(50% - min(150px, 35vw) - 48px)); }
-  .sc-info { order: 2; justify-items: center; text-align: center; }
-  .sc-actions { justify-content: center; }
-  .sc-all { order: 3; justify-self: center; }
+  /* التلفون: الكروت ← الاسم والوصف ← التلفون ← الأزرار على طول ← التلميح ← كل القوالب */
+  .sc-info { order: 1; justify-items: center; text-align: center; gap: 4px; }
+  .sc-count { font-size: 15px; }
+  .sc-name { font-size: clamp(30px, 8.5vw, 40px); }
+  .sc-desc { font-size: 14.5px; line-height: 1.65; }
+  .sc-stage .sc-tip { display: none; }
+  .sc-actions { order: 3; justify-content: center; margin-top: -6px; }
+  .sc-actions .btn { flex: 1 1 0; min-width: 0; max-width: 220px; justify-content: center; }
+  .sc-tip--below { display: block; order: 4; margin-top: -10px; }
+  .sc-all { order: 5; justify-self: center; }
 }
 @media (max-width: 420px) {
   .sc-phone { width: 68vw; }
