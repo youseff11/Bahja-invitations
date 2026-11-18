@@ -2459,6 +2459,8 @@ a.tpl-cover { text-decoration: none; cursor: pointer; }
 .sc-desc { margin: 2px 0 0; max-width: 46ch; color: var(--muted); line-height: 1.75; }
 .sc-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: -4px; }
 .sc-tip--below { display: none; }
+/* القسم اللي بعده ليه حشو من فوق، فهنا بنقلّل الحشو اللي تحت عشان الفراغ مايتضاعفش */
+.section--showcase { padding-bottom: 36px; }
 
 .sc-rail { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; }
 .sc-card {
@@ -2543,9 +2545,10 @@ a.tpl-cover { text-decoration: none; cursor: pointer; }
   .sc-cat, .sc-desc { display: none; }
   .sc-rail-hint { margin-top: 4px; font-size: 12px; }
   .sc-stage .sc-tip { display: none; }
-  .sc-actions { order: 3; justify-content: center; gap: 8px; margin-top: -2px; }
+  .section--showcase { padding-bottom: 8px; }
+  .sc-actions { order: 3; justify-content: center; gap: 8px; margin-top: 8px; }
   .sc-actions .btn { flex: 0 1 auto; min-width: 0; padding: 8px 16px; font-size: 13px; justify-content: center; }
-  .sc-tip--below { display: block; order: 4; margin-top: -10px; }
+  .sc-tip--below { display: block; order: 4; margin-top: -6px; }
   .sc-all { order: 5; justify-self: center; }
 }
 @media (max-width: 420px) {
