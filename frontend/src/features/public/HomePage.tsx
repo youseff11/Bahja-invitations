@@ -7,6 +7,7 @@ import { savedScroll } from '@/lib/scrollMemory'
 import { useDocumentTitle } from '@/lib/useDocumentTitle'
 import { FxSky } from './fx'
 import { usePublicHome } from './hooks'
+import { ComposeSection } from './sections/ComposeSection'
 import { CtaSection } from './sections/CtaSection'
 import { FaqSection } from './sections/FaqSection'
 import { FeaturesSection } from './sections/FeaturesSection'
@@ -113,6 +114,7 @@ export function HomePage() {
         mobileColumns={site.templatesMobileColumns}
       />
       <FeaturesSection />
+      <ComposeSection />
       {site.plansPublic && <PlansSection site={site} plans={home.data?.plans} />}
       <StepsSection />
       {SHOW_ORDER_FORM && site.ordersEnabled && <OrderSection site={site} />}

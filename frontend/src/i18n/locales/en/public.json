@@ -64,6 +64,15 @@
     "calendar": { "title": "Save the Date", "text": "Adds the event to a guest's calendar" },
     "venueQr": { "title": "Entry Pass", "text": "A quicker, tidier welcome at the door" }
   },
+  "compose": {
+    "eyebrow": "Mix & match",
+    "title": "Design it your way",
+    "sub": "Take the intro from one template, the verse from another and the countdown from a third. We bring them together into one invitation that feels like you.",
+    "yours": "Your invitation",
+    "from": "from",
+    "cta": "Browse the templates",
+    "parts": { "intro": "Intro", "ayah": "Verse", "countdown": "Countdown", "calendar": "Date", "rsvp": "RSVP", "closing": "Closing", "location": "Venue" }
+  },
   "plans": {
     "eyebrow": "Pricing",
     "title": "Packages with published prices",
