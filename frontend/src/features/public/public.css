@@ -503,11 +503,9 @@ html[lang="en"] .plan-badge { letter-spacing: .1em; }
   }
   #templates .tpl-cover { aspect-ratio: 1 / 1; }
 
-  /* الجسم بارتفاع ثابت عشان كل الكروت تطلع بنفس الطول حتى لو
-     الوصف ناقص أو الاسم بيلف على سطرين. */
+  /* من غير وصف: الجسم صغير والصورة هي اللي واخدة الكارت. */
   #templates .tpl-body {
-    padding: 16px 12px 12px;
-    min-height: 190px;
+    padding: 14px 10px 10px;
     gap: 5px;
   }
   #templates .tpl-body h3 {
@@ -1471,7 +1469,7 @@ html[lang="en"] .feature-en { display: inline; }
    محصور في ‎#templates‎: نفس الكارت بيتستعمل في المعرض ولوحة التحكم.
    إطار داخلي رفيع بلون الذهبي/العنابي، نص متمركز، فاصل زخرفي، وزر بإطار. */
 #templates .tpl-card {
-  position: relative; padding: 13px 13px 10px; border-radius: 28px; text-align: center;
+  position: relative; padding: 9px 9px 8px; border-radius: 26px; text-align: center;
   background: linear-gradient(180deg, var(--surface), color-mix(in srgb, var(--surface-2) 60%, var(--surface)));
   border: 1px solid color-mix(in srgb, var(--accent) 20%, var(--line));
   box-shadow: 0 34px 60px -44px color-mix(in srgb, var(--accent) 60%, rgba(23, 19, 15, .5)),
@@ -1479,17 +1477,17 @@ html[lang="en"] .feature-en { display: inline; }
 }
 /* الإطار الداخلي */
 #templates .tpl-card::before {
-  content: ""; position: absolute; inset: 6px; border-radius: 22px; pointer-events: none; z-index: 1;
+  content: ""; position: absolute; inset: 4px; border-radius: 22px; pointer-events: none; z-index: 1;
   border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
   transition: border-color .3s ease, inset .3s ease;
 }
 #templates .tpl-card:hover { border-color: color-mix(in srgb, var(--accent) 55%, var(--line)); }
-#templates .tpl-card:hover::before { border-color: color-mix(in srgb, var(--accent) 65%, transparent); inset: 4px; }
+#templates .tpl-card:hover::before { border-color: color-mix(in srgb, var(--accent) 65%, transparent); inset: 3px; }
 
 #templates .tpl-cover {
-  overflow: hidden; border-radius: 18px;
+  overflow: hidden; border-radius: 19px;
   background-size: 100% 100%; background-position: center;
-  box-shadow: 0 18px 34px -22px rgba(30, 14, 20, .55);
+  box-shadow: 0 22px 40px -22px rgba(30, 14, 20, .6);
 }
 #templates .tpl-cover { transition: background-size .9s cubic-bezier(.22, .8, .3, 1); }
 #templates .tpl-card:hover .tpl-cover { background-size: 107% 107%; }
@@ -1502,8 +1500,8 @@ html[lang="en"] .feature-en { display: inline; }
 }
 #templates .tpl-card:hover .tpl-cover::before { inset-inline-start: 120%; transition: inset-inline-start .85s ease; }
 
-#templates .tpl-body { align-items: center; padding: 22px 16px 14px; gap: 7px; }
-#templates .tpl-body h3 { font-family: var(--font-display); font-size: 21px; font-weight: 700; line-height: 1.3; }
+#templates .tpl-body { align-items: center; padding: 16px 12px 10px; gap: 6px; }
+#templates .tpl-body h3 { font-family: var(--font-display); font-size: 20px; font-weight: 700; line-height: 1.3; }
 #templates .tpl-meta {
   font-size: 12.5px; color: var(--accent); font-weight: 600;
   padding: 3px 14px; border-radius: 999px; background: var(--accent-soft);
@@ -1520,7 +1518,7 @@ html[lang="en"] .feature-en { display: inline; }
 #templates .tpl-orn i { width: 6px; height: 6px; background: var(--accent); transform: rotate(45deg); }
 #templates .tpl-desc { margin: 0; font-size: 14px; line-height: 1.7; color: var(--muted); max-width: 30ch; }
 
-#templates .tpl-actions { justify-content: center; padding-top: 14px; }
+#templates .tpl-actions { justify-content: center; padding-top: 10px; }
 #templates .tpl-actions .btn--gold {
   background: transparent; color: var(--accent); border: 1px solid var(--accent);
   border-radius: 999px; padding: 10px 26px; gap: 10px; font-weight: 600;

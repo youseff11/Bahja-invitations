@@ -57,20 +57,17 @@ function Meta({ template }: { template: PublicTemplate }) {
   )
 }
 
-/** كارت القالب في الرئيسية: زرار واحد بيفتح معاينة القالب. */
+/** كارت القالب في الرئيسية: الصورة هي البطل — اسم وتصنيف وزرار معاينة، من غير وصف. */
 export function HomeTemplateCard({ template }: { template: PublicTemplate }) {
   const { t } = useTranslation()
   const lang = useLang()
   const name = pick(lang, template.name, template.nameEn)
-  const hasDescription = !!(template.description || template.descriptionEn)
   return (
     <article className="tpl-card" data-reveal data-reveal-stagger>
       <Cover template={template} name={name} />
       <div className="tpl-body">
         <h3>{name}</h3>
         <Meta template={template} />
-        <span className="tpl-orn" aria-hidden="true"><i /></span>
-        {hasDescription && <p className="tpl-desc">{pick(lang, template.description, template.descriptionEn)}</p>}
         <div className="tpl-actions">
           <Link className="btn btn--gold btn--sm" to={previewPath(template)} {...warmProps(template)}>
             {t('public.templates.preview')}
