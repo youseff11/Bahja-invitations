@@ -2535,13 +2535,16 @@ a.tpl-cover { text-decoration: none; cursor: pointer; }
   .sc-arrow--prev { inset-inline-start: max(0px, calc(50% - min(150px, 35vw) - 48px)); }
   .sc-arrow--next { inset-inline-end: max(0px, calc(50% - min(150px, 35vw) - 48px)); }
   /* التلفون: الكروت ← الاسم والوصف ← التلفون ← الأزرار على طول ← التلميح ← كل القوالب */
-  .sc-info { order: 1; justify-items: center; text-align: center; gap: 4px; }
-  .sc-count { font-size: 15px; }
-  .sc-name { font-size: clamp(30px, 8.5vw, 40px); }
-  .sc-desc { font-size: 14.5px; line-height: 1.65; }
+  /* مضغوط: الاسم بس فوق التلفون، عشان الكروت تفضل قريبة منه */
+  .sc { gap: 14px; }
+  .sc-info { order: 1; display: flex; align-items: baseline; justify-content: center; gap: 10px; text-align: center; }
+  .sc-count { font-size: 13px; }
+  .sc-name { font-size: clamp(24px, 7vw, 32px); }
+  .sc-cat, .sc-desc { display: none; }
+  .sc-rail-hint { margin-top: 4px; font-size: 12px; }
   .sc-stage .sc-tip { display: none; }
-  .sc-actions { order: 3; justify-content: center; margin-top: -6px; }
-  .sc-actions .btn { flex: 1 1 0; min-width: 0; max-width: 220px; justify-content: center; }
+  .sc-actions { order: 3; justify-content: center; gap: 8px; margin-top: -2px; }
+  .sc-actions .btn { flex: 0 1 auto; min-width: 0; padding: 8px 16px; font-size: 13px; justify-content: center; }
   .sc-tip--below { display: block; order: 4; margin-top: -10px; }
   .sc-all { order: 5; justify-self: center; }
 }
