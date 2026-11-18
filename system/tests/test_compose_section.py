@@ -6,6 +6,8 @@ from system.models import SiteSetting, Template
 from system.tests.test_api_dashboard import BASE, DashboardApiCase
 
 PIECES = {"intro": "/media/assets/a/intro.webp", "ayah": "/media/assets/a/ayah.webp"}
+STORED = {"intro": {"src": "/media/assets/a/intro.webp", "on": "any"},
+          "ayah": {"src": "/media/assets/a/ayah.webp", "on": "any"}}
 
 
 class ComposePiecesTests(DashboardApiCase):
@@ -14,7 +16,20 @@ class ComposePiecesTests(DashboardApiCase):
                         {"composePieces": {**PIECES, "rsvp": ""}})
         self.assertEqual(res.status_code, 200)
         self.template.refresh_from_db()
-        self.assertEqual(self.template.compose_pieces, PIECES)
+        self.assertEqual(self.template.compose_pieces, STORED)
+
+    def test_patch_saves_background_and_tones(self):
+        body = {"background": {"src": "/media/bg.webp", "tone": "dark"},
+                "ayah": {"src": "/media/a.webp", "on": "dark"}}
+        res = self.send("PATCH", f"{BASE}/templates/{self.template.pk}/", {"composePieces": body})
+        self.assertEqual(res.status_code, 200)
+        self.template.refresh_from_db()
+        self.assertEqual(self.template.compose_pieces, body)
+
+    def test_patch_rejects_bad_tone(self):
+        res = self.send("PATCH", f"{BASE}/templates/{self.template.pk}/",
+                        {"composePieces": {"ayah": {"src": "/media/a.webp", "on": "purple"}}})
+        self.assertEqual(res.status_code, 400)
 
     def test_patch_rejects_unknown_part_and_bad_url(self):
         bad_part = self.send("PATCH", f"{BASE}/templates/{self.template.pk}/",
@@ -65,4 +80,16 @@ class ComposeHomeTests(DashboardApiCase):
         Template.objects.create(name="أ", slug="a", compose_pieces=PIECES)
         data = self.home()
         self.assertEqual([t["slug"] for t in data], ["a"])
-        self.assertEqual(data[0]["pieces"], PIECES)
+        self.assertEqual(data[0]["pieces"], STORED)
+        self.assertIsNone(data[0]["background"])
+
+    def test_background_is_split_from_pieces(self):
+        Template.objects.create(name="ب", slug="bg", compose_pieces={
+            "background": {"src": "/media/bg.webp", "tone": "light"}, "rsvp": {"src": "/media/r.webp", "on": "light"}})
+        data = self.home()
+        self.assertEqual(data[0]["background"], {"src": "/media/bg.webp", "tone": "light"})
+        self.assertEqual(data[0]["pieces"], {"rsvp": {"src": "/media/r.webp", "on": "light"}})
+
+    def test_template_with_only_background_is_skipped(self):
+        Template.objects.create(name="ج", slug="onlybg", compose_pieces={"background": {"src": "/media/bg.webp", "tone": "light"}})
+        self.assertEqual(self.home(), [])

@@ -62,7 +62,10 @@ export interface ComposeTemplate {
   id: number
   slug: string
   name: string
-  pieces: Partial<Record<ComposePart, string>>
+  /** خلفية القالب لوحدها: لما افتتاحيته تتختار، بقية الدعوة بتتعرض عليها */
+  background: { src: string; tone: 'light' | 'dark' } | null
+  /** كل جزء صورة شفافة؛ ‎on‎ = الخلفية اللي بيبان عليها */
+  pieces: Partial<Record<ComposePart, { src: string; on: 'any' | 'light' | 'dark' }>>
 }
 export type ComposePart = 'intro' | 'ayah' | 'invite' | 'countdown' | 'calendar' | 'program' | 'location' | 'rsvp' | 'closing'
 

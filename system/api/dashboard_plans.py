@@ -14,7 +14,8 @@ from django.urls import path, reverse
 
 from .. import blocks as blocks_engine
 from ..forms import PlanAddonForm, SiteSettingForm
-from ..models import COMPOSE_PARTS, Plan, PlanAddon, SiteSetting, Template
+from .. import compose
+from ..models import Plan, PlanAddon, SiteSetting, Template
 from .dashboard_common import (
     money,
     number_input_value,
@@ -189,10 +190,9 @@ def _compose_state(cfg: SiteSetting) -> dict:
     rows = []
     for t in Template.objects.only("id", "name", "name_en", "is_active", "compose_pieces",
                                    "cover_image", "cover_url").order_by("-created_at"):
-        raw = t.compose_pieces if isinstance(t.compose_pieces, dict) else {}
-        parts = [k for k in COMPOSE_PARTS if isinstance(raw.get(k), str) and raw.get(k)]
-        rows.append({"id": t.pk, "name": t.name, "isActive": t.is_active, "parts": parts,
-                     "intro": raw.get("intro") or "", "cover": t.cover_src or ""})
+        data = compose.read(t.compose_pieces)
+        rows.append({"id": t.pk, "name": t.name, "isActive": t.is_active, "parts": compose.parts(t.compose_pieces),
+                     "intro": (data.get("intro") or {}).get("src", ""), "cover": t.cover_src or ""})
     return {"selected": [i for i in (cfg.compose_template_ids or []) if isinstance(i, int)],
             "max": COMPOSE_MAX, "templates": rows}
 

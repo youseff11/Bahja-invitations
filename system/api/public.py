@@ -18,7 +18,8 @@ from django.urls import path
 from django.utils.datastructures import MultiValueDict
 
 from ..forms import OrderForm
-from ..models import COMPOSE_PARTS, FAQ, Plan, PlanAddon, SiteSetting, Template, NO_CATEGORY, category_choices
+from .. import compose
+from ..models import FAQ, Plan, PlanAddon, SiteSetting, Template, NO_CATEGORY, category_choices
 from .http import ApiError, api_view, client_hash, json_body, json_response
 from .serializers import site_payload, template_card
 
@@ -108,20 +109,18 @@ def _gallery_categories(labels: dict) -> list[dict]:
 
 def _compose_payload(templates: list[Template]) -> list[dict]:
     """قوالب قسم «اعملوا دعوتكم بذوقكم»: اللي اختارها الأدمن بالترتيب، أو أول ٦ ليهم حتت."""
-    def pieces(t: Template) -> dict:
-        raw = t.compose_pieces if isinstance(t.compose_pieces, dict) else {}
-        return {k: str(raw[k]) for k in COMPOSE_PARTS if isinstance(raw.get(k), str) and raw.get(k)}
-
     by_id = {t.pk: t for t in templates}
     ids = SiteSetting.load().compose_template_ids or []
     chosen = [by_id[i] for i in ids if isinstance(i, int) and i in by_id]
     if not ids:
-        chosen = [t for t in templates if pieces(t)][:6]
+        chosen = [t for t in templates if compose.parts(t.compose_pieces)][:6]
     out = []
     for t in chosen:
-        p = pieces(t)
-        if p:
-            out.append({"id": t.pk, "slug": t.slug, "name": t.display_name, "pieces": p})
+        data = compose.read(t.compose_pieces)
+        background = data.pop("background", None)
+        if data:
+            out.append({"id": t.pk, "slug": t.slug, "name": t.display_name,
+                        "background": background, "pieces": data})
     return out
 
 
