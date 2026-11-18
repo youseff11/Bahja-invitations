@@ -44,7 +44,7 @@ export function GalleryPage() {
               </Link>
             ))}
           </ScrollChips>
-          <div className="grid grid--4 grid--gallery">
+          <div className="grid grid--4 grid--gallery gallery-grid">
             {results?.map((template) => <GalleryTemplateCard key={template.id} template={template} />)}
             {results?.length === 0 && <p className="empty">{t('public.gallery.empty')}</p>}
             {gallery.isError && (
