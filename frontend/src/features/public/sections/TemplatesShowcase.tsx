@@ -7,6 +7,7 @@ import type { SiteInfo } from '@/api/types'
 import { warmPreview } from '@/features/invite/previewPrefetch'
 import { useHistoryState } from '@/lib/useHistoryState'
 import { pick, useLang } from '../text'
+import { DynamicIsland } from './DynamicIsland'
 import type { ComposeTemplate, PublicTemplate } from '../types'
 
 /**
@@ -21,7 +22,8 @@ const PHONE_W = 390
 const PHONE_H = 720
 /** أزرار المعاينة اللي بتخرّج برّه (رجوع، نسخ الرابط، شريط التواصل، التمرير التلقائي) بتستخبى جوه التلفون بس */
 const HIDE_IN_PHONE =
-  '.lb-back,.lb-share-fab,.lb-cta,.lb-autoscroll{display:none!important}' +
+  '.lb-back,.lb-share-fab,.lb-cta,.lb-autoscroll,.lb-music{display:none!important}' +
+  // زرار المزيكا مستخبي: المشغّل بقى في الـ Dynamic Island (DynamicIsland.tsx)
   'html{scrollbar-width:none}html::-webkit-scrollbar{display:none}' +
   // المسافة اللي المعاينة بتسيبها تحت عشان شريط التواصل — الشريط مستخبي هنا، فآخر حاجة تبقى «صُممت بواسطة بهجة»
   '.lb-doc .lb-stage{margin-block-end:0!important}' +
@@ -49,6 +51,7 @@ export function TemplatesShowcase({ site, templates, chosen, error }: Props) {
   const [near, setNear] = useState(false)
   const [loading, setLoading] = useState(true)
   const [scale, setScale] = useState(0.7)
+  const [loaded, setLoaded] = useState(0)
   const section = useRef<HTMLElement>(null)
   const screen = useRef<HTMLDivElement>(null)
   const frame = useRef<HTMLIFrameElement>(null)
@@ -169,6 +172,7 @@ export function TemplatesShowcase({ site, templates, chosen, error }: Props) {
 
   function onFrameLoad() {
     setLoading(false)
+    setLoaded((n) => n + 1)
     try {
       const doc = frame.current?.contentDocument
       if (doc && !doc.getElementById('bahja-phone-hide')) {
@@ -214,7 +218,7 @@ export function TemplatesShowcase({ site, templates, chosen, error }: Props) {
                 </svg>
               </button>
               <div className="sc-phone">
-                <div className="sc-island" aria-hidden="true" />
+                <DynamicIsland key={current.slug} frame={frame} loaded={loaded} cover={current.cover} name={name} />
                 <div className="sc-screen" ref={screen}>
                   {near && (
                     <iframe
