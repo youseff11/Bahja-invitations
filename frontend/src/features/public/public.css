@@ -2383,83 +2383,138 @@ html[lang="en"] .nav--site .nav-cta { letter-spacing: .08em; font-size: 12.5px; 
 a.tpl-cover { text-decoration: none; cursor: pointer; }
 
 /* ================================================================
-   «جرّبوا القالب قبل ما تختاروه» (ComposeSection.tsx): تلفون في النص بيشغّل
-   معاينة القالب الحقيقية (iframe متصغّر)، وكروت القوالب على الجنبين.
+   عرض القوالب بالتلفون (TemplatesShowcase.tsx) — بديل شبكة الكروت لما الأدمن يختاره:
+   تلفون بيشغّل معاينة القالب الحقيقية (iframe 390×720 متصغّر)، وجنبه اسم القالب
+   وأزراره وكروت كل القوالب. على التلفون: الكروت شريط بيتسحب فوق، والتلفون في النص.
    ================================================================ */
-.section--compose {
-  --c-gold: #b08a4e; --c-gold-hi: #f1d9a8; --c-wine: #5a0f22;
+.section--showcase {
+  --sc-gold: #b08a4e; --sc-wine: #5a0f22;
   position: relative; overflow: hidden;
   background:
-    radial-gradient(60% 50% at 50% 55%, color-mix(in srgb, var(--accent) 9%, transparent), transparent 70%),
-    linear-gradient(180deg, transparent, color-mix(in srgb, var(--c-gold) 5%, transparent) 50%, transparent);
+    radial-gradient(55% 45% at 30% 50%, color-mix(in srgb, var(--accent) 8%, transparent), transparent 70%),
+    linear-gradient(180deg, transparent, color-mix(in srgb, var(--sc-gold) 5%, transparent) 50%, transparent);
 }
-.cmp {
-  display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center;
-  gap: clamp(22px, 4vw, 60px); max-width: 1180px; margin: 40px auto 0;
+.sc {
+  display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: start;
+  gap: clamp(36px, 5vw, 80px); max-width: 1180px; margin: 8px auto 0;
 }
-.cmp-side { display: grid; grid-template-columns: repeat(2, minmax(0, 170px)); gap: 16px; justify-content: center; }
 
-/* ---- كروت القوالب */
-.cmp-src {
-  all: unset; box-sizing: border-box; cursor: pointer; position: relative; display: grid; gap: 7px;
-  padding: 6px; border-radius: 16px; background: var(--surface);
-  border: 1px solid color-mix(in srgb, var(--c-gold) 28%, var(--line));
-  box-shadow: 0 14px 26px -22px rgba(60, 10, 25, .55);
-  transition: transform .25s cubic-bezier(.2, .8, .3, 1), border-color .25s ease, box-shadow .25s ease;
-}
-.cmp-src:hover { transform: translateY(-4px); border-color: color-mix(in srgb, var(--c-gold) 65%, var(--line)); }
-.cmp-src:focus-visible { outline: 2px solid var(--c-gold); outline-offset: 2px; }
-.cmp-src-img { display: block; aspect-ratio: 1 / 1; overflow: hidden; border-radius: 11px; background: var(--surface-2); }
-.cmp-src-img img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.cmp-src-name { padding: 0 4px 3px; text-align: center; direction: ltr; font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.cmp-src.is-active { border-color: var(--c-wine); box-shadow: 0 0 0 2px var(--c-wine), 0 18px 30px -20px rgba(60, 10, 25, .7); }
-.cmp-src.is-active .cmp-src-name { color: var(--accent); font-weight: 600; }
-
-/* ---- التلفون */
-.cmp-phone-wrap { display: grid; justify-items: center; gap: 14px; }
-.cmp-phone {
-  position: relative; width: clamp(260px, 24vw, 310px); padding: 10px; border-radius: 46px;
+/* ---- التلفون والأسهم */
+.sc-stage { position: sticky; top: 96px; display: grid; justify-items: center; gap: 16px; padding-inline: 56px; }
+.sc-phone {
+  position: relative; width: clamp(270px, 25vw, 320px); padding: 10px; border-radius: 48px;
   background: linear-gradient(145deg, #3a1a22, #12060a 45%, #2a1018);
   box-shadow:
-    0 0 0 1.5px color-mix(in srgb, var(--c-gold) 70%, transparent),
+    0 0 0 1.5px color-mix(in srgb, var(--sc-gold) 70%, transparent),
     0 0 0 7px color-mix(in srgb, var(--surface) 85%, transparent),
-    0 0 0 8px color-mix(in srgb, var(--c-gold) 30%, transparent),
+    0 0 0 8px color-mix(in srgb, var(--sc-gold) 30%, transparent),
     0 60px 90px -45px rgba(60, 10, 25, .75),
     0 0 120px -30px color-mix(in srgb, var(--accent) 45%, transparent);
 }
-.cmp-island { position: absolute; top: 20px; left: 50%; z-index: 3; width: 84px; height: 24px; margin-left: -42px; border-radius: 14px; background: #070203; pointer-events: none; }
-.cmp-screen { position: relative; width: 100%; aspect-ratio: 390 / 720; overflow: hidden; border-radius: 36px; background: #fbf7f3; }
-.cmp-frame { position: absolute; left: 0; top: 0; border: 0; transform-origin: 0 0; background: #fff; }
-.cmp-loading {
-  position: absolute; inset: 0; z-index: 2; display: grid; place-items: center; pointer-events: none;
-  opacity: 0; transition: opacity .35s ease;
-}
-.cmp-loading.is-on { opacity: 1; }
-.cmp-loading img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; filter: blur(2px) brightness(.92); }
-.cmp-spin {
-  position: relative; width: 34px; height: 34px; border-radius: 50%;
-  border: 2.5px solid rgba(255, 255, 255, .45); border-top-color: #fff; animation: cmp-spin .8s linear infinite;
-}
-@keyframes cmp-spin { to { transform: rotate(360deg); } }
-.cmp-now { font-size: 14px; color: var(--muted); }
-.cmp-now b { font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 19px; color: var(--accent); direction: ltr; }
-.cmp-tip { margin: 26px auto 0; text-align: center; font-size: 13.5px; color: var(--muted); }
+.sc-island { position: absolute; top: 19px; left: 50%; z-index: 3; width: 84px; height: 24px; margin-left: -42px; border-radius: 14px; background: #070203; pointer-events: none; }
+.sc-screen { position: relative; width: 100%; aspect-ratio: 390 / 720; overflow: hidden; border-radius: 38px; background: #fbf7f3; isolation: isolate; }
+.sc-frame { position: absolute; left: 0; top: 0; border: 0; transform-origin: 0 0; background: #fff; }
 
-/* ---- تابلت وتلفون: التلفون فوق والكروت صف بيتسحب بالعرض */
+/* التحميل: الغلاف كامل في النص فوق نسخة منه مغبّشة */
+.sc-loading {
+  position: absolute; inset: 0; z-index: 2; display: grid; place-items: center; pointer-events: none;
+  background: #f4ece6; opacity: 0; transition: opacity .4s ease;
+}
+.sc-loading.is-on { opacity: 1; }
+.sc-loading-bg { position: absolute; inset: -12%; width: 124%; height: 124%; object-fit: cover; filter: blur(18px) saturate(1.1) brightness(.9); }
+.sc-loading-fg {
+  position: absolute; top: 50%; left: 50%; width: 86%; aspect-ratio: 1; object-fit: cover;
+  transform: translate(-50%, -50%); border-radius: 18px;
+  box-shadow: 0 24px 40px -18px rgba(20, 5, 10, .6), 0 0 0 1px rgba(255, 255, 255, .5);
+}
+.sc-spin {
+  position: absolute; left: 50%; bottom: 13%; width: 30px; height: 30px; margin-left: -15px; border-radius: 50%;
+  border: 2.5px solid rgba(255, 255, 255, .45); border-top-color: #fff; animation: sc-spin .8s linear infinite;
+}
+@keyframes sc-spin { to { transform: rotate(360deg); } }
+
+.sc-arrow {
+  all: unset; box-sizing: border-box; position: absolute; top: calc(50% - 40px); z-index: 4; cursor: pointer;
+  display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%;
+  background: color-mix(in srgb, var(--surface) 92%, transparent); color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--sc-gold) 45%, var(--line));
+  box-shadow: 0 10px 24px -14px rgba(60, 10, 25, .6); transition: transform .2s ease, background .2s ease;
+}
+.sc-arrow svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+[dir="ltr"] .sc-arrow svg { transform: scaleX(-1); }
+.sc-arrow:hover { transform: scale(1.06); background: var(--surface); }
+.sc-arrow:focus-visible { outline: 2px solid var(--sc-gold); outline-offset: 2px; }
+.sc-arrow--prev { inset-inline-start: 0; }
+.sc-arrow--next { inset-inline-end: 0; }
+.sc-tip { margin: 0; font-size: 13px; color: var(--muted); text-align: center; }
+
+/* ---- اللوحة: اسم القالب وأزراره وكروت القوالب */
+.sc-panel { display: grid; gap: 28px; padding-top: 18px; }
+.sc-info { display: grid; gap: 8px; justify-items: start; }
+.sc-count { margin: 0; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 18px; letter-spacing: .12em; color: var(--sc-gold); direction: ltr; }
+.sc-count span { color: var(--muted); }
+.sc-name { margin: 0; font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-weight: 600; font-size: clamp(34px, 3.6vw, 48px); line-height: 1.05; color: var(--accent); }
+.sc-cat { margin: 0; font-size: 13px; letter-spacing: .04em; color: var(--muted); }
+.sc-desc { margin: 2px 0 0; max-width: 46ch; color: var(--muted); line-height: 1.75; }
+.sc-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+
+.sc-rail { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 14px; }
+.sc-card {
+  all: unset; box-sizing: border-box; cursor: pointer; display: grid; gap: 7px; padding: 5px; border-radius: 16px;
+  background: var(--surface); border: 1px solid color-mix(in srgb, var(--sc-gold) 25%, var(--line));
+  box-shadow: 0 14px 26px -22px rgba(60, 10, 25, .55);
+  transition: transform .25s cubic-bezier(.2, .8, .3, 1), border-color .25s ease, box-shadow .25s ease;
+}
+.sc-card:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--sc-gold) 60%, var(--line)); }
+.sc-card:focus-visible { outline: 2px solid var(--sc-gold); outline-offset: 2px; }
+.sc-card-img { position: relative; display: block; aspect-ratio: 1; overflow: hidden; border-radius: 12px; background: var(--surface-2); }
+.sc-card-img img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.sc-card-ph { display: grid; place-items: center; height: 100%; font-size: 30px; color: var(--accent); }
+.sc-new {
+  position: absolute; top: 7px; inset-inline-start: 7px; padding: 2px 8px; border-radius: 99px;
+  background: var(--sc-wine); color: #fff; font-size: 10.5px; letter-spacing: .04em;
+}
+.sc-card-name {
+  padding: 0 4px 3px; text-align: center; direction: ltr; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 15px;
+}
+.sc-card.is-active { border-color: var(--sc-wine); box-shadow: 0 0 0 2px var(--sc-wine), 0 18px 30px -20px rgba(60, 10, 25, .7); }
+.sc-card.is-active .sc-card-name { color: var(--accent); font-weight: 600; }
+.sc-all { justify-self: start; color: var(--accent); font-weight: 600; text-decoration: none; border-bottom: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); padding-bottom: 2px; }
+.sc-all:hover { border-bottom-color: var(--accent); }
+[dir="ltr"] .sc-all span { display: inline-block; transform: scaleX(-1); }
+
+/* ---- تابلت وتلفون: الكروت شريط فوق، التلفون في النص، والاسم والأزرار تحته */
 @media (max-width: 980px) {
-  .cmp { grid-template-columns: minmax(0, 1fr); gap: 20px; margin-top: 28px; }
-  .cmp-phone-wrap { order: 0; }
-  .cmp-phone { width: min(280px, 72vw); }
-  .cmp-side {
-    order: 1; display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none;
-    margin-inline: -16px; padding: 4px 16px 6px; justify-content: flex-start;
+  .sc { grid-template-columns: minmax(0, 1fr); gap: 22px; margin-top: 0; }
+  .sc-panel { display: contents; }
+  .sc-rail {
+    order: 0; display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none;
+    margin-inline: -16px; padding: 4px 16px 8px;
   }
-  .cmp-side + .cmp-phone-wrap + .cmp-side { margin-top: -10px; }
-  .cmp-side::-webkit-scrollbar { display: none; }
-  .cmp-src { flex: 0 0 132px; scroll-snap-align: center; }
-  .cmp-src:hover { transform: none; }
+  .sc-rail::-webkit-scrollbar { display: none; }
+  /* لو الكروت قليلة تتسنتر، ولو كتير تتسحب عادي من أولها */
+  .sc-card:first-child { margin-inline-start: auto; }
+  .sc-card:last-child { margin-inline-end: auto; }
+  .sc-card { flex: 0 0 104px; scroll-snap-align: center; padding: 4px; border-radius: 14px; }
+  .sc-card:hover { transform: none; }
+  .sc-card-name { font-size: 13.5px; }
+  .sc-stage { order: 1; position: relative; top: auto; justify-self: center; width: 100%; padding-inline: 0; }
+  .sc-phone { width: min(300px, 70vw); border-radius: 44px; }
+  .sc-screen { border-radius: 34px; }
+  .sc-arrow { width: 38px; height: 38px; }
+  .sc-arrow--prev { inset-inline-start: max(0px, calc(50% - min(150px, 35vw) - 48px)); }
+  .sc-arrow--next { inset-inline-end: max(0px, calc(50% - min(150px, 35vw) - 48px)); }
+  .sc-info { order: 2; justify-items: center; text-align: center; }
+  .sc-actions { justify-content: center; }
+  .sc-all { order: 3; justify-self: center; }
+}
+@media (max-width: 420px) {
+  .sc-phone { width: 68vw; }
+  .sc-arrow--prev { inset-inline-start: -4px; }
+  .sc-arrow--next { inset-inline-end: -4px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .cmp-src, .cmp-loading { transition: none !important; }
-  .cmp-spin { animation-duration: 2s; }
+  .sc-card, .sc-loading, .sc-arrow { transition: none !important; }
+  .sc-spin { animation-duration: 2s; }
 }

@@ -7,7 +7,6 @@ import { savedScroll } from '@/lib/scrollMemory'
 import { useDocumentTitle } from '@/lib/useDocumentTitle'
 import { FxSky } from './fx'
 import { usePublicHome } from './hooks'
-import { ComposeSection } from './sections/ComposeSection'
 import { CtaSection } from './sections/CtaSection'
 import { FaqSection } from './sections/FaqSection'
 import { FeaturesSection } from './sections/FeaturesSection'
@@ -17,6 +16,7 @@ import { PlansSection } from './sections/PlansSection'
 import { HomeFooter } from './sections/SiteFooter'
 import { StepsSection } from './sections/StepsSection'
 import { TemplatesSection } from './sections/TemplatesSection'
+import { TemplatesShowcase } from './sections/TemplatesShowcase'
 import { prefersReducedMotion } from './motion'
 import { pick, useLang } from './text'
 import { useReveal } from './useReveal'
@@ -107,14 +107,18 @@ export function HomePage() {
     <>
       <FxSky />
       <HeroSection hero={site.hero} />
-      <TemplatesSection
-        templates={home.data?.templates}
-        categories={home.data?.categories}
-        error={home.error}
-        mobileColumns={site.templatesMobileColumns}
-      />
+      {/* شكل قسم القوالب بيختاره الأدمن: تلفون بيشغّل القالب، أو شبكة الكروت القديمة */}
+      {site.templatesLayout === 'grid' ? (
+        <TemplatesSection
+          templates={home.data?.templates}
+          categories={home.data?.categories}
+          error={home.error}
+          mobileColumns={site.templatesMobileColumns}
+        />
+      ) : (
+        <TemplatesShowcase site={site} templates={home.data?.templates} chosen={home.data?.compose} error={home.error} />
+      )}
       <FeaturesSection />
-      <ComposeSection templates={home.data?.compose} gallery={home.data?.templates} />
       {site.plansPublic && <PlansSection site={site} plans={home.data?.plans} />}
       <StepsSection />
       {SHOW_ORDER_FORM && site.ordersEnabled && <OrderSection site={site} />}

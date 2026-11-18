@@ -2,6 +2,8 @@
 
 export type Lang = 'ar' | 'en'
 
+export type TemplatesLayout = 'showcase' | 'grid'
+
 export interface ApiUser {
   id: number
   username: string
@@ -25,6 +27,8 @@ export interface SiteInfo {
   translationEnabled: boolean
   /** عدد القوالب في الصف على التلفون في الرئيسية: ١ أو ٢ */
   templatesMobileColumns: 1 | 2
+  /** شكل عرض القوالب في الرئيسية: تلفون بيشغّل القالب، أو شبكة الكروت القديمة */
+  templatesLayout: TemplatesLayout
   whatsapp: {
     floatReady: boolean
     url: string

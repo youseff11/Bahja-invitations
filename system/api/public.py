@@ -108,19 +108,16 @@ def _gallery_categories(labels: dict) -> list[dict]:
 
 
 def _compose_payload(templates: list[Template]) -> list[dict]:
-    """قوالب قسم «اعملوا دعوتكم بذوقكم»: اللي اختارها الأدمن بالترتيب، أو أول ٦ ليهم حتت."""
+    """قوالب عرض التلفون في الرئيسية: اللي اختارها الأدمن بالترتيب (المفعّلة بس).
+    فاضية = الواجهة بتعرض كل القوالب المفعّلة. الحتت والخلفية اختيارية (للتصميمات الجاية)."""
     by_id = {t.pk: t for t in templates}
     ids = SiteSetting.load().compose_template_ids or []
-    chosen = [by_id[i] for i in ids if isinstance(i, int) and i in by_id]
-    if not ids:
-        chosen = [t for t in templates if compose.parts(t.compose_pieces)][:6]
     out = []
-    for t in chosen:
+    for t in (by_id[i] for i in ids if isinstance(i, int) and i in by_id):
         data = compose.read(t.compose_pieces)
         background = data.pop("background", None)
-        if data:
-            out.append({"id": t.pk, "slug": t.slug, "name": t.display_name,
-                        "background": background, "pieces": data})
+        out.append({"id": t.pk, "slug": t.slug, "name": t.display_name,
+                    "background": background, "pieces": data})
     return out
 
 

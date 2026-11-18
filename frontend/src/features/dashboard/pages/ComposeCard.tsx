@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import type { TemplatesLayout } from '@/api/types'
 import { useComposeSettings, useSaveComposeSettings } from '../api'
 import { useToast } from '../ui/Toast'
 
 /**
- * إعدادات قسم «اعملوا دعوتكم بذوقكم» في الرئيسية: الأدمن بيختار القوالب اللي تظهر
- * حوالين التلفون وبيرتّبها. القالب اللي مالوش حتت (لقطات) مايتختارش.
+ * عرض القوالب في الرئيسية: الأدمن بيختار الشكل (تلفون بيشغّل القالب أو شبكة الكروت القديمة)
+ * والقوالب اللي تظهر حوالين التلفون بالترتيب. مفيش اختيار = كل القوالب المفعّلة.
  */
 export function ComposeCard() {
   const { t } = useTranslation()
@@ -14,14 +15,16 @@ export function ComposeCard() {
   const { data } = useComposeSettings()
   const save = useSaveComposeSettings()
   const [picked, setPicked] = useState<number[]>([])
+  const [layout, setLayout] = useState<TemplatesLayout>('showcase')
 
   useEffect(() => {
-    if (data) setPicked(data.selected)
+    if (!data) return
+    setPicked(data.selected)
+    setLayout(data.layout)
   }, [data])
 
   if (!data) return null
   const byId = new Map(data.templates.map((row) => [row.id, row]))
-  const usable = data.templates.filter((row) => row.parts.length > 0)
   const full = picked.length >= data.max
 
   const toggle = (id: number) =>
@@ -36,7 +39,7 @@ export function ComposeCard() {
     })
 
   function onSave() {
-    save.mutate(picked, {
+    save.mutate({ templateIds: picked, layout }, {
       onSuccess: () => toast.success(t('dashboard.site.compose.saved')),
       onError: (error) => toast.fail(error),
     })
@@ -48,6 +51,19 @@ export function ComposeCard() {
       <p className="muted" style={{ fontSize: 13.5, marginTop: 0 }}>
         {t('dashboard.site.compose.body', { max: data.max })}
       </p>
+
+      <h3 className="compose-admin-sub">{t('dashboard.site.compose.layout')}</h3>
+      <div className="compose-admin-layouts" role="radiogroup" aria-label={t('dashboard.site.compose.layout')}>
+        {data.layouts.map((value) => (
+          <label key={value} className={'compose-admin-layout' + (layout === value ? ' is-on' : '')}>
+            <input type="radio" name="templatesLayout" value={value} checked={layout === value} onChange={() => setLayout(value)} />
+            <span>
+              <strong>{t(`dashboard.site.compose.layouts.${value}`)}</strong>
+              <small className="muted">{t(`dashboard.site.compose.layouts.${value}Hint`)}</small>
+            </span>
+          </label>
+        ))}
+      </div>
 
       <h3 className="compose-admin-sub">{t('dashboard.site.compose.order')}</h3>
       {picked.length === 0 ? (
@@ -87,7 +103,7 @@ export function ComposeCard() {
       <div className="compose-admin-grid">
         {data.templates.map((row) => {
           const on = picked.includes(row.id)
-          const disabled = row.parts.length === 0 || (!on && full)
+          const disabled = !on && full
           return (
             <button
               key={row.id}
@@ -95,20 +111,15 @@ export function ComposeCard() {
               className={'compose-admin-tile' + (on ? ' is-on' : '')}
               onClick={() => toggle(row.id)}
               disabled={disabled}
-              title={row.parts.length ? row.parts.join(' · ') : t('dashboard.site.compose.noPieces')}
             >
-              {row.intro || row.cover ? <img src={row.intro || row.cover} alt="" loading="lazy" /> : <span className="compose-admin-ph" />}
+              {row.cover || row.intro ? <img src={row.cover || row.intro} alt="" loading="lazy" /> : <span className="compose-admin-ph" />}
               <span className="compose-admin-name">{row.name}</span>
-              <small>
-                {row.parts.length
-                  ? t('dashboard.site.compose.parts', { count: row.parts.length })
-                  : t('dashboard.site.compose.noPieces')}
-              </small>
+              {!row.isActive && <small>{t('dashboard.site.compose.hidden')}</small>}
             </button>
           )
         })}
       </div>
-      {usable.length === 0 && <p className="muted">{t('dashboard.site.compose.none')}</p>}
+      {data.templates.length === 0 && <p className="muted">{t('dashboard.site.compose.none')}</p>}
 
       <div style={{ marginTop: 16 }}>
         <button type="button" className="btn btn--gold" onClick={onSave} disabled={save.isPending}>

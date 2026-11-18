@@ -183,7 +183,7 @@ def site(request):
     return _site_payload(cfg)
 
 
-COMPOSE_MAX = 8
+COMPOSE_MAX = 12
 
 
 def _compose_state(cfg: SiteSetting) -> dict:
@@ -194,12 +194,14 @@ def _compose_state(cfg: SiteSetting) -> dict:
         rows.append({"id": t.pk, "name": t.name, "isActive": t.is_active, "parts": compose.parts(t.compose_pieces),
                      "intro": (data.get("intro") or {}).get("src", ""), "cover": t.cover_src or ""})
     return {"selected": [i for i in (cfg.compose_template_ids or []) if isinstance(i, int)],
-            "max": COMPOSE_MAX, "templates": rows}
+            "max": COMPOSE_MAX, "layout": cfg.templates_layout,
+            "layouts": [value for value, _ in SiteSetting._meta.get_field("templates_layout").choices],
+            "templates": rows}
 
 
 @staff_api("GET", "PUT")
 def site_compose(request):
-    """قوالب قسم «اعملوا دعوتكم بذوقكم»: ‎PUT {templateIds: [..]}‎ بالترتيب."""
+    """عرض القوالب في الرئيسية: ‎PUT {templateIds: [..], layout?: "showcase"|"grid"}‎."""
     cfg = SiteSetting.load()
     if request.method == "PUT":
         data = json_body(request)
@@ -213,8 +215,16 @@ def site_compose(request):
         missing = [i for i in ids if i not in known]
         if missing:
             raise ApiError(400, "validation_error", f"قوالب مش موجودة: {missing}")
+        fields = ["compose_template_ids"]
+        layout = data.get("layout")
+        if layout is not None:
+            allowed = [value for value, _ in SiteSetting._meta.get_field("templates_layout").choices]
+            if layout not in allowed:
+                raise ApiError(400, "validation_error", f"شكل العرض لازم يكون واحد من: {allowed}")
+            cfg.templates_layout = layout
+            fields.append("templates_layout")
         cfg.compose_template_ids = ids
-        cfg.save(update_fields=["compose_template_ids"])
+        cfg.save(update_fields=fields)
     return _compose_state(cfg)
 
 

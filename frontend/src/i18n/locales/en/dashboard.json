@@ -594,18 +594,23 @@
     "saved": "Settings saved.",
     "reviewData": "Check the data — a field is missing or wrong.",
     "compose": {
-      "title": "\"Design it your way\" section on the home page",
-      "body": "Choose which templates' pieces (intro, verse, countdown…) appear around the phone, and set their order. Up to {{max}} templates. Templates without captured pieces can't be picked.",
-      "order": "Order",
-      "auto": "Nothing chosen — the section shows the first templates that have pieces.",
+      "title": "Templates on the home page",
+      "body": "Choose how the templates section after the hero looks, and which templates appear around the phone, in order (up to {{max}}).",
+      "layout": "Layout",
+      "layouts": {
+        "showcase": "Live phone showcase",
+        "showcaseHint": "Visitors pick a template and try it live inside a phone, with the templates around it.",
+        "grid": "Card grid (the old look)",
+        "gridHint": "Template cards with categories and a preview button on each."
+      },
+      "order": "Phone templates, in order",
+      "auto": "Nothing chosen — the phone shows every active template in gallery order.",
       "available": "Templates",
       "hidden": "(hidden — won't show)",
       "remove": "Remove",
-      "noPieces": "No pieces yet",
-      "parts": "{{count}} pieces",
-      "none": "No templates have pieces yet.",
-      "save": "Save section",
-      "saved": "Saved — the home page section is updated."
+      "none": "No templates yet.",
+      "save": "Save",
+      "saved": "Saved — the home page is updated."
     }
   },
   "analytics": {

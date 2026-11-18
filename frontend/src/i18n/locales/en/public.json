@@ -64,13 +64,18 @@
     "calendar": { "title": "Save the Date", "text": "Adds the event to a guest's calendar" },
     "venueQr": { "title": "Entry Pass", "text": "A quicker, tidier welcome at the door" }
   },
-  "compose": {
-    "eyebrow": "Try it yourself",
-    "title": "Try a template before you choose",
-    "sub": "Pick any template and watch it run on the phone exactly as your guests will see it: the intro, the motion and the scroll.",
-    "tip": "Tap inside the phone to try the invitation, and scroll to see every section.",
-    "now": "Now showing",
-    "open": "Open full size"
+  "showcase": {
+    "eyebrow": "Designs",
+    "title": "Try your invitation before you choose",
+    "sub": "Every template runs right here on the phone exactly as your guests will see it: the intro, the motion, the music and every section.",
+    "tip": "Tap inside the phone and scroll down to see every section",
+    "pick": "Choose a template",
+    "prev": "Previous template",
+    "next": "Next template",
+    "order": "Order on WhatsApp",
+    "orderMessage": "Hello, I love the {{name}} template and would like to order it",
+    "open": "Open full size",
+    "all": "See all templates"
   },
   "plans": {
     "eyebrow": "Pricing",

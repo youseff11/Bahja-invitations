@@ -1,5 +1,7 @@
 /** أشكال بيانات ‎/api/v1/dashboard/‎ — بتتطابق مع system/api/dashboard*.py. */
 
+import type { TemplatesLayout } from '@/api/types'
+
 export interface Choice {
   value: string
   label: string
@@ -311,5 +313,7 @@ export interface SiteResponse {
 export interface ComposeSettings {
   selected: number[]
   max: number
+  layout: TemplatesLayout
+  layouts: TemplatesLayout[]
   templates: { id: number; name: string; isActive: boolean; parts: string[]; intro: string; cover: string }[]
 }

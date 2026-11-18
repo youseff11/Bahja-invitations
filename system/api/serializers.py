@@ -77,6 +77,7 @@ def site_payload(request) -> dict:
         "darkModeEnabled": cfg.dark_mode_enabled,
         "translationEnabled": cfg.translation_enabled,
         "templatesMobileColumns": cfg.templates_mobile_columns,
+        "templatesLayout": cfg.templates_layout,
         "whatsapp": {
             # الزر العائم: رابط جاهز + الأساس والرسالة لنافذة الشات
             "floatReady": cfg.whatsapp_float_ready,

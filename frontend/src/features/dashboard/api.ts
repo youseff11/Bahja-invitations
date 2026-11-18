@@ -1,6 +1,7 @@
 import { keepPreviousData, queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { api } from '@/api/client'
+import type { TemplatesLayout } from '@/api/types'
 import type {
   AddonBody,
   AddonRow,
@@ -320,8 +321,9 @@ export function useComposeSettings() {
 
 export function useSaveComposeSettings() {
   return useInvalidatingMutation(
-    (templateIds: number[]) =>
-      api<ComposeSettings>('/dashboard/site/compose/', { method: 'PUT', body: { templateIds } }),
-    [['public', 'home']],
+    (body: { templateIds: number[]; layout: TemplatesLayout }) =>
+      api<ComposeSettings>('/dashboard/site/compose/', { method: 'PUT', body }),
+    // شكل العرض بيتقرا من إعدادات الموقع ‎['site']‎ والقوالب من الرئيسية
+    [['public', 'home'], ['site']],
   )
 }
