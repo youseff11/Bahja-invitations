@@ -17,7 +17,7 @@ from django.urls import path, reverse
 from .. import blocks as blocks_engine
 from .. import templateimport
 from ..forms import TemplateForm
-from ..models import NO_CATEGORY, Template, category_choices
+from ..models import COMPOSE_PARTS, NO_CATEGORY, Template, category_choices
 from .dashboard_common import (
     editor_url,
     check_upload,
@@ -98,10 +98,27 @@ def _quick_edit(request, tpl) -> dict:
                            fields={"category": "التصنيف غير صالح."})
         tpl.category = category
         update_fields.append("category")
+    if "composePieces" in data:
+        # حتت قسم «بذوقكم»: {part: "/media/…"}؛ الجزء الفاضي بيتشال
+        raw = data["composePieces"]
+        if not isinstance(raw, dict):
+            raise ApiError(400, "validation_error", "composePieces لازم يكون object.")
+        pieces = {}
+        for key, url in raw.items():
+            if key not in COMPOSE_PARTS:
+                raise ApiError(400, "validation_error", f"جزء مش معروف: {key}")
+            url = str(url or "").strip()
+            if not url:
+                continue
+            if not (url.startswith("/media/") or url.startswith("https://")) or len(url) > 500:
+                raise ApiError(400, "validation_error", f"رابط غير صالح للجزء {key}.")
+            pieces[key] = url
+        tpl.compose_pieces = pieces
+        update_fields.append("compose_pieces")
     if update_fields:
         tpl.save(update_fields=[*update_fields, "updated_at"])
     return {"id": tpl.pk, "name": tpl.name, "description": tpl.description,
-            "category": tpl.category}
+            "category": tpl.category, "composePieces": tpl.compose_pieces or {}}
 
 
 @staff_api("PATCH", "DELETE")

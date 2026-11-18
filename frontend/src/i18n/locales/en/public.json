@@ -71,7 +71,12 @@
     "yours": "Your invitation",
     "from": "from",
     "cta": "Browse the templates",
-    "parts": { "intro": "Intro", "ayah": "Verse", "countdown": "Countdown", "calendar": "Date", "rsvp": "RSVP", "closing": "Closing", "location": "Venue" }
+    "partsLabel": "Invitation parts",
+    "drop": "Drop it here",
+    "shuffle": "Surprise me",
+    "choose": "Choose the",
+    "tip": "Tap any option or drag it onto the phone.",
+    "parts": { "intro": "Intro", "ayah": "Verse", "countdown": "Countdown", "calendar": "Date", "rsvp": "RSVP", "closing": "Closing", "location": "Venue", "invite": "Invitation", "program": "Program" }
   },
   "plans": {
     "eyebrow": "Pricing",

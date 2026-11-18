@@ -1,5 +1,39 @@
-import type { ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
+
+import { useLang } from '../text'
+
+/** عدّاد حيّ بيعدّ تنازلياً من رقم ثابت: نفس شكل اللي هيشوفه الضيف في الدعوة. */
+const COUNTDOWN_START = 126 * 86400 + 7 * 3600 + 42 * 60 + 18
+
+function CountdownArt() {
+  const { t } = useTranslation()
+  const lang = useLang()
+  const [left, setLeft] = useState(COUNTDOWN_START)
+  useEffect(() => {
+    const end = Date.now() + COUNTDOWN_START * 1000
+    const id = window.setInterval(() => setLeft(Math.max(0, Math.round((end - Date.now()) / 1000))), 1000)
+    return () => window.clearInterval(id)
+  }, [])
+  const two = (n: number) =>
+    n.toLocaleString(lang === 'en' ? 'en-US' : 'ar-EG', { minimumIntegerDigits: 2, useGrouping: false })
+  const parts = [
+    ['days', Math.floor(left / 86400)],
+    ['hours', Math.floor((left % 86400) / 3600)],
+    ['minutes', Math.floor((left % 3600) / 60)],
+    ['seconds', left % 60],
+  ] as const
+  return (
+    <div className="art-count">
+      {parts.map(([unit, value]) => (
+        <div className="art-count-unit" key={unit}>
+          <b>{two(value)}</b>
+          <small>{t(`public.features.units.${unit}`)}</small>
+        </div>
+      ))}
+    </div>
+  )
+}
 
 /** QR مرسوم بالخلايا (شكل بس): ‎1‎ = خلية مليانة. */
 const QR_ROWS = ['1110111', '1010101', '1110110', '0001011', '1101101', '0111001', '1010111']
@@ -14,34 +48,47 @@ function Qr({ scan }: { scan?: boolean }) {
   )
 }
 
-/** لقطة حقيقية من قالب منشور (مقصوصة على الجزء المهم)، بتقرّب بالراحة لما الكارت يظهر. */
-function RealArt({ img, from, pos = '50% 50%' }: { img: string; from: string; pos?: string }) {
+function CalendarArt() {
+  const lang = useLang()
+  const day = (n: number) => n.toLocaleString(lang === 'en' ? 'en-US' : 'ar-EG', { minimumIntegerDigits: 2, useGrouping: false })
   return (
-    <div className="art-real">
-      <img src={`/static/images/home/${img}.webp`} alt="" loading="lazy" style={{ objectPosition: pos }} />
-      <span className="art-real-from">{from}</span>
+    <div className="art-cal">
+      <div className="art-cal-top">
+        <i />
+        <i />
+      </div>
+      <div className="art-cal-num">
+        <b>{day(7)}</b>
+        <b>{day(8)}</b>
+      </div>
+      <div className="art-cal-dots">
+        {Array.from({ length: 14 }, (_, i) => (
+          <i key={i} className={i === 8 ? 'on' : undefined} />
+        ))}
+      </div>
     </div>
   )
 }
 
 const ART: Record<string, () => ReactNode> = {
-  countdown: () => <RealArt img="ft-countdown" from="Lantern Nights" pos="50% 88%" />,
-  rsvp: () => <RealArt img="ft-rsvp" from="Rose Garden" pos="50% 20%" />,
-  whatsapp: () => (
-    <div className="art-wa">
-      <div className="art-wa-bubble">
-        <img src="/static/images/home/ft-chat.webp" alt="" loading="lazy" />
-        <div className="art-wa-meta">
-          <b>Omar &amp; Nour</b>
-          <span>bahja-invitations.com</span>
+  countdown: () => <CountdownArt />,
+  rsvp: () => (
+    <div className="art-rsvp">
+      {[0, 1, 2].map((i) => (
+        <div className="art-rsvp-row" key={i} style={{ ['--i' as string]: i }}>
+          <i />
+          <span />
         </div>
-        <i className="art-wa-time">
-          9:41
-          <svg viewBox="0 0 18 12" aria-hidden="true">
-            <path d="M1 6.5 4.5 10 11 2.5M7 9.5l.6.5L14 2.5" />
-          </svg>
-        </i>
-      </div>
+      ))}
+    </div>
+  ),
+  whatsapp: () => (
+    <div className="art-chat">
+      <span className="art-bubble art-bubble--in" />
+      <span className="art-bubble art-bubble--out" />
+      <svg className="art-plane" viewBox="0 0 24 24">
+        <path d="M20 4 4.5 10.2c-.8.3-.8 1.4 0 1.7l5.1 1.9 1.9 5.1c.3.8 1.4.8 1.7 0L20 4Z" />
+      </svg>
     </div>
   ),
   music: () => (
@@ -51,10 +98,25 @@ const ART: Record<string, () => ReactNode> = {
       ))}
     </div>
   ),
-  gallery: () => <RealArt img="ft-gallery" from="Lantern Nights" pos="50% 55%" />,
-  maps: () => <RealArt img="ft-map" from="Rose Garden" pos="50% 40%" />,
+  gallery: () => (
+    <div className="art-photos">
+      <span className="ph ph--1" />
+      <span className="ph ph--2" />
+      <span className="ph ph--3" />
+    </div>
+  ),
+  maps: () => (
+    <div className="art-map">
+      <span className="art-map-road" />
+      <span className="art-map-ring" />
+      <svg className="art-map-pin" viewBox="0 0 24 24">
+        <path d="M12 21s7-6.1 7-12a7 7 0 1 0-14 0c0 5.9 7 12 7 12Z" />
+        <circle cx="12" cy="9" r="2.4" />
+      </svg>
+    </div>
+  ),
   qr: () => <Qr scan />,
-  calendar: () => <RealArt img="ft-calendar" from="Palace Rose" pos="50% 30%" />,
+  calendar: () => <CalendarArt />,
   venueQr: () => (
     <div className="art-ticket">
       <Qr />

@@ -14,7 +14,7 @@ from django.urls import path, reverse
 
 from .. import blocks as blocks_engine
 from ..forms import PlanAddonForm, SiteSettingForm
-from ..models import Plan, PlanAddon, SiteSetting, Template
+from ..models import COMPOSE_PARTS, Plan, PlanAddon, SiteSetting, Template
 from .dashboard_common import (
     money,
     number_input_value,
@@ -182,6 +182,42 @@ def site(request):
     return _site_payload(cfg)
 
 
+COMPOSE_MAX = 8
+
+
+def _compose_state(cfg: SiteSetting) -> dict:
+    rows = []
+    for t in Template.objects.only("id", "name", "name_en", "is_active", "compose_pieces",
+                                   "cover_image", "cover_url").order_by("-created_at"):
+        raw = t.compose_pieces if isinstance(t.compose_pieces, dict) else {}
+        parts = [k for k in COMPOSE_PARTS if isinstance(raw.get(k), str) and raw.get(k)]
+        rows.append({"id": t.pk, "name": t.name, "isActive": t.is_active, "parts": parts,
+                     "intro": raw.get("intro") or "", "cover": t.cover_src or ""})
+    return {"selected": [i for i in (cfg.compose_template_ids or []) if isinstance(i, int)],
+            "max": COMPOSE_MAX, "templates": rows}
+
+
+@staff_api("GET", "PUT")
+def site_compose(request):
+    """قوالب قسم «اعملوا دعوتكم بذوقكم»: ‎PUT {templateIds: [..]}‎ بالترتيب."""
+    cfg = SiteSetting.load()
+    if request.method == "PUT":
+        data = json_body(request)
+        ids = data.get("templateIds")
+        if not isinstance(ids, list) or not all(isinstance(i, int) and not isinstance(i, bool) for i in ids):
+            raise ApiError(400, "validation_error", "templateIds لازم تكون قايمة أرقام.")
+        ids = list(dict.fromkeys(ids))
+        if len(ids) > COMPOSE_MAX:
+            raise ApiError(400, "validation_error", f"أقصى عدد {COMPOSE_MAX} قوالب.")
+        known = set(Template.objects.filter(pk__in=ids).values_list("pk", flat=True))
+        missing = [i for i in ids if i not in known]
+        if missing:
+            raise ApiError(400, "validation_error", f"قوالب مش موجودة: {missing}")
+        cfg.compose_template_ids = ids
+        cfg.save(update_fields=["compose_template_ids"])
+    return _compose_state(cfg)
+
+
 urlpatterns = [
     path("dashboard/plans/", plans, name="api_dashboard_plans"),
     path("dashboard/plans/<int:pk>/", plan_detail, name="api_dashboard_plan"),
@@ -189,4 +225,5 @@ urlpatterns = [
     path("dashboard/addons/<int:pk>/", addon_detail, name="api_dashboard_addon"),
     path("dashboard/addons/<int:pk>/toggle/", addon_toggle, name="api_dashboard_addon_toggle"),
     path("dashboard/site/", site, name="api_dashboard_site"),
+    path("dashboard/site/compose/", site_compose, name="api_dashboard_site_compose"),
 ]

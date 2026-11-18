@@ -68,6 +68,8 @@ def _endpoints(ids):
         ("POST", f"{BASE}/addons/{ids['addon']}/toggle/"),
         ("GET", f"{BASE}/site/"),
         ("PUT", f"{BASE}/site/"),
+        ("GET", f"{BASE}/site/compose/"),
+        ("PUT", f"{BASE}/site/compose/"),
     ]
 
 

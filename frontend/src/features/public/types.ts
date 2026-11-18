@@ -54,7 +54,17 @@ export interface HomeData {
   categories: { value: string; label: string }[]
   plans: PublicPlan[]
   faqs: PublicFaq[]
+  compose?: ComposeTemplate[]
 }
+
+/** قالب في قسم «اعملوا دعوتكم بذوقكم»: حتت حقيقية منه (‎part → رابط صورة‎). */
+export interface ComposeTemplate {
+  id: number
+  slug: string
+  name: string
+  pieces: Partial<Record<ComposePart, string>>
+}
+export type ComposePart = 'intro' | 'ayah' | 'invite' | 'countdown' | 'calendar' | 'program' | 'location' | 'rsvp' | 'closing'
 
 export interface GalleryData {
   results: PublicTemplate[]

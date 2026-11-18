@@ -306,3 +306,10 @@ export interface SiteResponse {
   }
   sample: { name: string; previewUrl: string } | null
 }
+
+/** قسم «اعملوا دعوتكم بذوقكم»: القوالب المختارة والقوالب المتاحة بأجزائها. */
+export interface ComposeSettings {
+  selected: number[]
+  max: number
+  templates: { id: number; name: string; isActive: boolean; parts: string[]; intro: string; cover: string }[]
+}

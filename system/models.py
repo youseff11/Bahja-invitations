@@ -195,6 +195,10 @@ def default_category() -> str:
 
 
 # --------------------------------------------------------------------------
+# أجزاء الدعوة اللي ممكن تتبدّل في قسم «اعملوا دعوتكم بذوقكم» (بالترتيب جوه التلفون)
+COMPOSE_PARTS = ("intro", "ayah", "invite", "countdown", "calendar", "program", "location", "rsvp", "closing")
+
+
 class Template(TimeStampedModel):
     """قالب دعوة — مستند blocks كامل قابل للتعديل في المحرر."""
 
@@ -237,6 +241,10 @@ class Template(TimeStampedModel):
     runtime_root_attrs = models.JSONField("بيانات غلاف JavaScript", default=dict, blank=True)
 
     required_features = models.JSONField("المزايا التي يحتاجها", default=list, blank=True)
+
+    # حتت القالب لقسم «اعملوا دعوتكم بذوقكم» في الرئيسية: {"intro": "/media/…webp", "ayah": …}
+    # (لقطات حقيقية من القالب). الأجزاء المسموحة في ‎COMPOSE_PARTS‎.
+    compose_pieces = models.JSONField("حتت قسم «بذوقكم»", default=dict, blank=True)
 
     is_active = models.BooleanField("معروض للعملاء", default=True)
     sort_order = models.PositiveIntegerField("الترتيب", default=0)
@@ -1058,6 +1066,12 @@ class SiteSetting(models.Model):
         choices=[(1, "قالب واحد في الصف"), (2, "قالبين في الصف")],
         default=1,
         help_text="بيأثّر على قسم القوالب في الصفحة الرئيسية على شاشة التلفون بس.",
+    )
+
+    # ---- قسم «اعملوا دعوتكم بذوقكم» في الرئيسية
+    compose_template_ids = models.JSONField(
+        "قوالب قسم «بذوقكم»", default=list, blank=True,
+        help_text="أرقام القوالب اللي بتظهر حوالين التلفون بالترتيب. فاضية = أول القوالب اللي ليها حتت.",
     )
 
     class Meta:

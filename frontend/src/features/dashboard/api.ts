@@ -5,6 +5,7 @@ import type {
   AddonBody,
   AddonRow,
   AnalyticsResponse,
+  ComposeSettings,
   ClipRow,
   FontRow,
   ImageRow,
@@ -42,6 +43,7 @@ export const dashKeys = {
   images: [...ROOT, 'images'] as const,
   plans: [...ROOT, 'plans'] as const,
   site: [...ROOT, 'site'] as const,
+  siteCompose: [...ROOT, 'site-compose'] as const,
 }
 
 function useInvalidatingMutation<TData, TVars>(
@@ -308,5 +310,18 @@ export function useSaveSiteSettings() {
   return useInvalidatingMutation(
     (body: SiteValues) => api<SiteResponse>('/dashboard/site/', { method: 'PUT', body }),
     [['site']],
+  )
+}
+
+// ---------------------------------------------------------------- قسم «بذوقكم» في الرئيسية
+export function useComposeSettings() {
+  return useQuery({ queryKey: dashKeys.siteCompose, queryFn: () => api<ComposeSettings>('/dashboard/site/compose/') })
+}
+
+export function useSaveComposeSettings() {
+  return useInvalidatingMutation(
+    (templateIds: number[]) =>
+      api<ComposeSettings>('/dashboard/site/compose/', { method: 'PUT', body: { templateIds } }),
+    [['public', 'home']],
   )
 }

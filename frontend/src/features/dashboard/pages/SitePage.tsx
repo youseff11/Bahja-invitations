@@ -3,6 +3,7 @@ import { Trans, useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 
 import { useSaveSiteSettings, useSiteSettings } from '../api'
+import { ComposeCard } from './ComposeCard'
 import type { SiteValues } from '../types'
 import { CheckField, ErrorList, SelectField, TextField, useFormErrors } from '../ui/forms'
 import { PageHead, usePageTitle } from '../ui/page'
@@ -257,6 +258,7 @@ export function SitePage() {
               </p>
             </aside>
           </div>
+          <ComposeCard />
         </>
       )}
     </>

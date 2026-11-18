@@ -2385,117 +2385,152 @@ html[lang="en"] .nav--site .nav-cta { letter-spacing: .08em; font-size: 12.5px; 
 a.tpl-cover { text-decoration: none; cursor: pointer; }
 
 /* ================================================================
-   المميزات بلقطات حقيقية من القوالب: الصورة مالية مساحة الرسمة وبتقرّب بالراحة
-   لما الكارت يظهر، واسم القالب في كبسولة صغيرة في الركن.
+   «اعملوا دعوتكم بذوقكم» (ComposeSection.tsx): تلفون ثابت في النص،
+   الأجزاء على جنب والاختيارات على الجنب التاني. مفيش حركة مستمرة —
+   الحركة بس لما الزائر يختار (لمعة على الجزء اللي اتغيّر).
    ================================================================ */
-.bento-art:has(.art-real) { place-items: stretch; padding: 0; }
-.art-real { position: relative; width: 100%; height: 100%; min-height: 150px; }
-.art-real img {
-  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
-  transform: scale(1.02); transition: transform 7s cubic-bezier(.2, .7, .2, 1);
+.section--compose {
+  --c-gold: #b08a4e; --c-gold-hi: #f1d9a8; --c-wine: #5a0f22;
+  position: relative; overflow: hidden;
+  background:
+    radial-gradient(60% 50% at 50% 55%, color-mix(in srgb, var(--accent) 9%, transparent), transparent 70%),
+    linear-gradient(180deg, transparent, color-mix(in srgb, var(--c-gold) 5%, transparent) 50%, transparent);
 }
-.bento-tile.is-in .art-real img { transform: scale(1.1); }
-.bento-tile:hover .art-real img { transform: scale(1.14); transition-duration: 1.2s; }
-.art-real::after { content: ""; position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .25), inset 0 -40px 40px -30px rgba(20, 4, 10, .35); }
-.art-real-from {
-  position: absolute; inset-block-end: 10px; inset-inline-start: 10px; z-index: 1;
-  padding: 4px 10px; border-radius: 999px; direction: ltr;
-  font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 13px; line-height: 1.2;
-  color: #fbf3ea; background: rgba(40, 8, 18, .55); backdrop-filter: blur(4px);
-  border: 1px solid rgba(241, 217, 168, .35);
+.cmp {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1.25fr); align-items: start;
+  gap: clamp(24px, 4vw, 56px); max-width: 1180px; margin: 40px auto 0;
 }
 
-/* واتساب: فقاعة رسالة فيها معاينة الدعوة الحقيقية */
-.art-wa { width: min(220px, 86%); padding: 6px 0; }
-.art-wa-bubble {
-  position: relative; padding: 5px 5px 20px; border-radius: 14px 14px 4px 14px;
-  background: #dcf5d0; box-shadow: 0 10px 20px -14px rgba(20, 40, 20, .5);
-  transform: translateY(14px) scale(.96); opacity: 0;
-  transition: transform .8s cubic-bezier(.2, .8, .3, 1.2), opacity .6s ease;
+/* ---- الأجزاء */
+.cmp-parts { display: grid; gap: 6px; align-self: center; }
+.cmp-part {
+  all: unset; box-sizing: border-box; cursor: pointer; display: flex; align-items: center; gap: 14px;
+  padding: 12px 16px; border-radius: 14px; border: 1px solid transparent;
+  transition: background-color .25s ease, border-color .25s ease, transform .25s ease;
 }
-html[data-theme="dark"] .art-wa-bubble { background: #1f4a37; }
-.bento-tile.is-in .art-wa-bubble { transform: none; opacity: 1; }
-.art-wa-bubble img { display: block; width: 100%; height: 108px; object-fit: cover; object-position: 50% 20%; border-radius: 10px; }
-.art-wa-meta { padding: 6px 6px 0; direction: ltr; text-align: left; }
-.art-wa-meta b { display: block; font-size: 13px; color: #1d2b22; }
-.art-wa-meta span { font-size: 11px; color: #4f6b57; }
-html[data-theme="dark"] .art-wa-meta b { color: #eaf6ee; }
-html[data-theme="dark"] .art-wa-meta span { color: #a9c9b4; }
-.art-wa-time { position: absolute; inset-block-end: 4px; right: 8px; display: inline-flex; align-items: center; gap: 3px; font-style: normal; font-size: 10px; color: #5c7a66; direction: ltr; }
-.art-wa-time svg { width: 15px; height: 10px; fill: none; stroke: #34b7f1; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.cmp-part:hover { background: color-mix(in srgb, var(--c-gold) 7%, transparent); }
+.cmp-part:focus-visible { outline: 2px solid var(--c-gold); outline-offset: 2px; }
+.cmp-part-n { font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 22px; line-height: 1; color: var(--c-gold); direction: ltr; min-width: 28px; }
+.cmp-part-txt { display: grid; gap: 2px; min-width: 0; }
+.cmp-part-txt b { font-family: var(--font-display); font-size: 16px; font-weight: 600; }
+.cmp-part-txt small { font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 14px; color: var(--muted); direction: ltr; text-align: start; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cmp-part.is-active {
+  background: linear-gradient(135deg, var(--c-wine), color-mix(in srgb, var(--c-wine) 70%, #12070a));
+  border-color: color-mix(in srgb, var(--c-gold) 60%, transparent); color: #fbf3ea;
+  box-shadow: 0 18px 30px -20px rgba(60, 10, 25, .7), inset 0 0 0 1px rgba(241, 217, 168, .18);
+}
+.cmp-part.is-active .cmp-part-n { color: var(--c-gold-hi); }
+.cmp-part.is-active small { color: rgba(251, 243, 234, .8); }
 
-/* ================================================================
-   «اعملوا دعوتكم بذوقكم»: كروت قوالب حقيقية على الجنبين، وحتت منها بتطير
-   وتتجمع في موبايل في النص (ComposeSection.tsx).
-   ================================================================ */
-.section--compose { overflow: hidden; }
-.cmp-stage {
-  position: relative; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
-  gap: clamp(18px, 4vw, 56px); max-width: 1080px; margin: 44px auto 0; perspective: 1400px;
-}
-.cmp-col { display: grid; gap: 30px; justify-items: center; }
-.cmp-col:first-child { justify-items: end; }
-.cmp-col:last-child { justify-items: start; }
-.cmp-src {
-  position: relative; width: clamp(96px, 11vw, 128px); aspect-ratio: 300 / 649; border-radius: 14px;
-  transition: transform .5s cubic-bezier(.2, .8, .3, 1), filter .5s ease;
-  filter: saturate(.85) brightness(.97);
-}
-.cmp-col:first-child .cmp-src { transform: rotateY(16deg) rotateZ(-2deg); }
-.cmp-col:last-child .cmp-src { transform: rotateY(-16deg) rotateZ(2deg); }
-.cmp-col:first-child .cmp-src:nth-child(2) { margin-inline-end: 34px; }
-.cmp-col:last-child .cmp-src:nth-child(2) { margin-inline-start: 34px; }
-.cmp-src img {
-  display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 14px;
-  box-shadow: 0 0 0 1px color-mix(in srgb, #b08a4e 40%, transparent), 0 22px 34px -22px rgba(40, 10, 20, .55);
-}
-.cmp-src span {
-  position: absolute; inset-inline: 0; inset-block-end: -24px; text-align: center; white-space: nowrap; direction: ltr;
-  font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 14px; color: var(--muted);
-}
-.cmp-src.is-active { filter: none; transform: translateY(-6px) scale(1.08) !important; z-index: 2; }
-.cmp-src.is-active img { box-shadow: 0 0 0 2px #b08a4e, 0 0 0 6px color-mix(in srgb, #b08a4e 25%, transparent), 0 28px 40px -20px rgba(40, 10, 20, .6); }
-.cmp-src.is-active span { color: var(--accent); font-weight: 600; }
-
+/* ---- التلفون */
+.cmp-phone-wrap { display: grid; justify-items: center; gap: 18px; position: sticky; top: 96px; }
 .cmp-phone {
-  position: relative; width: clamp(230px, 24vw, 280px); aspect-ratio: 9 / 18.5; padding: 11px;
-  border-radius: 40px; background: linear-gradient(160deg, #2b1219, #12060a);
-  box-shadow: 0 0 0 1px rgba(241, 217, 168, .35), 0 0 0 6px color-mix(in srgb, var(--surface) 70%, transparent), 0 50px 80px -40px rgba(40, 10, 20, .7);
+  position: relative; width: clamp(250px, 23vw, 300px); aspect-ratio: 9 / 18.6; padding: 10px; border-radius: 46px;
+  background: linear-gradient(145deg, #3a1a22, #12060a 45%, #2a1018);
+  box-shadow:
+    0 0 0 1.5px color-mix(in srgb, var(--c-gold) 70%, transparent),
+    0 0 0 7px color-mix(in srgb, var(--surface) 85%, transparent),
+    0 0 0 8px color-mix(in srgb, var(--c-gold) 30%, transparent),
+    0 60px 90px -45px rgba(60, 10, 25, .75),
+    0 0 120px -30px color-mix(in srgb, var(--accent) 45%, transparent);
+  transition: box-shadow .3s ease, transform .3s ease;
 }
-.cmp-notch { position: absolute; top: 18px; left: 50%; z-index: 3; width: 74px; height: 20px; margin-left: -37px; border-radius: 12px; background: #0b0306; }
-.cmp-screen { position: relative; width: 100%; height: 100%; overflow: hidden; border-radius: 30px; background: #fbf7f3; }
-.cmp-feed { position: absolute; inset-inline: 0; top: 0; transition: transform .9s cubic-bezier(.45, .05, .2, 1), opacity .6s ease; }
-.cmp-feed.is-fading { opacity: 0; }
-.cmp-feed img { display: block; width: 100%; height: auto; opacity: 0; }
-.cmp-feed img.is-in { opacity: 1; animation: cmp-land .5s ease-out; }
-@keyframes cmp-land { from { filter: brightness(1.35); } to { filter: none; } }
-.cmp-ghost {
-  position: absolute; z-index: 5; display: block; object-fit: cover; object-position: top; border-radius: 12px; pointer-events: none;
-  transform-origin: 0 0; box-shadow: 0 30px 50px -20px rgba(40, 10, 20, .6), 0 0 0 1px rgba(241, 217, 168, .5);
+.cmp-phone::after {
+  content: ""; position: absolute; inset: 10px; border-radius: 36px; pointer-events: none; z-index: 2;
+  background: linear-gradient(115deg, rgba(255, 255, 255, .14), transparent 28%, transparent 70%, rgba(255, 255, 255, .06));
 }
-.cmp-tag {
-  position: absolute; left: 50%; bottom: -54px; z-index: 4; display: flex; gap: 8px; align-items: baseline; white-space: nowrap;
-  padding: 8px 16px; border-radius: 999px; transform: translateX(-50%) translateY(6px); opacity: 0;
-  background: var(--surface); box-shadow: 0 0 0 1px color-mix(in srgb, #b08a4e 45%, var(--line)), 0 16px 26px -18px rgba(40, 10, 20, .5);
-  transition: opacity .35s ease, transform .35s ease;
+.cmp-phone.is-drop { transform: scale(1.02); box-shadow: 0 0 0 2px var(--c-gold), 0 0 0 9px color-mix(in srgb, var(--c-gold) 30%, transparent), 0 60px 90px -45px rgba(60, 10, 25, .75); }
+.cmp-island { position: absolute; top: 20px; left: 50%; z-index: 3; width: 84px; height: 24px; margin-left: -42px; border-radius: 14px; background: #070203; }
+.cmp-screen {
+  position: relative; height: 100%; overflow-y: auto; overscroll-behavior: contain; border-radius: 36px;
+  background: #fbf7f3; scrollbar-width: none; scroll-behavior: smooth;
 }
-.cmp-tag.is-on { opacity: 1; transform: translateX(-50%); }
-.cmp-tag b { font-family: var(--font-display); font-size: 15px; color: var(--accent); }
-.cmp-tag span { font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 14px; color: var(--muted); }
-.cmp-yours { position: absolute; left: 0; right: 0; top: -40px; margin: 0; text-align: center; font-family: 'Great Vibes', cursive; font-size: 28px; color: var(--accent); }
-.cmp-cta { margin-top: 84px; text-align: center; }
+.cmp-screen::-webkit-scrollbar { display: none; }
+.cmp-slot { position: relative; cursor: pointer; }
+.cmp-slot img { display: block; width: 100%; height: auto; animation: cmp-in .45s ease-out; }
+@keyframes cmp-in { from { opacity: .3; } to { opacity: 1; } }
+.cmp-slot::after { content: ""; position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 0 0 transparent; transition: box-shadow .3s ease; }
+.cmp-slot.is-active::after { box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--c-gold) 80%, transparent); }
+.cmp-slot.is-flash::before {
+  content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(100deg, transparent 30%, rgba(255, 240, 210, .65) 50%, transparent 70%);
+  animation: cmp-flash .9s ease-out forwards;
+}
+@keyframes cmp-flash { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+.cmp-slot-tag {
+  position: absolute; top: 46px; left: 50%; translate: -50% 0; z-index: 2; padding: 3px 9px; border-radius: 999px; white-space: nowrap;
+  font-size: 10.5px; line-height: 1.3; color: #fbf3ea; background: rgba(30, 6, 14, .6); backdrop-filter: blur(3px);
+  opacity: 0; transition: opacity .25s ease;
+}
+.cmp-slot-tag i { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 12px; }
+.cmp-slot:hover .cmp-slot-tag, .cmp-slot.is-active .cmp-slot-tag { opacity: 1; }
+.cmp-drop-hint {
+  position: absolute; inset: 10px; z-index: 4; display: grid; place-items: center; border-radius: 36px; pointer-events: none;
+  font-family: var(--font-display); font-size: 18px; color: #fbf3ea; background: rgba(90, 15, 34, .55); backdrop-filter: blur(2px);
+  border: 2px dashed rgba(241, 217, 168, .8); opacity: 0; transition: opacity .2s ease;
+}
+.cmp-phone.is-drop .cmp-drop-hint { opacity: 1; }
+.cmp-shuffle {
+  all: unset; box-sizing: border-box; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+  padding: 9px 18px; border-radius: 999px; font-size: 14px;
+  border: 1px solid color-mix(in srgb, var(--c-gold) 55%, var(--line)); background: var(--surface);
+  transition: border-color .2s ease, color .2s ease;
+}
+.cmp-shuffle:hover { border-color: var(--accent); color: var(--accent); }
+.cmp-shuffle svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 
-@media (max-width: 760px) {
-  .cmp-stage { grid-template-columns: 1fr; gap: 20px; }
-  .cmp-col { grid-auto-flow: column; justify-content: center !important; gap: 10px; }
-  .cmp-col:first-child { order: 0; }
-  .cmp-phone { order: 1; margin: 46px auto 0; }
-  .cmp-col:last-child { order: 2; margin-top: 70px; }
-  .cmp-src { width: 72px; transform: none !important; margin: 0 !important; }
-  .cmp-src span { font-size: 11px; inset-block-end: -18px; }
-  .cmp-src.is-active { transform: translateY(-4px) scale(1.08) !important; }
-  .cmp-cta { margin-top: 44px; }
+/* ---- الاختيارات */
+.cmp-options { align-self: stretch; display: flex; flex-direction: column; }
+.cmp-options-head { margin: 0 0 14px; font-size: 15px; color: var(--muted); }
+.cmp-options-head b { font-family: var(--font-display); font-size: 22px; color: var(--accent); }
+.cmp-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.cmp-opt {
+  all: unset; box-sizing: border-box; cursor: grab; position: relative; display: grid; gap: 7px;
+  padding: 6px; border-radius: 16px; background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--c-gold) 28%, var(--line));
+  box-shadow: 0 14px 26px -22px rgba(60, 10, 25, .55);
+  transition: transform .25s cubic-bezier(.2, .8, .3, 1), border-color .25s ease, box-shadow .25s ease;
+}
+.cmp-opt:hover { transform: translateY(-4px); border-color: color-mix(in srgb, var(--c-gold) 65%, var(--line)); }
+.cmp-opt:active { cursor: grabbing; }
+.cmp-opt:focus-visible { outline: 2px solid var(--c-gold); outline-offset: 2px; }
+.cmp-opt-img { display: block; aspect-ratio: 4 / 5; overflow: hidden; border-radius: 11px; background: var(--surface-2); }
+.cmp-opt-img img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.cmp-opt-name { padding: 0 4px 3px; text-align: center; direction: ltr; font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cmp-opt.is-on { border-color: var(--c-wine); box-shadow: 0 0 0 2px var(--c-wine), 0 18px 30px -20px rgba(60, 10, 25, .7); }
+.cmp-opt-ok { position: absolute; top: 12px; inset-inline-end: 12px; width: 26px; height: 26px; }
+.cmp-opt-ok circle { fill: var(--c-wine); stroke: var(--c-gold-hi); stroke-width: 1; }
+.cmp-opt-ok path { fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.cmp-tip { margin: 16px 0 0; font-size: 13px; color: var(--muted); }
+.cmp-cta { margin-top: 40px; text-align: center; }
+
+/* ---- تابلت: الأجزاء صف فوق، والتلفون والاختيارات جنب بعض */
+@media (max-width: 1100px) {
+  .cmp { grid-template-columns: auto minmax(0, 1fr); }
+  .cmp-parts { grid-column: 1 / -1; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 4px; }
+  .cmp-parts::-webkit-scrollbar { display: none; }
+  .cmp-part { flex: none; padding: 9px 14px; border: 1px solid color-mix(in srgb, var(--c-gold) 30%, var(--line)); }
+  .cmp-part-n { font-size: 17px; min-width: 0; }
+  .cmp-part-txt small { display: none; }
+}
+/* ---- تلفون: التلفون فوق، تحته الأجزاء، وتحتها الاختيارات بالعرض بسحب */
+@media (max-width: 700px) {
+  .cmp { grid-template-columns: minmax(0, 1fr); gap: 18px; margin-top: 28px; }
+  .cmp-phone-wrap { position: static; order: 0; }
+  .cmp-phone { width: min(240px, 66vw); }
+  .cmp-parts { order: 1; margin-inline: -16px; padding-inline: 16px; }
+  .cmp-options { order: 2; }
+  .cmp-options-head { margin-bottom: 10px; text-align: center; }
+  .cmp-grid {
+    display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none;
+    margin-inline: -16px; padding: 4px 16px 8px;
+  }
+  .cmp-grid::-webkit-scrollbar { display: none; }
+  .cmp-opt { flex: 0 0 132px; scroll-snap-align: center; cursor: pointer; }
+  .cmp-opt:hover { transform: none; }
+  .cmp-tip { text-align: center; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .cmp-feed, .cmp-src, .cmp-tag, .art-real img, .art-wa-bubble { transition: none !important; animation: none !important; }
+  .cmp-slot img, .cmp-slot.is-flash::before { animation: none !important; }
+  .cmp-screen { scroll-behavior: auto; }
 }
