@@ -595,7 +595,7 @@
     "reviewData": "Check the data — a field is missing or wrong.",
     "compose": {
       "title": "Templates on the home page",
-      "body": "Choose how the templates section after the hero looks, and which templates appear around the phone, in order (up to {{max}}).",
+      "body": "Choose how the templates section after the hero looks, and which templates come first, in order (up to {{max}}). Every active template always shows; the rest follow your picks.",
       "layout": "Layout",
       "layouts": {
         "showcase": "Live phone showcase",
@@ -603,8 +603,8 @@
         "grid": "Card grid (the old look)",
         "gridHint": "Template cards with categories and a preview button on each."
       },
-      "order": "Phone templates, in order",
-      "auto": "Nothing chosen — the phone shows every active template in gallery order.",
+      "order": "Shown first, in order",
+      "auto": "Nothing chosen — every template shows in gallery order.",
       "available": "Templates",
       "hidden": "(hidden — won't show)",
       "remove": "Remove",

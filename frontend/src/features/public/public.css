@@ -2449,7 +2449,7 @@ a.tpl-cover { text-decoration: none; cursor: pointer; }
 .sc-tip { margin: 0; font-size: 13px; color: var(--muted); text-align: center; }
 
 /* ---- اللوحة: اسم القالب وأزراره وكروت القوالب */
-.sc-panel { display: grid; gap: 28px; padding-top: 18px; }
+.sc-panel { display: grid; gap: 22px; padding-top: 6px; }
 .sc-info { display: grid; gap: 8px; justify-items: start; }
 .sc-count { margin: 0; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 18px; letter-spacing: .12em; color: var(--sc-gold); direction: ltr; }
 .sc-count span { color: var(--muted); }
@@ -2458,7 +2458,7 @@ a.tpl-cover { text-decoration: none; cursor: pointer; }
 .sc-desc { margin: 2px 0 0; max-width: 46ch; color: var(--muted); line-height: 1.75; }
 .sc-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
 
-.sc-rail { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 14px; }
+.sc-rail { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px; }
 .sc-card {
   all: unset; box-sizing: border-box; cursor: pointer; display: grid; gap: 7px; padding: 5px; border-radius: 16px;
   background: var(--surface); border: 1px solid color-mix(in srgb, var(--sc-gold) 25%, var(--line));
@@ -2475,8 +2475,8 @@ a.tpl-cover { text-decoration: none; cursor: pointer; }
   background: var(--sc-wine); color: #fff; font-size: 10.5px; letter-spacing: .04em;
 }
 .sc-card-name {
-  padding: 0 4px 3px; text-align: center; direction: ltr; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 15px;
+  padding: 0 3px 2px; text-align: center; direction: ltr; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 14px;
 }
 .sc-card.is-active { border-color: var(--sc-wine); box-shadow: 0 0 0 2px var(--sc-wine), 0 18px 30px -20px rgba(60, 10, 25, .7); }
 .sc-card.is-active .sc-card-name { color: var(--accent); font-weight: 600; }

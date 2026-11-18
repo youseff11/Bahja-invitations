@@ -14,13 +14,15 @@ import type { ComposeTemplate, PublicTemplate } from '../types'
  * تلفون بيشغّل معاينة القالب الحقيقية نفسها (iframe متصغّر من ‎390×720‎ — مقاس المتصفح
  * على التلفون بعد شريط العنوان، فكل قسم بيملا الشاشة زي ما الضيف بيشوفه)،
  * وجنبه اسم القالب وأزراره وكروت كل القوالب للاختيار.
- * القوالب: اللي الأدمن رتّبها (‎compose‎)، ولو مفيش = كل القوالب المفعّلة بترتيب المعرض.
+ * القوالب: كلها دايمًا — اللي الأدمن رتّبها (‎compose‎) الأول، والباقي بعدها بترتيب المعرض.
  */
 
 const PHONE_W = 390
 const PHONE_H = 720
 /** أزرار المعاينة اللي بتخرّج برّه (رجوع، نسخ الرابط، شريط التواصل، التمرير التلقائي) بتستخبى جوه التلفون بس */
-const HIDE_IN_PHONE = '.lb-back,.lb-share-fab,.lb-cta,.lb-autoscroll{display:none!important}'
+const HIDE_IN_PHONE =
+  '.lb-back,.lb-share-fab,.lb-cta,.lb-autoscroll{display:none!important}' +
+  'html{scrollbar-width:none}html::-webkit-scrollbar{display:none}'
 
 const previewPath = (slug: string) => `/templates/${slug}/preview/`
 
@@ -36,7 +38,8 @@ export function TemplatesShowcase({ site, templates, chosen, error }: Props) {
   const lang = useLang()
   const all = templates ?? []
   const picked = (chosen ?? []).map((c) => all.find((tpl) => tpl.slug === c.slug)).filter(Boolean) as PublicTemplate[]
-  const list = picked.length ? picked : all
+  // كل القوالب المفعّلة بتظهر دايمًا: اللي الأدمن اختارها الأول بترتيبه، والباقي بعدها بترتيب المعرض
+  const list = [...picked, ...all.filter((tpl) => !picked.includes(tpl))]
 
   // محفوظ في خانة التاريخ: الرجوع من المعاينة الكاملة بيلاقي نفس القالب
   const [stored, setStored] = useHistoryState('showcaseTemplate', '')
