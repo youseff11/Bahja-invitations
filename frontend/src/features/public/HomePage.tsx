@@ -114,7 +114,7 @@ export function HomePage() {
         mobileColumns={site.templatesMobileColumns}
       />
       <FeaturesSection />
-      <ComposeSection templates={home.data?.compose} />
+      <ComposeSection templates={home.data?.compose} gallery={home.data?.templates} />
       {site.plansPublic && <PlansSection site={site} plans={home.data?.plans} />}
       <StepsSection />
       {SHOW_ORDER_FORM && site.ordersEnabled && <OrderSection site={site} />}

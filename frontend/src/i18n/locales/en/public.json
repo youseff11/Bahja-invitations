@@ -65,18 +65,12 @@
     "venueQr": { "title": "Entry Pass", "text": "A quicker, tidier welcome at the door" }
   },
   "compose": {
-    "eyebrow": "Mix & match",
-    "title": "Design it your way",
-    "sub": "Take the intro from one template, the verse from another and the countdown from a third. We bring them together into one invitation that feels like you.",
-    "yours": "Your invitation",
-    "from": "from",
-    "cta": "Browse the templates",
-    "partsLabel": "Invitation parts",
-    "drop": "Drop it here",
-    "shuffle": "Surprise me",
-    "choose": "Choose the",
-    "tip": "Tap any option or drag it onto the phone.",
-    "parts": { "intro": "Intro", "ayah": "Verse", "countdown": "Countdown", "calendar": "Date", "rsvp": "RSVP", "closing": "Closing", "location": "Venue", "invite": "Invitation", "program": "Program" }
+    "eyebrow": "Try it yourself",
+    "title": "Try a template before you choose",
+    "sub": "Pick any template and watch it run on the phone exactly as your guests will see it: the intro, the motion and the scroll.",
+    "tip": "Tap inside the phone to try the invitation, and scroll to see every section.",
+    "now": "Now showing",
+    "open": "Open full size"
   },
   "plans": {
     "eyebrow": "Pricing",
