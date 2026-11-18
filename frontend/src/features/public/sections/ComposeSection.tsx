@@ -60,7 +60,7 @@ export function ComposeSection({ templates, gallery }: { templates?: ComposeTemp
   if (!list.length) return null
 
   const cover = (tpl: ComposeTemplate) =>
-    tpl.pieces.intro?.src || gallery?.find((g) => g.slug === tpl.slug)?.cover || ''
+    gallery?.find((g) => g.slug === tpl.slug)?.cover || tpl.pieces.intro?.src || ''
   const current = list.find((tpl) => tpl.slug === active)
 
   function choose(slug: string) {
