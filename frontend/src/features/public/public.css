@@ -2560,23 +2560,6 @@ a.tpl-cover { text-decoration: none; cursor: pointer; }
   .sc-spin { animation-duration: 2s; }
 }
 
-/* ---- صفحة المعرض على التلفون: قالبين في الصف بكارت مضغوط (من غير الوصف، والزرارين تحت بعض) */
-@media (max-width: 600px) {
-  .grid--gallery.gallery-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding-inline: 0; }
-  .grid--gallery.gallery-grid .tpl-card { padding: 8px 8px 6px; border-radius: 20px; }
-  .grid--gallery.gallery-grid .tpl-card::before { inset: 4px; border-radius: 16px; }
-  .grid--gallery.gallery-grid .tpl-cover { border-radius: 13px; }
-  .grid--gallery.gallery-grid .tpl-body { min-height: 0; padding: 12px 4px 6px; gap: 4px; }
-  .grid--gallery.gallery-grid .tpl-body h3 { font-size: 15px; }
-  .grid--gallery.gallery-grid .tpl-meta {
-    max-width: 100%; padding: 2px 8px; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .grid--gallery.gallery-grid .tpl-desc--sm,
-  .grid--gallery.gallery-grid .tpl-body > .tpl-orn { display: none; }
-  .grid--gallery.gallery-grid .tpl-actions { flex-direction: column; gap: 6px; width: 100%; padding-top: 8px; }
-  .grid--gallery.gallery-grid .tpl-actions .btn { width: 100%; padding: 8px 10px; font-size: 13px; justify-content: center; }
-}
-
 /* ---- الـ Dynamic Island: مشغّل مزيكا القالب (DynamicIsland.tsx). كل المقاسات بـ cqi
    (نسبة من عرض التلفون) فبتتصغّر مع التلفون، والحركة سوستة بتفوت شوية وترجع زي الآيفون. */
 .sc-phone { container-type: inline-size; }

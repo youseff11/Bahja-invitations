@@ -6,7 +6,7 @@ import { warmPreview } from '@/features/invite/previewPrefetch'
 import { useHistoryState } from '@/lib/useHistoryState'
 import { useGallery } from '../hooks'
 import { ScrollChips } from '../ScrollChips'
-import { firstChar, pick, truncateChars, useLang } from '../text'
+import { firstChar, pick, useLang } from '../text'
 import type { PublicTemplate } from '../types'
 
 const previewPath = (template: PublicTemplate) => `/templates/${template.slug}/preview/`
@@ -71,36 +71,6 @@ export function HomeTemplateCard({ template }: { template: PublicTemplate }) {
         <div className="tpl-actions">
           <Link className="btn btn--gold btn--sm" to={previewPath(template)} {...warmProps(template)}>
             {t('public.templates.preview')}
-          </Link>
-        </div>
-      </div>
-    </article>
-  )
-}
-
-/** كارت القالب في معرض القوالب: معاينة حية + «اطلبه». */
-export function GalleryTemplateCard({ template }: { template: PublicTemplate }) {
-  const { t } = useTranslation()
-  const lang = useLang()
-  const name = pick(lang, template.name, template.nameEn)
-  const hasDescription = !!(template.description || template.descriptionEn)
-  return (
-    <article className="tpl-card">
-      <Cover template={template} name={name} />
-      <div className="tpl-body">
-        <h3>{name}</h3>
-        <Meta template={template} />
-        {hasDescription && (
-          <p className="muted tpl-desc--sm">
-            {pick(lang, truncateChars(template.description, 80), truncateChars(template.descriptionEn, 80))}
-          </p>
-        )}
-        <div className="tpl-actions">
-          <Link className="btn btn--ghost btn--sm" to={previewPath(template)} {...warmProps(template)}>
-            {t('public.gallery.live')}
-          </Link>
-          <Link className="btn btn--gold btn--sm" to={{ pathname: '/', hash: '#order' }}>
-            {t('public.gallery.order')}
           </Link>
         </div>
       </div>

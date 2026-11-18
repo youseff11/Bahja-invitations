@@ -7,10 +7,13 @@ import { useDocumentTitle } from '@/lib/useDocumentTitle'
 import { useGallery } from './hooks'
 import { ScrollChips } from './ScrollChips'
 import { GalleryFooter } from './sections/SiteFooter'
-import { GalleryTemplateCard } from './sections/TemplatesSection'
+import { HomeTemplateCard } from './sections/TemplatesSection'
 import { pick, useLang } from './text'
 
-/** معرض القوالب بفلتر التصنيف (‎?category=‎). معاينة القالب نفسها صفحة تانية (B3). */
+/**
+ * معرض القوالب بفلتر التصنيف (‎?category=‎). معاينة القالب نفسها صفحة تانية (B3).
+ * نفس شكل شبكة القوالب في الرئيسية بالظبط (‎#templates‎ + ‎HomeTemplateCard‎)، وقالبين في الصف على التلفون.
+ */
 export function GalleryPage() {
   const { t } = useTranslation()
   const lang = useLang()
@@ -24,7 +27,7 @@ export function GalleryPage() {
   const results = gallery.data?.results
   return (
     <>
-      <section className="section section--below-nav">
+      <section className="section section--below-nav" id="templates">
         <div className="wrap">
           <div className="section-head">
             <p className="eyebrow">{t('public.gallery.eyebrow')}</p>
@@ -44,8 +47,8 @@ export function GalleryPage() {
               </Link>
             ))}
           </ScrollChips>
-          <div className="grid grid--4 grid--gallery gallery-grid">
-            {results?.map((template) => <GalleryTemplateCard key={template.id} template={template} />)}
+          <div className="grid grid--4 grid--gallery" data-mobile-cols="2">
+            {results?.map((template) => <HomeTemplateCard key={template.id} template={template} />)}
             {results?.length === 0 && <p className="empty">{t('public.gallery.empty')}</p>}
             {gallery.isError && (
               <p className="empty" role="alert">
