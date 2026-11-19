@@ -41,4 +41,7 @@ urlpatterns.append(re_path(rf"^{re.escape(settings.MEDIA_URL.strip('/'))}/(?P<pa
 
 urlpatterns.append(re_path(rf"^{re.escape(settings.STREAM_URL.strip('/'))}/(?P<path>.*)$", files.media_stream))
 
-urlpatterns.append(re_path(rf"^{_prefix}(?:/.*)?$" if _prefix else r"^.*$", spa_shell, name="spa"))
+# ‎static/‎ مستثناة: ملف ستاتيك ناقص (مثلاً بعد git pull وقبل collectstatic) لازم يرجع 404، مش صفحة
+# الموقع بـ200 — المتصفح وكلاودفلير كانوا بيخزّنوا الـHTML مكان الـJS والموقع يفضل أبيض.
+_spa_root = r"^(?!static/)"
+urlpatterns.append(re_path(rf"^{_prefix}(?:/.*)?$" if _prefix else _spa_root + r".*$", spa_shell, name="spa"))
