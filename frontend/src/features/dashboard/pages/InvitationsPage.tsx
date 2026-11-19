@@ -6,7 +6,7 @@ import { useDeleteInvitation, useDuplicateInvitation, useInvitations, useSetInvi
 import type { InvitationFilters, InvitationRow } from '../types'
 import { useConfirm } from '../ui/ConfirmDialog'
 import { useLabels } from '../ui/labels'
-import { PageHead, Pill, usePageTitle } from '../ui/page'
+import { Pill, usePageTitle } from '../ui/page'
 import { RowMenu, RowMenuButton, RowMenuCopy, RowMenuLink, RowMenuTitle } from '../ui/RowMenu'
 import { QueryState, Table } from '../ui/table'
 import { useToast } from '../ui/Toast'
@@ -29,6 +29,15 @@ export function InvitationsPage() {
   }
   const { data, isPending, isError } = useInvitations(filters)
   const host = window.location.origin
+  const rows = data?.results ?? []
+  const paidCount = rows.filter((row) => Number(row.paidAmount) > 0).length
+  const stats: [string, number][] = [
+    ['invitations', rows.length],
+    ['published', rows.filter((row) => row.status === 'published').length],
+    ['guests', rows.reduce((sum, row) => sum + row.guests, 0)],
+    ['rsvps', rows.reduce((sum, row) => sum + row.rsvps, 0)],
+    ['views', rows.reduce((sum, row) => sum + row.views, 0)],
+  ]
 
   function applyFilters(form: HTMLFormElement) {
     const values = new FormData(form)
@@ -63,26 +72,60 @@ export function InvitationsPage() {
 
   return (
     <>
-      <PageHead title={t('dashboard.invitations.title')}>
-        <Link className="btn btn--gold" to="/dashboard/invitations/new">
-          {t('dashboard.common.newInvitation')}
-        </Link>
-      </PageHead>
+      <section className="inv-hero">
+        <div className="inv-hero__text">
+          <span className="inv-hero__kicker">BAHJA · INVITATIONS</span>
+          <h1>{t('dashboard.invitations.title')}</h1>
+          <div className="inv-hero__orn" aria-hidden="true">
+            <i />
+            <b />
+            <i />
+          </div>
+          <p>{t('dashboard.invitations.heroSubtitle')}</p>
+          <Link className="btn btn--gold inv-hero__new" to="/dashboard/invitations/new">
+            {t('dashboard.common.newInvitation')}
+          </Link>
+        </div>
+        <div className="inv-hero__total">
+          <span>{t('dashboard.invitations.totalPaid')}</span>
+          <strong>
+            {data ? formatMoney(data.totalPaid) : '—'}
+            <small>{t('dashboard.invitations.currency')}</small>
+          </strong>
+          {data && <em>{t('dashboard.invitations.totalPaidFrom', { n: paidCount, total: data.results.length })}</em>}
+        </div>
+      </section>
+
+      <div className="inv-stats">
+        {stats.map(([key, value]) => (
+          <div className="inv-stat" key={key}>
+            <strong>{data ? formatMoney(String(value)) : '—'}</strong>
+            <span>{t(`dashboard.invitations.stats.${key}`)}</span>
+          </div>
+        ))}
+      </div>
 
       <form
-        className="toolbar"
+        className="toolbar inv-toolbar"
         key={params.toString()}
         onSubmit={(event) => {
           event.preventDefault()
           applyFilters(event.currentTarget)
         }}
       >
-        <input
-          type="search"
-          name="q"
-          defaultValue={filters.q}
-          placeholder={t('dashboard.invitations.searchPlaceholder')}
-        />
+        <label className="inv-search">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="11" cy="11" r="6.5" />
+            <path d="m20 20-4.2-4.2" />
+          </svg>
+          <input
+            type="search"
+            name="q"
+            defaultValue={filters.q}
+            placeholder={t('dashboard.invitations.searchPlaceholder')}
+            aria-label={t('dashboard.invitations.searchPlaceholder')}
+          />
+        </label>
         <select name="status" defaultValue={filters.status}>
           <option value="">{t('dashboard.invitations.allStatuses')}</option>
           {data?.statusChoices.map((choice) => (
@@ -106,21 +149,9 @@ export function InvitationsPage() {
 
       <QueryState loading={isPending} error={isError} />
       {data && (
-        <div className="stats paid-stats">
-          <div className="stat">
-            <b>
-              {formatMoney(data.totalPaid)} <small>{t('dashboard.invitations.currency')}</small>
-            </b>
-            <span>
-              {t('dashboard.invitations.totalPaid', { n: data.results.length })}
-            </span>
-          </div>
-        </div>
-      )}
-      {data && (
         <Table
           cards="lg"
-          className="inv-table"
+          className="inv-table inv-lux"
           head={[
             t('dashboard.invitations.cols.invitation'),
             t('dashboard.invitations.cols.customer'),
@@ -232,6 +263,7 @@ function PaidInput({ invitation }: { invitation: InvitationRow }) {
   }
 
   return (
+    <label className={initial ? 'paid-field is-paid' : 'paid-field'}>
     <input
       key={initial}
       className="paid-input"
@@ -239,7 +271,7 @@ function PaidInput({ invitation }: { invitation: InvitationRow }) {
       inputMode="decimal"
       dir="ltr"
       defaultValue={initial}
-      placeholder="0"
+      placeholder="—"
       aria-label={t('dashboard.invitations.cols.paid')}
       disabled={save.isPending}
       onBlur={(event) => commit(event.currentTarget)}
@@ -251,5 +283,7 @@ function PaidInput({ invitation }: { invitation: InvitationRow }) {
         }
       }}
     />
+      <span>{t('dashboard.invitations.currency')}</span>
+    </label>
   )
 }

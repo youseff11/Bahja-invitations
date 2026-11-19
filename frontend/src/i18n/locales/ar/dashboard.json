@@ -127,7 +127,7 @@
     "allStatuses": "كل الحالات",
     "allTemplates": "كل القوالب",
     "search": "بحث",
-    "totalPaid": "إجمالي المدفوع · {{n}} دعوة",
+    "totalPaid": "إجمالي المدفوع",
     "currency": "ج.م",
     "paidSaved": "اتحفظ المدفوع لـ«{{title}}».",
     "cols": {
@@ -165,7 +165,16 @@
     "deleted": "اتحذفت الدعوة «{{title}}».",
     "confirmDelete": "تحذف «{{title}}» نهائياً؟",
     "confirmGuests": "معاها {{guests}} ضيف و{{rsvps}} رد.",
-    "confirmPublished": "الدعوة منشورة — رابطها هيبطّل يفتح."
+    "confirmPublished": "الدعوة منشورة — رابطها هيبطّل يفتح.",
+    "totalPaidFrom": "دفعوا {{n}} من {{total}} دعوة",
+    "heroSubtitle": "كل دعوات عملائك في مكان واحد — الحالة والردود واللي اتدفع.",
+    "stats": {
+      "invitations": "دعوة",
+      "published": "منشورة",
+      "guests": "ضيف",
+      "rsvps": "رد",
+      "views": "مشاهدة"
+    }
   },
   "invitationNew": {
     "pageTitle": "دعوة جديدة",

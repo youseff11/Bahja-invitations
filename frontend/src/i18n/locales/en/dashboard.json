@@ -127,7 +127,7 @@
     "allStatuses": "All statuses",
     "allTemplates": "All templates",
     "search": "Search",
-    "totalPaid": "Total paid · {{n}} invitations",
+    "totalPaid": "Total paid",
     "currency": "EGP",
     "paidSaved": "Saved the paid amount for “{{title}}”.",
     "cols": {
@@ -165,7 +165,16 @@
     "deleted": "Deleted the invitation “{{title}}”.",
     "confirmDelete": "Delete “{{title}}” permanently?",
     "confirmGuests": "It has {{guests}} guests and {{rsvps}} replies.",
-    "confirmPublished": "The invitation is published — its link will stop working."
+    "confirmPublished": "The invitation is published — its link will stop working.",
+    "totalPaidFrom": "{{n}} of {{total}} invitations paid",
+    "heroSubtitle": "All your clients’ invitations in one place — status, replies and payments.",
+    "stats": {
+      "invitations": "Invitations",
+      "published": "Published",
+      "guests": "Guests",
+      "rsvps": "Replies",
+      "views": "Views"
+    }
   },
   "invitationNew": {
     "pageTitle": "New invitation",

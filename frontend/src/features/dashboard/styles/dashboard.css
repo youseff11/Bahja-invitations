@@ -1372,35 +1372,479 @@ html[lang='en'] .dash-root .tpl-meta {
   word-break: break-all;
 }
 
-/* خانة «المدفوع» اليدوية + كارت الإجمالي فوق الجدول */
-.dash-root .paid-stats {
-  margin-bottom: 18px;
+/* =====================================================================
+   صفحة الدعوات — الشكل الفخم: ترويسة قطيفة بدهبي فيها إجمالي المدفوع،
+   كروت أرقام راكبة عليها، فلاتر في شريط واحد، وجدول بحواف دهبي.
+   الدهبي والقطيفة ثابتين هنا عشان الترويسة تفضل غامقة في الثيمين.
+   ===================================================================== */
+.dash-root {
+  --lux-gold: #c9a35f;
+  --lux-gold-hi: #f3dca6;
 }
-.dash-root .paid-stats .stat b small {
-  font-size: 14px;
+.dash-root .inv-hero {
+  --hero-wine: #4e1426;
+  --hero-ink: #170a10;
+  --hero-deep: #2a0f1a;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  padding: 38px 40px 96px;
+  border-radius: 26px;
+  color: #f4e9d6;
+  background:
+    radial-gradient(70% 130% at 85% 0%, color-mix(in srgb, var(--hero-wine) 85%, transparent), transparent 72%),
+    radial-gradient(45% 70% at 8% 100%, rgba(201, 163, 95, 0.16), transparent 70%),
+    linear-gradient(160deg, var(--hero-deep) 0%, var(--hero-ink) 62%, #0f070b 100%);
+  box-shadow: 0 30px 60px -30px rgba(40, 8, 20, 0.55);
+}
+/* الدارك: نفس القطيفة بس زمردي زي باقي الثيم الغامق */
+[data-theme='dark'] .dash-root .inv-hero {
+  --hero-wine: #1f4a35;
+  --hero-ink: #0c140f;
+  --hero-deep: #15261c;
+}
+.dash-root .inv-hero::before {
+  content: '';
+  position: absolute;
+  inset: 12px;
+  z-index: -1;
+  pointer-events: none;
+  border: 1px solid rgba(201, 163, 95, 0.42);
+  border-radius: 18px;
+  box-shadow: inset 0 0 0 5px rgba(201, 163, 95, 0.05);
+}
+/* لمعة بتعدّي مرة واحدة (transform بس) */
+.dash-root .inv-hero::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: -40%;
+  bottom: -40%;
+  left: 0;
+  width: 22%;
+  transform: translateX(-160%) skewX(-18deg);
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(255, 236, 200, 0.09), transparent);
+  animation: inv-sheen 2.8s 0.3s ease-out both;
+}
+@keyframes inv-sheen {
+  to {
+    transform: translateX(620%) skewX(-18deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dash-root .inv-hero::after {
+    display: none;
+  }
+}
+.dash-root .inv-hero__text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+}
+.dash-root .inv-hero__kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.34em;
+  color: var(--lux-gold);
+  direction: ltr;
+}
+.dash-root .inv-hero__kicker::before {
+  content: '';
+  width: 22px;
+  height: 1px;
+  background: currentColor;
+}
+.dash-root .inv-hero h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(32px, 4vw, 46px);
+  line-height: 1.3;
+  background: linear-gradient(180deg, #fff4da 0%, var(--lux-gold-hi) 32%, var(--lux-gold) 64%, #f0d49a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.dash-root .inv-hero__orn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.dash-root .inv-hero__orn i {
+  display: block;
+  width: 56px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--lux-gold));
+}
+.dash-root .inv-hero__orn i:last-child {
+  transform: scaleX(-1);
+}
+.dash-root .inv-hero__orn b {
+  width: 7px;
+  height: 7px;
+  transform: rotate(45deg);
+  border: 1px solid var(--lux-gold);
+}
+.dash-root .inv-hero p {
+  margin: 2px 0 10px;
+  max-width: 46ch;
+  font-size: 14.5px;
+  line-height: 1.9;
+  color: rgba(244, 233, 214, 0.74);
+}
+.dash-root .inv-hero .btn--gold {
+  color: #2a1208;
+  background: linear-gradient(135deg, #f6e2b0 0%, var(--lux-gold) 50%, #a77d3c 100%);
+  box-shadow:
+    0 12px 26px -12px rgba(201, 163, 95, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+.dash-root .inv-hero .btn--gold:hover {
+  box-shadow:
+    0 16px 32px -12px rgba(201, 163, 95, 0.85),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+/* إجمالي المدفوع — كارت زجاج جوّه الترويسة */
+.dash-root .inv-hero__total {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 270px;
+  padding: 24px 30px 22px;
+  border-radius: 20px;
+  text-align: center;
+  border: 1px solid rgba(201, 163, 95, 0.45);
+  background:
+    linear-gradient(160deg, rgba(255, 244, 218, 0.1), rgba(255, 244, 218, 0.02) 60%),
+    rgba(0, 0, 0, 0.18);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 244, 218, 0.14),
+    0 20px 40px -26px rgba(0, 0, 0, 0.7);
+}
+.dash-root .inv-hero__total > span {
+  font-size: 12.5px;
+  letter-spacing: 0.08em;
+  color: var(--lux-gold);
+}
+.dash-root .inv-hero__total strong {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(40px, 5vw, 56px);
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+  color: #fff4da;
+  text-shadow: 0 6px 22px rgba(201, 163, 95, 0.25);
+}
+.dash-root .inv-hero__total strong small {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--lux-gold-hi);
+  opacity: 0.85;
+}
+.dash-root .inv-hero__total em {
+  font-style: normal;
+  font-size: 12.5px;
+  color: rgba(244, 233, 214, 0.62);
+}
+
+/* كروت الأرقام راكبة على طرف الترويسة */
+.dash-root .inv-stats {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+  margin: -58px 22px 26px;
+}
+.dash-root .inv-stat {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 18px 10px 15px;
+  border-radius: 18px;
+  text-align: center;
+  border: 1px solid color-mix(in srgb, var(--lux-gold) 30%, var(--line));
+  background: var(--surface);
+  box-shadow: 0 18px 40px -24px rgba(40, 12, 22, 0.45);
+}
+.dash-root .inv-stat::before {
+  content: '';
+  position: absolute;
+  inset: 0 24% auto;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--lux-gold), transparent);
+}
+.dash-root .inv-stat strong {
+  font-family: var(--font-display);
+  font-size: clamp(24px, 2.6vw, 32px);
+  font-weight: 600;
+  line-height: 1.15;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+.dash-root .inv-stat span {
+  font-size: 12.5px;
   color: var(--muted);
 }
-.dash-root .inv-table .paid-input {
-  width: 92px;
-  padding: 6px 9px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
+
+/* شريط الفلاتر */
+.dash-root .inv-toolbar {
+  gap: 10px;
+  padding: 10px;
+  margin-bottom: 18px;
+  border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--lux-gold) 22%, var(--line));
+  background: var(--surface);
+  box-shadow: 0 14px 34px -28px rgba(40, 12, 22, 0.45);
+}
+.dash-root .inv-toolbar input,
+.dash-root .inv-toolbar select {
+  height: 42px;
+  padding-block: 0;
+  border-radius: 11px;
+  border-color: var(--line);
+  background: var(--bg);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+.dash-root .inv-toolbar input:focus,
+.dash-root .inv-toolbar select:focus {
+  outline: none;
+  border-color: color-mix(in srgb, var(--lux-gold) 70%, var(--accent));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--lux-gold) 18%, transparent);
+}
+.dash-root .inv-toolbar select {
+  min-width: 150px;
+}
+.dash-root .inv-toolbar .btn {
+  height: 42px;
+  padding-inline: 26px;
+}
+.dash-root .inv-search {
+  position: relative;
+  flex: 1 1 260px;
+  display: flex;
+}
+.dash-root .inv-search svg {
+  position: absolute;
+  inset-inline-start: 13px;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  transform: translateY(-50%);
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+.dash-root .inv-search input {
+  flex: 1;
+  width: 100%;
+  padding-inline-start: 40px;
+}
+
+/* الجدول */
+.dash-root .inv-lux {
+  border-radius: 20px;
+  border-color: color-mix(in srgb, var(--lux-gold) 26%, var(--line));
+  box-shadow: 0 22px 50px -34px rgba(40, 12, 22, 0.4);
+}
+.dash-root .inv-lux th {
+  padding-block: 15px;
+  font-size: 12px;
+  font-weight: 500;
+  color: color-mix(in srgb, var(--lux-gold) 55%, var(--muted));
+  background: color-mix(in srgb, var(--lux-gold) 8%, var(--surface-2));
+  border-bottom: 1px solid color-mix(in srgb, var(--lux-gold) 28%, var(--line));
+}
+.dash-root .inv-lux thead th:first-child {
+  border-start-start-radius: 20px;
+}
+.dash-root .inv-lux thead th:last-child {
+  border-start-end-radius: 20px;
+}
+.dash-root .inv-lux tbody tr {
+  transition: background-color 0.2s ease;
+}
+.dash-root .inv-lux tbody tr:hover {
+  background: color-mix(in srgb, var(--lux-gold) 6%, var(--surface));
+}
+.dash-root .inv-lux tbody tr:last-child td {
+  border-bottom: 0;
+}
+.dash-root .inv-lux td {
+  padding-block: 16px;
+  font-variant-numeric: tabular-nums;
+}
+.dash-root .inv-lux .cell--title strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 15.5px;
+  font-weight: 600;
+}
+.dash-root .inv-lux .cell--title small {
+  display: block;
+  margin-top: 3px;
+  font-size: 12px;
+  direction: ltr;
+  text-align: end;
+  color: color-mix(in srgb, var(--lux-gold) 45%, var(--muted));
+}
+.dash-root .inv-lux .pill {
+  padding: 4px 12px;
+  font-weight: 500;
+}
+.dash-root .inv-lux .pill--published {
+  background: color-mix(in srgb, var(--ok) 9%, transparent);
+}
+.dash-root .inv-lux .pill--draft {
+  background: color-mix(in srgb, var(--muted) 8%, transparent);
+}
+
+/* خانة «المدفوع»: رقم + «ج.م» في كبسولة، ودهبي لما يبقى فيها مبلغ */
+.dash-root .paid-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: 128px;
+  height: 40px;
+  padding-inline: 12px;
+  border-radius: 12px;
+  border: 1px dashed var(--line);
+  background: var(--bg);
+  cursor: text;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+.dash-root .paid-field:hover {
+  border-color: color-mix(in srgb, var(--lux-gold) 60%, var(--line));
+}
+.dash-root .paid-field:focus-within {
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--lux-gold) 75%, var(--accent));
+  background: var(--surface);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--lux-gold) 18%, transparent);
+}
+.dash-root .paid-field.is-paid {
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--lux-gold) 50%, var(--line));
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--lux-gold) 12%, var(--surface)),
+    color-mix(in srgb, var(--lux-gold) 4%, var(--surface))
+  );
+}
+.dash-root .paid-field span {
+  flex: none;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+.dash-root .paid-field .paid-input {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  outline: none;
   background: transparent;
-  color: inherit;
+  color: var(--text);
   font: inherit;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
   text-align: center;
 }
-.dash-root .inv-table .paid-input:hover {
-  border-color: var(--muted);
+.dash-root .paid-field.is-paid .paid-input {
+  color: var(--accent);
 }
-.dash-root .inv-table .paid-input:focus {
-  outline: none;
-  border-color: var(--accent);
-  background: var(--surface);
+.dash-root .paid-field .paid-input::placeholder {
+  color: color-mix(in srgb, var(--muted) 60%, transparent);
+  font-weight: 400;
 }
-.dash-root .inv-table .paid-input:disabled {
-  opacity: 0.55;
+.dash-root .paid-field .paid-input:disabled {
+  opacity: 0.5;
+}
+
+/* الكروت (تابلت/موبايل) بحواف دهبي */
+@media (max-width: 1180px) {
+  .dash-root .inv-lux {
+    box-shadow: none;
+  }
+  .dash-root .table-cards.inv-lux tbody tr {
+    border-color: color-mix(in srgb, var(--lux-gold) 24%, var(--line));
+    border-radius: 18px;
+    box-shadow: 0 16px 36px -28px rgba(40, 12, 22, 0.45);
+  }
+  .dash-root .table-cards.inv-lux tbody tr:hover {
+    background: var(--surface);
+  }
+}
+@media (max-width: 1100px) {
+  .dash-root .inv-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 760px) {
+  .dash-root .inv-hero {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 22px;
+    padding: 30px 22px 84px;
+  }
+  .dash-root .inv-hero__text {
+    align-items: center;
+    text-align: center;
+  }
+  .dash-root .inv-hero__total {
+    min-width: 0;
+  }
+  .dash-root .inv-stats {
+    margin-inline: 12px;
+    gap: 9px;
+  }
+  .dash-root .inv-stat {
+    padding: 14px 6px 12px;
+    border-radius: 15px;
+  }
+  .dash-root .inv-toolbar select {
+    flex: 1 1 140px;
+    min-width: 0;
+  }
+  .dash-root .inv-toolbar .btn {
+    flex: 1 1 100%;
+  }
+}
+@media (max-width: 420px) {
+  .dash-root .inv-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .dash-root .inv-stat:first-child {
+    grid-column: 1 / -1;
+  }
 }
 
 @media (min-width: 921px) and (max-width: 1180px) {
