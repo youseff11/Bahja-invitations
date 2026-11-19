@@ -85,6 +85,7 @@ class CutoverTests(InviteBase):
                 html = response.content.decode()
                 self.assertIn('<meta property="og:title" content="متابعة ردود الضيوف', html)
                 self.assertIn(f'content="http://testserver/i/{slug}/responses/{code}/"', html)
+                self.assertIn('images/responses-share-ar', html)
                 self.assertIn('<meta name="robots" content="noindex, nofollow">', html)
                 self.assertEqual(response["X-Robots-Tag"], "noindex, nofollow")
         # كود غلط: نفس الصفحة العامة من غير أي بيانات من الدعوة

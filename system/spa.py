@@ -51,7 +51,6 @@ def _client_head(request, invitation) -> dict:
     """معاينة رابط متابعة الردود: لما صاحب الدعوة يستلمه على واتساب/ماسنجر يبان
     من العنوان والوصف إنه لوحة الردود — مش الدعوة نفسها ولا الصفحة الرئيسية."""
     from django.utils.translation import get_language
-    from . import services
 
     en = (get_language() or "").startswith("en")
     names = (" & " if en else " و ").join(
@@ -64,12 +63,15 @@ def _client_head(request, invitation) -> dict:
         title = f"متابعة ردود الضيوف · {names}"
         description = ("رابط خاص بأصحاب الدعوة — تابع تأكيدات الحضور وعدد الضيوف "
                        "ورسائل التهنئة أولاً بأول.")
-    s = (invitation.get_document() or {}).get("settings") or {}
-    template = getattr(invitation, "template", None)
-    image = services._share_image(  # noqa: SLF001
-        request, s.get("share_image"),
-        getattr(template, "cover_image", None), getattr(template, "cover_url", ""),
-    )
+    # صورة ثابتة فخمة خاصة بلوحة الردود (لوجو بهجة على قطيفة غامقة ودهبي) بدل غلاف
+    # الدعوة — عشان اللي يستلم اللينك يفهم من أول نظرة إنها صفحة المتابعة مش الدعوة.
+    # ‎?v=‎ بيتغيّر لما الصورة تتغيّر عشان ميتا وواتساب مايفضلوش ماسكين القديمة.
+    from django.templatetags.static import static
+    image = {
+        "url": request.build_absolute_uri(static(f"images/responses-share-{'en' if en else 'ar'}.jpg")) + "?v=1",
+        "width": 1200,
+        "height": 630,
+    }
     return {
         "title": title,
         "description": description,

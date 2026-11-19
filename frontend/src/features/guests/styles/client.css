@@ -262,6 +262,212 @@
 
 
 
+/* =====================================================================
+   الشكل الفخم — ترويسة قطيفة غامقة بدهبي، كروت أرقام راكبة عليها، وأقسام بحواف ذهبية.
+   الألوان الأساسية من التوكنز؛ الدهبي والحبر هنا بس عشان يفضلوا ثابتين في الثيمين.
+   ===================================================================== */
+.client-followup-page {
+  --lux-gold: #c9a35f;
+  --lux-gold-hi: #f3dca6;
+  --lux-ink: #170a10;
+  --lux-wine: #4e1426;
+  background:
+    radial-gradient(900px 420px at 50% -120px, color-mix(in srgb, var(--lux-gold) 16%, transparent), transparent 70%),
+    var(--bg);
+}
+.client-followup { padding-top: 28px; }
+
+/* الترويسة */
+.client-followup-welcome {
+  position: relative; isolation: isolate; overflow: hidden;
+  margin-bottom: 0; padding: 40px 28px 92px; gap: 12px;
+  border-radius: 26px; color: #f4e9d6;
+  background:
+    radial-gradient(70% 120% at 50% 0%, color-mix(in srgb, var(--lux-wine) 85%, transparent), transparent 75%),
+    radial-gradient(40% 60% at 12% 100%, rgba(201, 163, 95, .14), transparent 70%),
+    linear-gradient(160deg, #2a0f1a 0%, var(--lux-ink) 60%, #0f070b 100%);
+  box-shadow: 0 30px 60px -30px rgba(40, 8, 20, .55);
+}
+.client-followup-welcome::before {   /* برواز دهبي رفيع جوّه الترويسة */
+  content: ""; position: absolute; inset: 12px; z-index: -1; pointer-events: none;
+  border: 1px solid rgba(201, 163, 95, .45); border-radius: 18px;
+  box-shadow: inset 0 0 0 5px rgba(201, 163, 95, .06);
+}
+.client-followup-welcome::after {    /* لمعة خفيفة بتعدّي مرة واحدة */
+  content: ""; position: absolute; z-index: -1; top: -40%; bottom: -40%; width: 22%;
+  inset-inline-start: -30%; transform: skewX(-18deg); pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(255, 236, 200, .09), transparent);
+  animation: cf-sheen 2.6s .4s ease-out both;
+}
+@keyframes cf-sheen { to { inset-inline-start: 120%; } }
+@media (prefers-reduced-motion: reduce) { .client-followup-welcome::after { display: none; } }
+
+.client-followup .client-followup-welcome .client-followup-logo {
+  width: min(78%, 300px);
+  background-image: var(--site-logo-dark, url('/site-logo/dark.png'));
+  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, .45));
+}
+.client-followup .client-followup-welcome h1 {
+  font-size: clamp(28px, 4.2vw, 46px); line-height: 1.35; padding-bottom: 2px;
+  background: linear-gradient(180deg, #fff4da 0%, var(--lux-gold-hi) 30%, var(--lux-gold) 62%, #f0d49a 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.client-followup-orn { display: flex; align-items: center; gap: 12px; }
+.client-followup-orn i { display: block; width: 72px; height: 1px; background: linear-gradient(90deg, transparent, var(--lux-gold)); }
+.client-followup-orn i:last-child { transform: scaleX(-1); }
+.client-followup-orn b { width: 8px; height: 8px; transform: rotate(45deg); border: 1px solid var(--lux-gold); }
+.client-followup-welcome .client-followup-subtitle {
+  color: rgba(244, 233, 214, .78); font-size: 15px; line-height: 1.9; max-width: 52ch;
+}
+
+/* الأزرار فوق: طباعة الردود + PDF التهاني */
+.client-followup-toolbar {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 10px;
+}
+.gw .client-followup-tool {
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 12px 22px; border-radius: 999px; font-size: 14.5px;
+}
+.client-followup-tool svg {
+  width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor;
+  stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round;
+}
+.gw .client-followup-welcome .btn--gold {
+  color: #2a1208;
+  background: linear-gradient(135deg, #f6e2b0 0%, var(--lux-gold) 50%, #a77d3c 100%);
+  box-shadow: 0 12px 26px -12px rgba(201, 163, 95, .7), inset 0 1px 0 rgba(255, 255, 255, .5);
+}
+.gw .client-followup-welcome .btn--ghost {
+  color: #f4e9d6; border-color: rgba(201, 163, 95, .55); background: rgba(255, 255, 255, .04);
+}
+.gw .client-followup-welcome .btn--ghost:hover {
+  color: var(--lux-gold-hi); border-color: var(--lux-gold); background: rgba(201, 163, 95, .12);
+}
+
+/* كروت الأرقام: راكبة على طرف الترويسة */
+.client-followup-stats {
+  position: relative; z-index: 1;
+  margin: -58px 18px 30px; gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+}
+.client-followup-stat {
+  position: relative; overflow: hidden; min-height: 0;
+  align-items: center; text-align: center; justify-content: flex-start; gap: 6px;
+  padding: 20px 14px 18px; border-radius: 20px;
+  border: 1px solid color-mix(in srgb, var(--lux-gold) 30%, var(--line));
+  background: var(--surface);
+  box-shadow: 0 18px 40px -24px rgba(40, 12, 22, .45);
+}
+.client-followup-stat::before {
+  content: ""; position: absolute; inset: 0 22% auto; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--lux-gold), transparent);
+}
+.client-followup-stat-icon {
+  width: 40px; height: 40px; font-size: 17px; color: var(--accent);
+  border-color: color-mix(in srgb, var(--lux-gold) 55%, var(--line));
+  background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--lux-gold) 22%, var(--surface)), var(--surface));
+}
+.client-followup-stat-label { order: 3; font-size: 13px; letter-spacing: .02em; }
+.client-followup-stat strong {
+  order: 2; font-size: clamp(34px, 4vw, 44px); font-weight: 600; color: var(--accent);
+}
+
+/* الأقسام */
+.client-followup-section {
+  margin-top: 26px; border-radius: 22px;
+  border-color: color-mix(in srgb, var(--lux-gold) 26%, var(--line));
+  box-shadow: 0 22px 50px -34px rgba(40, 12, 22, .4);
+}
+.client-followup-section-head {
+  padding: 22px 26px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--lux-gold) 7%, var(--surface)), var(--surface));
+  border-bottom-color: color-mix(in srgb, var(--lux-gold) 28%, var(--line));
+}
+.client-followup-kicker {
+  display: inline-flex; align-items: center; gap: 8px;
+  color: color-mix(in srgb, var(--lux-gold) 70%, var(--accent));
+  font-family: "Cormorant Garamond", serif; font-weight: 600; letter-spacing: .32em; font-size: 12px;
+}
+.client-followup-kicker::before { content: ""; width: 18px; height: 1px; background: currentColor; }
+.client-followup-count { padding: 7px 16px; font-weight: 500; }
+
+/* الجدول */
+.client-followup-table th {
+  background: color-mix(in srgb, var(--lux-gold) 8%, var(--surface-2));
+  font-size: 12.5px; letter-spacing: .04em; padding-block: 14px;
+}
+.client-followup th, .client-followup td { padding-inline: 18px; }
+.client-followup-table td { padding-block: 15px; }
+.client-followup tbody tr { transition: background-color .2s ease; }
+.client-followup tbody tr:hover { background: color-mix(in srgb, var(--lux-gold) 6%, var(--surface)); }
+.client-followup-cell-name strong { font-size: 15px; }
+/* ‎td.‎ لازم: ‎.client-followup td‎ عليها nowrap وكانت بتغلب، فالتعليق كان بيطلع فوق عمود التاريخ */
+.client-followup td.client-followup-message {
+  white-space: normal; min-width: 240px; max-width: 420px; line-height: 1.8; overflow-wrap: anywhere;
+}
+.client-followup td.client-followup-cell-date { color: var(--muted); font-size: 13px; direction: ltr; text-align: end; }
+.client-followup-pill { padding: 4px 12px; font-weight: 500; }
+.client-followup-pill--attending { background: color-mix(in srgb, var(--ok) 9%, transparent); }
+.client-followup-pill--declined { background: color-mix(in srgb, var(--danger) 8%, transparent); }
+.client-followup-pill--maybe { background: color-mix(in srgb, var(--accent) 8%, transparent); }
+
+/* التهاني */
+.client-followup-messages { gap: 14px; padding: 22px; }
+.client-followup-message-card {
+  position: relative; padding: 18px 18px 16px; border-radius: 16px;
+  border-color: color-mix(in srgb, var(--lux-gold) 24%, var(--line));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--lux-gold) 5%, var(--surface)), var(--surface-2));
+}
+.client-followup-message-card-head strong { font-family: "Amiri", serif; font-size: 17px; }
+
+/* الموبايل */
+@media (max-width: 680px) {
+  .client-followup { width: min(100% - 24px, 560px); padding-top: 14px; }
+  .client-followup-welcome { padding: 30px 18px 80px; border-radius: 22px; }
+  .client-followup-welcome::before { inset: 8px; border-radius: 16px; }
+  .client-followup .client-followup-welcome .client-followup-logo { width: min(80%, 240px); }
+  .client-followup-welcome .client-followup-subtitle { font-size: 13.5px; }
+  .client-followup-toolbar { flex-direction: column; align-self: stretch; padding-inline: 6px; }
+  .gw .client-followup-tool { justify-content: center; width: 100%; }
+  .client-followup-stats { margin: -52px 8px 22px; gap: 10px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .client-followup-stat { padding: 16px 10px 14px; border-radius: 16px; }
+  .client-followup-stat:last-child:nth-child(odd) { grid-column: 1 / -1; }
+  .client-followup-stat-icon { width: 34px; height: 34px; font-size: 15px; }
+  .client-followup-section { border-radius: 18px; margin-top: 18px; }
+  .client-followup-section-head { padding: 16px 18px; }
+  .client-followup td.client-followup-message { min-width: 0; max-width: none; }
+  .client-followup-table--stack tr { border-color: color-mix(in srgb, var(--lux-gold) 22%, var(--line)); }
+  .client-followup-table--stack td.client-followup-cell-name strong { font-family: "Amiri", serif; font-size: 18px; }
+  .client-followup .client-followup-table--stack td { padding-inline: 0; }
+  .client-followup-messages { padding: 14px; }
+}
+
+/* طباعة الردود لوحدها (‎body.print-rsvp‎) */
+@media print {
+  body.print-rsvp { background: #fff; }
+  body.print-rsvp .client-followup-page { background: #fff; min-height: 0; }
+  body.print-rsvp .client-followup > :not(.client-followup-rsvp) { display: none !important; }
+  body.print-rsvp .client-followup { width: 100%; padding: 0; }
+  body.print-rsvp .client-followup-rsvp { margin: 0; border: 0; box-shadow: none; background: #fff; color: #000; overflow: visible; border-radius: 0; }
+  body.print-rsvp .client-followup-section-head { background: #fff; padding: 0 0 12px; }
+  body.print-rsvp .client-followup-print-names { display: block; margin: 4px 0 0; color: #333; }
+  body.print-rsvp .client-followup-table-wrap { overflow: visible; }
+  body.print-rsvp .client-followup-table { min-width: 0; font-size: 12px; }
+  body.print-rsvp .client-followup-table th { background: #f1ece4 !important; color: #333; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body.print-rsvp .client-followup-table td,
+  body.print-rsvp .client-followup-table th { padding: 8px 10px; border-bottom: 1px solid #ccc; color: #000; }
+  body.print-rsvp .client-followup-table tr { break-inside: avoid; }
+  body.print-rsvp .client-followup-pill { border-color: #888; color: #000; background: none; }
+  /* على الموبايل الجدول بيتحوّل كروت — في الطباعة نرجّعه جدول عادي */
+  body.print-rsvp .client-followup-table--stack { display: table; }
+  body.print-rsvp .client-followup-table--stack thead { position: static; width: auto; height: auto; overflow: visible; clip: auto; display: table-header-group; }
+  body.print-rsvp .client-followup-table--stack tbody { display: table-row-group; padding: 0; }
+  body.print-rsvp .client-followup-table--stack tr { display: table-row; border: 0; background: none; padding: 0; margin: 0; }
+  body.print-rsvp .client-followup-table--stack td { display: table-cell; }
+  body.print-rsvp .client-followup-table--stack td[data-label]::before { display: none; }
+  body.print-wishes .client-followup-section-head { background: #fff; padding: 0 0 12px; }
+}
+
 /* تحميل رسائل التهنئة PDF: بنطبع قسمها لوحده */
 @media print {
   body.print-wishes { background: #fff; }

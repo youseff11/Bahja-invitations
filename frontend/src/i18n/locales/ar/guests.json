@@ -206,6 +206,8 @@
     "noGuests": "لسه مفيش ضيوف أو تصاريح.",
     "wishesTitle": "رسائل التهنئة",
     "wishesCount": "{{n}} رسالة",
+    "printReplies": "طباعة الردود",
+    "wishesPdfTop": "تحميل رسائل التهنئة PDF",
     "wishesPdf": "تحميل PDF",
     "noWishes": "لسه مفيش رسائل تهنئة.",
     "emptyTitle": "لا توجد أدوات متابعة مفعّلة",

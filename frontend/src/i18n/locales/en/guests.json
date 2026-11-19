@@ -206,6 +206,8 @@
     "noGuests": "No guests or passes yet.",
     "wishesTitle": "Well-wishes",
     "wishesCount": "Messages: {{n}}",
+    "printReplies": "Print replies",
+    "wishesPdfTop": "Wishes PDF",
     "wishesPdf": "Download PDF",
     "noWishes": "No well-wishes yet.",
     "emptyTitle": "No follow-up tools are enabled",

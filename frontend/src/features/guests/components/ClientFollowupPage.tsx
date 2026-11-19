@@ -13,18 +13,19 @@ import '../styles/base.css'
 import '../styles/client.css'
 
 /**
- * تحميل رسائل التهنئة PDF: بنطبع القسم ده لوحده (الـCSS بيخفي الباقي لما ‎body.print-wishes‎ موجود)
- * والمتصفح بيحفظه PDF بالخط العربي الصح من غير مكتبات. عنوان الصفحة هو اسم الملف الافتراضي.
+ * طباعة قسم لوحده (الردود أو رسائل التهنئة): الـCSS بيخفي الباقي لما ‎body.print-rsvp‎ أو ‎body.print-wishes‎
+ * موجود، والمتصفح بيحفظه PDF بالخط العربي الصح من غير مكتبات. عنوان الصفحة هو اسم الملف الافتراضي.
  */
-function printWishes(fileTitle: string) {
+function printSection(mode: 'rsvp' | 'wishes', fileTitle: string) {
+  const bodyClass = `print-${mode}`
   const previousTitle = document.title
   const done = () => {
-    document.body.classList.remove('print-wishes')
+    document.body.classList.remove(bodyClass)
     document.title = previousTitle
     window.removeEventListener('afterprint', done)
   }
   document.title = fileTitle
-  document.body.classList.add('print-wishes')
+  document.body.classList.add(bodyClass)
   window.addEventListener('afterprint', done)
   window.print()
 }
@@ -58,6 +59,9 @@ export function ClientFollowupPage() {
   const venueLink = absoluteUrl(venuePath(invitation.slug, invitation.venueToken))
   const names = invitation.nameTwo ? `${invitation.nameOne} ${t('guests.client.and')}${invitation.nameTwo}` : invitation.nameOne
   const answersColumns = hasAnswers ? 6 : 5
+  const fileNames = names || invitation.slug
+  const canPrintRsvp = hasRsvp && rsvpRows.length > 0
+  const canPrintWishes = hasGuestbook && messageRows.length > 0
 
   return (
     <div className="gw client-followup-page">
@@ -68,7 +72,32 @@ export function ClientFollowupPage() {
             <span className="sr-only">{siteName}</span>
           </Link>
           <h1>{invitation.nameOne ? t('guests.client.welcomeNamed', { names }) : t('guests.client.welcome')}</h1>
+          <span className="client-followup-orn" aria-hidden="true"><i /><b /><i /></span>
           <p className="client-followup-subtitle">{t('guests.client.subtitle')}</p>
+          {(canPrintRsvp || canPrintWishes) && (
+            <div className="client-followup-toolbar no-print">
+              {canPrintRsvp && (
+                <button
+                  type="button"
+                  className="btn btn--gold client-followup-tool"
+                  onClick={() => printSection('rsvp', `${t('guests.client.rsvpTitle')} — ${fileNames}`)}
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 9V3h10v6M7 17H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2M7 14h10v7H7z" /></svg>
+                  {t('guests.client.printReplies')}
+                </button>
+              )}
+              {canPrintWishes && (
+                <button
+                  type="button"
+                  className="btn btn--ghost client-followup-tool"
+                  onClick={() => printSection('wishes', `${t('guests.client.wishesTitle')} — ${fileNames}`)}
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0-4.5-4.5M12 15l4.5-4.5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" /></svg>
+                  {t('guests.client.wishesPdfTop')}
+                </button>
+              )}
+            </div>
+          )}
         </header>
 
         <section className="client-followup-stats" aria-label={t('guests.client.summary')}>
@@ -152,11 +181,12 @@ export function ClientFollowupPage() {
         )}
 
         {hasRsvp && (
-          <section className="client-followup-section" aria-labelledby="rsvp-title">
+          <section className="client-followup-section client-followup-rsvp" aria-labelledby="rsvp-title">
             <div className="client-followup-section-head">
               <div>
                 <p className="client-followup-kicker">RSVP</p>
                 <h2 id="rsvp-title">{t('guests.client.rsvpTitle')}</h2>
+                {invitation.nameOne && <p className="client-followup-print-names">{names}</p>}
               </div>
               <span className="client-followup-count">{t('guests.client.repliesCount', { n: stats.rsvpTotal })}</span>
             </div>
@@ -284,18 +314,7 @@ export function ClientFollowupPage() {
                 <h2 id="messages-title">{t('guests.client.wishesTitle')}</h2>
                 {invitation.nameOne && <p className="client-followup-print-names">{names}</p>}
               </div>
-              <span className="client-followup-section-tools">
-                <span className="client-followup-count">{t('guests.client.wishesCount', { n: stats.messages })}</span>
-                {messageRows.length > 0 && (
-                  <button
-                    type="button"
-                    className="btn btn--gold btn--sm no-print"
-                    onClick={() => printWishes(`${t('guests.client.wishesTitle')} — ${names || invitation.slug}`)}
-                  >
-                    {t('guests.client.wishesPdf')}
-                  </button>
-                )}
-              </span>
+              <span className="client-followup-count">{t('guests.client.wishesCount', { n: stats.messages })}</span>
             </div>
             <div className="client-followup-messages">
               {messageRows.map((row) => (
