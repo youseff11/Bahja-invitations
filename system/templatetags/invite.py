@@ -419,7 +419,7 @@ def split_code(value):
     return {"css": css, "html": html,
             "js": wrap_js(_bind_event_date("\n".join(scripts)), events, names),
             "fluid": fills_width(css, html),
-            "fit": scales_with_frame(css, html)}
+            "fit": scales_with_frame(css, html, "\n".join(scripts))}
 
 
 # وحدات بتتقاس من الشاشة أو المسرح نفسه — الكود اللي بيستخدمها متظبط
@@ -430,8 +430,26 @@ _RELATIVE_UNIT_RE = re.compile(
     re.I)
 _CANVAS_RE = re.compile(r"<canvas\b", re.I)
 
+# سكربت بيقيس القسم/الشاشة وبيكتب المقاس بالبكسل (‎scope.style.width = W + 'px'‎
+# أو ‎Object.assign(el.style, {width: w + 'px'})‎) — الكود ده بيظبط نفسه على أي
+# عرض، و‎zoom‎ بيضرب المقاس المحسوب في النسبة تاني فيطلع أعرض من الشاشة.
+# قياس حي (دعوة ٦، قسم الختام): على ٤٣٠px القسم طلع ٤٧٤px ومزقوق ٤٣px يمين.
+_JS_COMMENT_RE = re.compile(r"/\*.*?\*/|(?<![:\\'\"])//[^\n]*", re.S)
+_JS_MEASURE_RE = re.compile(
+    r"\b(?:clientWidth|clientHeight|offsetWidth|offsetHeight|innerWidth|innerHeight"
+    r"|getBoundingClientRect)\b")
+_JS_PX_SIZE_RE = re.compile(
+    r"\.style\.(?:width|height|maxWidth|minWidth)\s*=[^;\n]*?\+\s*['\"]px['\"]"
+    r"|\b(?:width|height)\s*:\s*[A-Za-z_$(][^,;\n}]*?\+\s*['\"]px['\"]")
 
-def scales_with_frame(css: str, html: str) -> bool:
+
+def sizes_itself(js: str) -> bool:
+    """السكربت بيقيس الصفحة وبيدّي عناصره مقاس بالبكسل من القياس ده؟"""
+    code = _JS_COMMENT_RE.sub("", js or "")
+    return bool(_JS_MEASURE_RE.search(code) and _JS_PX_SIZE_RE.search(code))
+
+
+def scales_with_frame(css: str, html: str, js: str = "") -> bool:
     """الكود ينفع يتكبّر بنسبة عرض الموبايل لإطار المحرر (٣٩٠px)؟
 
     الخطوط والإزاحات في كود المصمّم بالبكسل، والصور والفيديو اللي حواليه
@@ -441,9 +459,14 @@ def scales_with_frame(css: str, html: str) -> bool:
     حاجة زي المحرر بالظبط. بنستثني:
       • كود بوحدات الشاشة/المسرح — متظبط لوحده و‎zoom‎ بيكبّره مرتين.
       • الكانفس — الرسم بالإصبع بيقيس بالبكسل وأي ‎zoom‎ بيبوّظ مكان اللمسة.
+      • سكربت بيقيس القسم/الشاشة ويكتب المقاس بالبكسل (‎sizes_itself‎) —
+        القسم بياخد عرض الشاشة بنفسه، و‎zoom‎ كان بيطلّعه أعرض منها ويزقّه
+        لجنب على التليفونات العريضة (آيفون ٤٣٠px).
     """
     text = _CSS_COMMENT_RE.sub("", css or "") + "\n" + (html or "")
     if _CANVAS_RE.search(html or ""):
+        return False
+    if sizes_itself(js):
         return False
     return not _RELATIVE_UNIT_RE.search(text)
 

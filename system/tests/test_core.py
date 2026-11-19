@@ -2388,6 +2388,31 @@ class CodeBoxFitsPhoneWidthTests(TestCase):
     def test_canvas_is_left_alone(self):
         self.assertFalse(invite_tags.scales_with_frame("", "<canvas></canvas>"))
 
+    # قسم بياخد عرض الشاشة بالسكربت: ‎zoom‎ كان بيطلّعه أعرض منها ويزقّه يمين
+    # على آيفون ٤٣٠px (ختام «وردة القصر» في دعوة ٦: ٤٧٤px بدل ٤٣٠).
+    def test_a_script_that_sizes_itself_from_the_page_is_left_alone(self):
+        js = ("const W = sec.clientWidth;\n"
+              "scope.style.width = W + 'px';")
+        self.assertFalse(invite_tags.scales_with_frame(".t{font-size:20px}", "<p>x</p>", js))
+        js = ("const r = el.getBoundingClientRect();\n"
+              "Object.assign(box.style, { width: r.width + 'px', height: h + 'px' });")
+        self.assertFalse(invite_tags.scales_with_frame("", "<p>x</p>", js))
+
+    def test_a_script_that_only_measures_or_only_sets_literals_still_scales(self):
+        self.assertTrue(invite_tags.scales_with_frame(
+            "", "<p>x</p>", "const w = el.offsetWidth; el.classList.toggle('wide', w > 300);"))
+        self.assertTrue(invite_tags.scales_with_frame(
+            "", "<p>x</p>", "const w = el.offsetWidth; dot.style.width = '9px';"))
+        self.assertTrue(invite_tags.scales_with_frame(
+            "", "<p>x</p>", "// scope.style.width = sec.clientWidth + 'px';\nrun();"))
+
+    def test_split_code_reads_the_script_for_fit(self):
+        code = ("<style>.brc{width:100%}</style><div class=\"brc\">x</div>"
+                "<script>const W = sec.clientWidth; scope.style.width = W + 'px';</script>")
+        self.assertFalse(invite_tags.split_code(code)["fit"])
+        self.assertTrue(invite_tags.split_code(
+            "<style>.t{font-size:20px}</style><p class=\"t\">x</p>")["fit"])
+
     def test_words_that_look_like_units_do_not_count(self):
         self.assertTrue(invite_tags.scales_with_frame(
             "/* 5vw */ .t{color:red}", "<p>2video 17.10.2026</p>"))
