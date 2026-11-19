@@ -58,7 +58,7 @@ _PROP_KEYS: dict[str, tuple[str, ...]] = {
     "details": ("heading", "eyebrow", "rows", "layout", "columns"),
     "agenda": ("heading", "items"),
     "location": ("heading", "eyebrow", "venue", "address", "show_map",
-                 "map_embed_url", "map_link", "map_width",
+                 "map_embed_url", "map_link", "map_open", "map_width",
                  "map_height", "directions_label", "notes"),
     "gallery": ("heading", "images", "layout", "columns", "gap",
                 "image_radius", "aspect", "lightbox"),

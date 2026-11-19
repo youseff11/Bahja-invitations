@@ -18,33 +18,33 @@ describe('mapEmbedUrl', () => {
     expect(mapEmbedUrl(code)).toBe('https://www.google.com/maps/embed?pb=!1m18&z=3')
   })
 
-  it('keeps an embeddable link as it is, and links to other sites untouched', () => {
-    expect(mapEmbedUrl('https://www.google.com/maps?q=cairo&output=embed')).toBe('https://www.google.com/maps?q=cairo&output=embed')
+  it('upgrades a legacy output=embed link, keeps other sites untouched', () => {
+    expect(mapEmbedUrl('https://www.google.com/maps?q=cairo&output=embed')).toBe('https://www.google.com/maps/embed?origin=mfe&pb=!1m2!2m1!1scairo')
     expect(mapEmbedUrl('https://example.com/map')).toBe('https://example.com/map')
   })
 
   it('turns coordinates (also Arabic comma) into an embed with a street-level zoom', () => {
-    expect(mapEmbedUrl('29.990823, 31.130000')).toBe('https://www.google.com/maps?q=29.990823,31.13&z=16&output=embed')
-    expect(mapEmbedUrl('30.04،31.23')).toBe('https://www.google.com/maps?q=30.04,31.23&z=16&output=embed')
+    expect(mapEmbedUrl('29.990823, 31.130000')).toBe('https://www.google.com/maps/embed?origin=mfe&pb=!1m3!2m1!1s29.990823,31.13!6i16')
+    expect(mapEmbedUrl('30.04،31.23')).toBe('https://www.google.com/maps/embed?origin=mfe&pb=!1m3!2m1!1s30.04,31.23!6i16')
     // خط عرض برّه المدى (٩٥) مش إحداثيات — بيتعامل كنص بحث
-    expect(mapEmbedUrl('95, 31')).toBe('https://www.google.com/maps?q=95,%2031&output=embed')
+    expect(mapEmbedUrl('95, 31')).toBe('https://www.google.com/maps/embed?origin=mfe&pb=!1m2!2m1!1s95,+31')
   })
 
   it('reads the place from a share link: @lat,lng,zoom, !3d!4d, q=, /place/', () => {
-    expect(mapEmbedUrl('https://www.google.com/maps/@30.0444,31.2357,15z')).toBe('https://www.google.com/maps?q=30.0444,31.2357&z=15&output=embed')
+    expect(mapEmbedUrl('https://www.google.com/maps/@30.0444,31.2357,15z')).toBe('https://www.google.com/maps/embed?origin=mfe&pb=!1m3!2m1!1s30.0444,31.2357!6i15')
     expect(mapEmbedUrl('https://www.google.com/maps/place/Pyramids/data=!3d29.9792!4d31.1342')).toBe(
-      'https://www.google.com/maps?q=29.9792,31.1342&z=16&output=embed',
+      'https://www.google.com/maps/embed?origin=mfe&pb=!1m3!2m1!1s29.9792,31.1342!6i16',
     )
-    expect(mapEmbedUrl('https://www.google.com/maps?q=30.1,31.2&z=12')).toBe('https://www.google.com/maps?q=30.1,31.2&z=12&output=embed')
+    expect(mapEmbedUrl('https://www.google.com/maps?q=30.1,31.2&z=12')).toBe('https://www.google.com/maps/embed?origin=mfe&pb=!1m3!2m1!1s30.1,31.2!6i12')
     expect(mapEmbedUrl('https://www.google.com/maps/place/Cairo+Opera+House/@30.04,31.22,17z')).toBe(
-      'https://www.google.com/maps?q=30.04,31.22&z=17&output=embed',
+      'https://www.google.com/maps/embed?origin=mfe&pb=!1m3!2m1!1s30.04,31.22!6i17',
     )
-    expect(mapEmbedUrl('https://www.google.com/maps/place/Cairo+Opera+House')).toBe('https://www.google.com/maps?q=Cairo%20Opera%20House&output=embed')
-    expect(mapEmbedUrl('https://www.google.com/maps?q=Opera%20House')).toBe('https://www.google.com/maps?q=Opera%20House&output=embed')
+    expect(mapEmbedUrl('https://www.google.com/maps/place/Cairo+Opera+House')).toBe('https://www.google.com/maps/embed?origin=mfe&pb=!1m2!2m1!1sCairo+Opera+House')
+    expect(mapEmbedUrl('https://www.google.com/maps?q=Opera%20House')).toBe('https://www.google.com/maps/embed?origin=mfe&pb=!1m2!2m1!1sOpera+House')
   })
 
   it('treats plain text as a search', () => {
-    expect(mapEmbedUrl('Cairo Opera House')).toBe('https://www.google.com/maps?q=Cairo%20Opera%20House&output=embed')
+    expect(mapEmbedUrl('Cairo Opera House')).toBe('https://www.google.com/maps/embed?origin=mfe&pb=!1m2!2m1!1sCairo+Opera+House')
   })
 })
 

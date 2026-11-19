@@ -32,7 +32,7 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.utils.text import slugify
 
 from . import blocks as blocks_engine
-from . import cssscope, images, video
+from . import cssscope, images, maplinks, video
 
 from .models import Asset, Template
 from .sanitize import clean_html
@@ -819,9 +819,7 @@ def _google_maps_embed_fallback(page: str) -> str | None:
     if not pairs:
         return None
     lat, lon = pairs[-1]
-    return "https://www.google.com/maps?q=" + urllib.parse.quote(
-        f"{lat:.7f},{lon:.7f}", safe=","
-    ) + "&output=embed"
+    return maplinks.embed_src(f"{lat:.7f},{lon:.7f}")
 
 
 _TN_ELEM_START_RE = re.compile(

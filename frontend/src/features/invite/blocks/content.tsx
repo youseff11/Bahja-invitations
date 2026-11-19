@@ -322,6 +322,8 @@ interface LocationProps {
   show_map?: boolean
   map_embed_url?: string
   map_link?: string
+  /** رابط فتح المكان لما الضيف يضغط على الخريطة نفسها (‎maplinks.open_url‎) */
+  map_open?: string
   map_width?: number
   map_height?: number
   directions_label?: string
@@ -365,6 +367,17 @@ export function Location({ block }: { block: BlockData }) {
             referrerPolicy="no-referrer-when-downgrade"
             title={t('map.title')}
           />
+          {/* الـiframe لوحده بيتحرك بس — الطبقة دي بتخلي الضغطة تفتح المكان.
+              في المحرر مستخبية بالـCSS عشان الخريطة تتسحب. */}
+          {on(p.map_open) && (
+            <a
+              className="lb-map-open"
+              href={p.map_open}
+              target="_blank"
+              rel="noopener"
+              aria-label={t('map.open')}
+            />
+          )}
         </div>
       ) : (
         on(p.show_map) && (

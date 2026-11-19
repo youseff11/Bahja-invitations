@@ -783,6 +783,18 @@
   background: var(--surface);
 }
 .lb-map iframe { width: 100%; height: 100%; border: 0; display: block; }
+/* طبقة شفافة فوق الخريطة: ضغطة الضيف تفتح المكان في خرائط جوجل بدل ما
+   تحرّك الخريطة الصغيرة. ‎.lb-map‎ في القوالب ممكن تبقى دايرة — ‎inherit‎
+   بيمشي على نفس الحواف. */
+.lb-map { position: relative; }
+.lb-map-open {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+.lb-doc--editing .lb-map-open { display: none; }
 
 /* جوّه المحرر الخريطة لازم تتسحب زي أي عنصر تاني. الـ‎<iframe>‎ بيبلع
    ضغطة الماوس قبل ما توصل للحاوية (‎[data-move]‎)، فكان مفيش سحب خالص —

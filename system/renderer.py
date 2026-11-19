@@ -24,6 +24,7 @@ from django.utils import timezone
 from django.utils.safestring import mark_safe
 
 from . import blocks as blocks_engine
+from . import maplinks
 from . import cssscope
 from . import tildacss
 
@@ -389,10 +390,10 @@ AUTO_FIELD_MAP = {
 # ‎<iframe>‎ (‎X-Frame-Options‎)، فالضيف بيشوف مربّع رمادي مكسور بدل
 # الخريطة — من غير أي رسالة تقول له إيه اللي حصل.
 #
-# الحل: نقبل أي شكل بيوصل من المستخدم ونحوّله لرابط ‎output=embed‎ اللي
+# الحل: نقبل أي شكل بيوصل من المستخدم ونحوّله لرابط ‎/maps/embed?pb=…‎ اللي
 # جوجل بيسمح بتضمينه. الأشكال المدعومة:
 #   • كود التضمين كامل ‎<iframe src="…">‎  → بناخد الـsrc
-#   • رابط ‎/maps/embed?pb=…‎ أو أي رابط فيه ‎output=embed‎  → زي ما هو
+#   • رابط ‎/maps/embed?pb=…‎ → زي ما هو، و‎output=embed‎ القديم → الصيغة النهائية
 #   • رابط عادي فيه إحداثيات (‎?ll=‎ / ‎@lat,lng,17z‎ / ‎!3d…!4d…‎)
 #   • رابط بحث أو مكان (‎?q=‎ / ‎/maps/place/<اسم>‎)
 #   • إحداثيات مكتوبة بالإيد ‎29.99, 31.13‎ أو اسم مكان
@@ -424,10 +425,9 @@ def _map_embed_from_query(query: str, zoom: str = "") -> str:
     """يبني رابط جوجل القابل للتضمين من إحداثيات أو نص بحث."""
     if not query:
         return ""
-    url = "https://www.google.com/maps?q=" + quote(query, safe=",")
-    if zoom:
-        url += "&z=" + zoom
-    return url + "&output=embed"
+    # الرابط النهائي على طول — ‎?output=embed‎ القديم بقى تحويل عليه
+    # ‎X-Frame-Options‎ ومتصفحات التطبيقات بتمنعه (شوف ‎maplinks.py‎).
+    return maplinks.embed_src(query, zoom)
 
 
 def map_embed_url(value: str) -> str:
@@ -463,9 +463,9 @@ def map_embed_url(value: str) -> str:
     # بالتضمين — مالناش دعوة نحوّله، بنسيبه زي ما هو.
     if not any(marker in host for marker in _MAP_GOOGLE_HOSTS):
         return raw
-    # رابط تضمين جاهز
+    # رابط تضمين جاهز — القديم (‎output=embed‎) بيتحوّل للصيغة النهائية
     if "/maps/embed" in parsed.path or "output=embed" in (parsed.query or ""):
-        return raw
+        return maplinks.modernize_embed(raw)
 
     params = parse_qs(parsed.query or "")
 
@@ -552,6 +552,12 @@ def _resolve_props(block: dict, data: dict) -> dict:
             and "output=embed" not in raw_embed
         ):
             props["map_link"] = raw_embed
+        # الرابط المختصر (‎maps.app.goo.gl‎) ساعات مابيفتحش من متصفح التطبيق —
+        # لو خانة التضمين فيها المكان بنستخدم رابط جوجل الرسمي بداله.
+        if props["map_link"]:
+            props["map_link"] = maplinks.open_url(props["map_link"], props["map_embed_url"])
+        # الضغط على الخريطة نفسها بيفتح المكان (الـiframe لوحده بيتحرك بس)
+        props["map_open"] = maplinks.open_url(props["map_link"], props["map_embed_url"])
 
     elif btype == "details":
         rows = []

@@ -10,6 +10,7 @@
      <!-- عرضه جوّه إطار، فبنوري رسالة توضّح المطلوب بدل إطار مكسور. #} -->
   {% if props.show_map and props.map_embed_url %}<div data-move="map" class="lb-map" style="--map-w:{{ props.map_width|default:100 }}%;--map-h:{{ props.map_height }}px">
     <iframe src="{{ props.map_embed_url }}" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="خريطة الموقع"></iframe>
+    {% if props.map_open and not editable %}<a class="lb-map-open" href="{{ props.map_open }}" target="_blank" rel="noopener" aria-label="افتح المكان على الخريطة"></a>{% endif %}
   </div>{% elif props.show_map %}<div class="lb-map lb-map--empty" style="--map-w:{{ props.map_width|default:100 }}%;--map-h:{{ props.map_height }}px">{% icon 'pin' 34 %}<span>{% if editable and props.map_embed %}الرابط ده مايتعرضش جوّه الدعوة. افتح المكان في خرائط جوجل ← مشاركة ← «تضمين خريطة» والصق الكود، أو الصق الإحداثيات كده: 29.990823, 31.130000{% else %}أضف رابط الخريطة من المحرر{% endif %}</span></div>{% endif %}
   {% if props.map_link %}<a class="lb-btn lb-btn--solid" href="{{ props.map_link }}" target="_blank" rel="noopener">{% icon 'pin' 18 %}<span data-ts="directions_label">{{ props.directions_label }}</span></a>{% endif %}
   {% if props.notes %}<p class="lb-note" data-ts="notes">{{ props.notes|linebreaksbr }}</p>{% endif %}

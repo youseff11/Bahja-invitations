@@ -9,6 +9,8 @@ from __future__ import annotations
 import re
 from html.parser import HTMLParser
 
+from . import maplinks
+
 ALLOWED_TAGS = {
     "p", "br", "strong", "b", "em", "i", "u", "s", "small", "mark",
     "span", "div", "main", "nav", "aside", "section", "article", "header", "footer",
@@ -284,6 +286,10 @@ class _Cleaner(HTMLParser):
                 if cleaned is None:
                     continue
                 value = cleaned
+                # خرايط جوجل القديمة (‎output=embed‎) في الأكواد والقوالب
+                # المستوردة — متصفحات التطبيقات بتمنعها (شوف ‎maplinks.py‎)
+                if tag == "iframe" and name == "src":
+                    value = maplinks.modernize_embed(value)
             elif name == "style":
                 value = _clean_style(value)
                 if not value:

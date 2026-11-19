@@ -4,7 +4,8 @@
   },
   "map": {
     "title": "Location map",
-    "empty": "Add the map link from the editor"
+    "empty": "Add the map link from the editor",
+    "open": "Open the location in Maps"
   },
   "empty": {
     "gallery": "Add photos from the editor",

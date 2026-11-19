@@ -3446,3 +3446,63 @@ class BrandingSectionTests(TestCase):
             "facebook", "https://x.com", "#fff", 9999))
         self.assertIn('width="34"', invite_tags.social_link(
             "facebook", "https://x.com", "#fff", "مش رقم"))
+
+
+class MapLinkTests(TestCase):
+    """خرايط جوجل في متصفحات التطبيقات (فيسبوك/واتساب على أندرويد) — ‎system/maplinks.py‎."""
+
+    EMBED = "https://www.google.com/maps/embed?origin=mfe&pb="
+
+    def test_embed_is_built_without_the_blocked_redirect(self):
+        from system import maplinks
+        self.assertEqual(maplinks.embed_src("30.4032143,31.3662546", "16"),
+                         self.EMBED + "!1m3!2m1!1s30.4032143,31.3662546!6i16")
+        self.assertEqual(maplinks.embed_src("قاعة الملكة!"),
+                         self.EMBED + "!1m2!2m1!1s%D9%82%D8%A7%D8%B9%D8%A9+%D8%A7%D9%84%D9%85%D9%84%D9%83%D8%A9%21")
+
+    def test_legacy_output_embed_links_are_upgraded(self):
+        from system import maplinks
+        from system.renderer import map_embed_url
+        legacy = "https://www.google.com/maps?q=30.1,31.2&z=12&output=embed"
+        self.assertEqual(maplinks.modernize_embed(legacy), self.EMBED + "!1m3!2m1!1s30.1,31.2!6i12")
+        self.assertEqual(map_embed_url(legacy), self.EMBED + "!1m3!2m1!1s30.1,31.2!6i12")
+        self.assertEqual(map_embed_url("30.4032143, 31.3662546"),
+                         self.EMBED + "!1m3!2m1!1s30.4032143,31.3662546!6i16")
+        official = "https://www.google.com/maps/embed?pb=!1m18!2d31.36!3d30.40"
+        self.assertEqual(maplinks.modernize_embed(official), official)
+        self.assertEqual(maplinks.modernize_embed("https://example.com/map?output=embed"),
+                         "https://example.com/map?output=embed")
+
+    def test_sanitizer_upgrades_map_iframes_in_custom_code(self):
+        html = clean_html('<iframe src="https://maps.google.com/maps?q=29.9,31.1&amp;z=15&amp;output=embed"></iframe>')
+        self.assertIn(self.EMBED + "!1m3!2m1!1s29.9,31.1!6i15", html)
+        self.assertNotIn("output=embed", html)
+
+    def test_short_directions_link_becomes_the_official_maps_link(self):
+        from system.renderer import _resolve_props
+        data = {"venue": "", "address": "", "map_url": "https://maps.app.goo.gl/abc"}
+        props = _resolve_props(
+            {"type": "location", "props": {"map_embed": "30.4032143, 31.3662546"}}, data)
+        url = "https://www.google.com/maps/search/?api=1&query=30.4032143%2C31.3662546"
+        self.assertEqual(props["map_link"], url)
+        self.assertEqual(props["map_open"], url)
+
+    def test_full_client_link_is_kept_and_map_opens_without_a_button(self):
+        from system.renderer import _resolve_props
+        full = "https://www.google.com/maps/place/Hall/@30.4,31.3,17z"
+        props = _resolve_props(
+            {"type": "location", "props": {"map_link": full, "map_embed": "30.4, 31.3"}},
+            {"venue": "", "address": "", "map_url": ""})
+        self.assertEqual(props["map_link"], full)
+        self.assertEqual(props["map_open"], full)
+        # مفيش زرار (مفيش رابط) — بس الضغط على الخريطة لسه بيفتح المكان
+        props = _resolve_props(
+            {"type": "location", "props": {"map_embed": "30.4, 31.3"}},
+            {"venue": "", "address": "", "map_url": ""})
+        self.assertEqual(props["map_link"], "")
+        self.assertEqual(props["map_open"], "https://www.google.com/maps/search/?api=1&query=30.4%2C31.3")
+        # رابط مختصر ومفيش مكان نعرفه — المختصر أحسن من مفيش
+        props = _resolve_props(
+            {"type": "location", "props": {}},
+            {"venue": "", "address": "", "map_url": "https://maps.app.goo.gl/abc"})
+        self.assertEqual(props["map_link"], "https://maps.app.goo.gl/abc")

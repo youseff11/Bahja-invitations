@@ -288,9 +288,8 @@ describe('S4b: video, map, countdown and section colours', () => {
 
     fireEvent.change(url, { target: { value: '29.99, 31.13' } })
     fireEvent.click(button('تغيير رابط الخريطة'))
-    expect(html()).toContain('q=29.99,31.13')
-    expect(html()).toContain('z=16')
-    expect((screen.getByPlaceholderText(/Google Maps/) as HTMLInputElement).value).toContain('output=embed')
+    expect(html()).toContain('!1s29.99,31.13!6i16')
+    expect((screen.getByPlaceholderText(/Google Maps/) as HTMLInputElement).value).toContain('/maps/embed?origin=mfe&pb=')
 
     const width = container.querySelector('[data-field-key="map-width"] input[type="number"]') as HTMLInputElement
     expect(width.value).toBe('335')

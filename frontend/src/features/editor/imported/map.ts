@@ -1,5 +1,5 @@
 /**
- * رابط خريطة جوجل ← رابط تضمين (‎output=embed‎) ينفع يتعرض جوّه ‎<iframe>‎. منقول من ‎mapEmbedUrl‎ في ‎editor.js‎ القديم.
+ * رابط خريطة جوجل ← رابط تضمين (‎/maps/embed?pb=…‎) ينفع يتعرض جوّه ‎<iframe>‎. منقول من ‎mapEmbedUrl‎ في ‎editor.js‎ القديم.
  * بيقبل: كود تضمين كامل (‎<iframe src=…>‎)، رابط تضمين جاهز، رابط مكان/بحث/اتجاهات، إحداثيات ‎29.99, 31.13‎، أو اسم مكان.
  * الروابط المختصرة (‎goo.gl‎، ‎maps.app.goo.gl‎) مابتتحلّش من غير شبكة — بترجع فاضي والواجهة بتشرح للمستخدم.
  */
@@ -17,9 +17,20 @@ function latLng(text: string): string {
   return lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180 ? `${lat},${lng}` : ''
 }
 
+/**
+ * رابط التضمين النهائي ‎/maps/embed?origin=mfe&pb=…‎ — نفس ‎maplinks.embed_src‎ في السيرفر.
+ * ‎?output=embed‎ القديم بقى تحويل 301 عليه ‎X-Frame-Options‎، ومتصفحات التطبيقات
+ * على أندرويد (فيسبوك/واتساب) بتعرض «Webpage not available» بدل الخريطة.
+ */
 function fromQuery(query: string, zoom: string): string {
   if (!query) return ''
-  return `https://www.google.com/maps?q=${encodeURIComponent(query).replace(/%2C/g, ',')}${zoom ? `&z=${zoom}` : ''}&output=embed`
+  const text = encodeURIComponent(query)
+    .replace(/[!'()*]/g, (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`)
+    .replace(/%2C/g, ',')
+    .replace(/%20/g, '+')
+  const z = zoom ? Math.round(parseFloat(zoom)) : NaN
+  const tail = Number.isFinite(z) ? `!6i${z}` : ''
+  return `https://www.google.com/maps/embed?origin=mfe&pb=!1m${tail ? 3 : 2}!2m1!1s${text}${tail}`
 }
 
 export function mapEmbedUrl(value: unknown): string {
@@ -44,7 +55,12 @@ export function mapEmbedUrl(value: unknown): string {
   const host = url.hostname.toLowerCase().replace(/^www\./, '')
   if (host === 'goo.gl' || host === 'maps.app.goo.gl' || host === 'g.co') return ''
   if (!host.includes('google.')) return raw
-  if (url.pathname.includes('/maps/embed') || /(?:^|&)output=embed(?:&|$)/.test(url.search.replace(/^\?/, ''))) return raw
+  if (url.pathname.includes('/maps/embed')) return raw
+  // ‎output=embed‎ القديم ← الصيغة النهائية (نفس ‎maplinks.modernize_embed‎)
+  if (/(?:^|&)output=embed(?:&|$)/.test(url.search.replace(/^\?/, ''))) {
+    const q = (url.searchParams.get('q') || url.searchParams.get('ll') || '').trim()
+    return q ? fromQuery(q, (url.searchParams.get('z') || '').trim()) : raw
+  }
 
   const first = (...keys: string[]) => {
     for (const key of keys) {
