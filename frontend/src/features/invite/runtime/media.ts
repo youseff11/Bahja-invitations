@@ -63,6 +63,56 @@ function flush() {
   batch.forEach(primeVideo)
 }
 
+function inView(el: Element) {
+  const r = el.getBoundingClientRect()
+  return r.bottom > 0 && r.right > 0 && r.top < window.innerHeight && r.left < window.innerWidth
+}
+
+/**
+ * فيديو بيبنيه سكربت «كود متقدّم» بنفسه (‎createElement('video')‎ من غير
+ * ‎autoplay‎ — زي فيديو العروسين في قسم الصورة بتاع «وردة القصر»). ده مابيدخلش
+ * ‎initImportedMedia‎: مكانش موجود وقت ما اشتغلت ومالوش ‎autoplay‎. فوضع التوفير
+ * في الآيفون كان بيرفض ‎play()‎ بتاع سكربت المصمّم للأبد والضيف يشوف البوستر
+ * واقف. بنفكّه في نفس اللمسة (تشغيل وإيقاف)، وسكربت المصمّم بيشغّله بعدين لما
+ * يحب (بعد ‎lb:intro-open‎ أو لما القسم يبان) وده بيعدّي عادي.
+ */
+function primeCodeVideos(target: EventTarget | null) {
+  const hit = target instanceof Node ? target : null
+  document.querySelectorAll<HTMLVideoElement>('.lb-extra-html video').forEach((v) => {
+    if (primed.has(v) || queue.includes(v) || v.closest('.lb-intro')) return
+    // الصوت ماينفعش يطلع ولو لحظة — الفيديو اللي بصوت تشغيله قرار المصمّم
+    if (!v.muted && !v.hasAttribute('muted')) return
+    if (!v.paused) {
+      primed.add(v)
+      return
+    }
+    // اللمسة جوّه صندوق الكود نفسه: سكربت المصمّم غالباً هو اللي هيشغّل/يوقف
+    // (فيديو بالضغط) — مانلعبش فيه عشان الإيقاف بتاعنا مايلغيش تشغيله
+    const box = v.closest('.lb-extra-html')
+    if (hit && box && box.contains(hit)) return
+    // لوب صامت ظاهر والدعوة مفتوحة = خلفية متحركة اترفضت قبل كده: يفضل شغال
+    if (v.loop && !document.querySelector('.lb-intro:not(.is-open)') && inView(v)) wanted.add(v)
+    primeVideo(v)
+  })
+}
+
+function onGesture(e: Event) {
+  primeCodeVideos(e.target)
+  flush()
+}
+
+function bindGestures() {
+  if (bound) return
+  bound = true
+  // مرحلة الالتقاط عشان نسبق أي مستمع بيوقف الحدث (لمسة فتح الدعوة)
+  ;['pointerdown', 'pointerup', 'touchend', 'click', 'keydown'].forEach((ev) => {
+    document.addEventListener(ev, onGesture, { capture: true, passive: true })
+  })
+  // مش لمسة: الطابور بس — فيديوهات الكود هنا سكربت المصمّم بيشغّلها في نفس
+  // اللحظة، ولو جهّزناها كنا هنوقفها وراه
+  document.addEventListener('lb:intro-open', flush)
+}
+
 /**
  * ‎keepPlaying‎: الفيديو ده مالوش مراقب يشغّله بعدين (فيديو المصمّم في «كود
  * متقدّم» أو قسم مستورد) — فالتجهيز بالنسبة له هو التشغيل نفسه.
@@ -71,13 +121,7 @@ export function queueMedia(v: HTMLVideoElement, keepPlaying = false) {
   if (!v || primed.has(v)) return
   if (keepPlaying) wanted.add(v)
   if (!queue.includes(v)) queue.push(v)
-  if (bound) return
-  bound = true
-  // مرحلة الالتقاط عشان نسبق أي مستمع بيوقف الحدث (لمسة فتح الدعوة)
-  ;['pointerdown', 'pointerup', 'touchend', 'click', 'keydown'].forEach((ev) => {
-    document.addEventListener(ev, flush, { capture: true, passive: true })
-  })
-  document.addEventListener('lb:intro-open', flush)
+  bindGestures()
 }
 
 /**
@@ -118,6 +162,9 @@ function holdForIntro(video: HTMLVideoElement, start: (held: boolean) => void) {
 }
 
 export function initImportedMedia(scope: ParentNode = document) {
+  // فيديوهات سكربت المصمّم بتتبني بعد كده (وأقسام بتتحمّل متأخر): اللمسة لازم
+  // تبقى متسجّلة من دلوقتي
+  bindGestures()
   scope.querySelectorAll<HTMLVideoElement>('.lb-custom video').forEach((video) => {
     if (bound$.has(video)) return
     bound$.add(video)
