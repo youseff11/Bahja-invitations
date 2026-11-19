@@ -10,6 +10,10 @@ import '@/styles/app.css'
 
 initI18n(boot.lang)
 
+// رقم البيلد: بيغيّر بصمة ملف main لما يتزوّد. اتعمل لما متصفحات خزّنت main-bBshPL2p.js
+// كصفحة HTML (اتطلب قبل collectstatic) — زوّده لو حصل كده تاني عشان الكاش القديم يتساب.
+document.documentElement.dataset.build = '2'
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />
