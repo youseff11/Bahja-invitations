@@ -378,8 +378,14 @@ html[lang="en"] .plan-badge { letter-spacing: .1em; }
 .foot { border-top: 1px solid var(--line); padding: 34px 0; text-align: center; color: var(--muted); font-size: 13px; }
 
 /* ---------------------------------------------------------- الدخول */
-.login-page { min-height: 100vh; display: grid; place-items: center; padding: 26px; }
-.login-card { width: min(390px, 100%); }
+.login-page { min-height: 100vh; min-height: 100dvh; display: grid; place-items: center; padding: 26px; }
+.login-card { width: min(390px, 100%); min-width: 0; box-sizing: border-box; }
+/* اللوجو بياخد عرض الكارت مش ارتفاع ثابت: ارتفاع 100px بنسبة 7:1 كان بيعمل 700px عرض ويزق الكارت برّه الشاشة */
+.login-card .brand--stacked { height: auto; width: min(100%, 300px); aspect-ratio: 7 / 1; margin-inline: auto; }
+@media (max-width: 480px) {
+  .login-page { padding: 16px; }
+  .login-card { padding: 26px 20px; }
+}
 
 
 /* ======== الاستجابة — الترويسة والهيرو — site.css:769-880 ======== */
