@@ -17,6 +17,8 @@ const makeVideo = (opts: { muted?: boolean; loop?: boolean } = {}) => {
   let paused = true
   Object.defineProperty(v, 'paused', { get: () => paused, configurable: true })
   Object.defineProperty(v, 'readyState', { get: () => 4, configurable: true })
+  const seek = vi.fn()
+  Object.defineProperty(v, 'currentTime', { get: () => 0.4, set: seek, configurable: true })
   const play = vi.fn(() => {
     paused = false
     return Promise.resolve()
@@ -26,7 +28,7 @@ const makeVideo = (opts: { muted?: boolean; loop?: boolean } = {}) => {
   })
   v.play = play
   v.pause = pause
-  return { box, v, play, pause }
+  return { box, v, play, pause, seek }
 }
 
 const tick = () => new Promise((r) => setTimeout(r, 0))
@@ -41,12 +43,14 @@ describe('script-built code videos get unlocked by the first tap', () => {
   })
 
   it('plays then parks a muted video created after load', async () => {
-    const { play, pause, v } = makeVideo()
+    const { play, pause, seek, v } = makeVideo()
     document.body.dispatchEvent(new Event('pointerdown', { bubbles: true }))
     await tick()
     expect(play).toHaveBeenCalledTimes(1)
     expect(pause).toHaveBeenCalledTimes(1)
     expect(v.paused).toBe(true)
+    // seek على فيديو واقف بيعلّق سفاري iOS 26 — مانرجّعوش للصفر
+    expect(seek).not.toHaveBeenCalled()
     // مرة واحدة بس
     document.body.dispatchEvent(new Event('click', { bubbles: true }))
     await tick()

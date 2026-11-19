@@ -36,6 +36,10 @@ document.addEventListener('visibilitychange', () => log(`visibility ${document.v
 ;['lb:intro-start', 'lb:intro-play', 'lb:intro-open'].forEach((name) =>
   document.addEventListener(name, () => log(name)),
 )
+// ‎vid‎ = فيديو الافتتاحية، ‎cvid‎ = فيديو جوّه «كود متقدّم» في قسم
+const who = (el: HTMLMediaElement) =>
+  el.closest?.('.lb-intro') ? 'vid' : el.closest?.('.lb-extra-html') ? 'cvid' : el.tagName.toLowerCase()
+
 // أحداث الفيديو/الصوت مابتطلعش (no bubble) — الالتقاط على document بيمسكها كلها
 ;['play', 'playing', 'pause', 'waiting', 'stalled', 'ended', 'error', 'emptied', 'abort', 'seeking', 'seeked'].forEach(
   (name) =>
@@ -44,12 +48,25 @@ document.addEventListener('visibilitychange', () => log(`visibility ${document.v
       (e) => {
         const el = e.target as HTMLMediaElement
         if (!(el instanceof HTMLMediaElement)) return
-        const who = el.closest?.('.lb-intro') ? 'vid' : el.tagName.toLowerCase()
-        log(`${who} ${name} t=${el.currentTime.toFixed(2)}`)
+        log(`${who(el)} ${name} t=${el.currentTime.toFixed(2)}`)
       },
       true,
     ),
 )
+
+// رفض ‎play()‎ (وضع التوفير/البيانات المنخفضة) مابيطلعش أي حدث — بنسجّله من الوعد نفسه
+const nativePlay = HTMLMediaElement.prototype.play
+HTMLMediaElement.prototype.play = function (this: HTMLMediaElement) {
+  const p = nativePlay.call(this)
+  const name = who(this)
+  if (p && typeof p.then === 'function') {
+    p.then(
+      () => log(`${name} play() ok`),
+      (err: unknown) => log(`${name} play() REJ ${(err as Error)?.name ?? err}`),
+    )
+  }
+  return p
+}
 
 const media = (el: HTMLMediaElement | null | undefined) => {
   if (!el) return '-'
@@ -67,12 +84,21 @@ window.setInterval(() => {
   const vid = intro?.querySelector('video')
   const state = (window as unknown as { __lbIntroState?: () => Record<string, unknown> }).__lbIntroState?.()
   const music = (window as unknown as { __lbMusic?: { audio: HTMLAudioElement } | null }).__lbMusic
+  const cvids = Array.from(document.querySelectorAll<HTMLVideoElement>('.lb-extra-html video')).filter(
+    (v) => !v.closest('.lb-intro'),
+  )
+  const cvidLines = cvids.slice(0, 3).map((v) => {
+    const r = v.getBoundingClientRect()
+    const vis = r.bottom > 0 && r.top < window.innerHeight
+    return `cvid ${media(v)} pre=${v.preload} muted=${+v.muted} vis=${+vis}`
+  })
   box.textContent = [
     `js ${stamp()}s tick=${ticks} raf=${frames} hidden=${+document.hidden}`,
     `intro ${intro ? intro.className.replace(/\blb-intro\b ?/, '') || '(on)' : 'GONE'}`,
     `state ${state ? JSON.stringify(state) : '-'}`,
     `vid ${media(vid)}`,
     `mus ${media(music?.audio)}`,
+    ...cvidLines,
     ...lines,
   ].join('\n')
 }, 250)

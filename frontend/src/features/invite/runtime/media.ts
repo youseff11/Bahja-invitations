@@ -14,6 +14,7 @@ const queue: HTMLVideoElement[] = []
 let bound = false
 const primed = new WeakSet<HTMLVideoElement>()
 const wanted = new WeakSet<HTMLVideoElement>()
+const codeVideos = new WeakSet<HTMLVideoElement>()
 
 export function setWanted(v: HTMLVideoElement, on: boolean) {
   if (on) wanted.add(v)
@@ -45,7 +46,9 @@ function primeVideo(v: HTMLVideoElement) {
       if (wanted.has(v)) return
       try {
         v.pause()
-        v.currentTime = 0
+        // فيديو سكربت المصمّم مانرجّعوش للصفر: seek على فيديو واقف قبل ‎play()‎
+        // الجاي بيعلّق ‎currentTime‎ في سفاري iOS 26 (نفس باج الافتتاحية)
+        if (!codeVideos.has(v)) v.currentTime = 0
       } catch {
         /* مش حرج */
       }
@@ -92,6 +95,7 @@ function primeCodeVideos(target: EventTarget | null) {
     if (hit && box && box.contains(hit)) return
     // لوب صامت ظاهر والدعوة مفتوحة = خلفية متحركة اترفضت قبل كده: يفضل شغال
     if (v.loop && !document.querySelector('.lb-intro:not(.is-open)') && inView(v)) wanted.add(v)
+    codeVideos.add(v)
     primeVideo(v)
   })
 }
