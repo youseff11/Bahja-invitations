@@ -72,6 +72,7 @@ export interface InvitationRow {
   guests: number
   rsvps: number
   views: number
+  paidAmount: string
   createdAt: string | null
   createdLabel: string
   createdTitle: string
@@ -91,6 +92,8 @@ export interface InvitationsResponse {
   filters: InvitationFilters
   statusChoices: Choice[]
   templateChoices: { id: number; name: string }[]
+  /** مجموع «المدفوع» للدعوات اللي في القايمة (بعد الفلتر) */
+  totalPaid: string
   results: InvitationRow[]
 }
 

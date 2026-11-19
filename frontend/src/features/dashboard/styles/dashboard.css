@@ -1372,6 +1372,37 @@ html[lang='en'] .dash-root .tpl-meta {
   word-break: break-all;
 }
 
+/* خانة «المدفوع» اليدوية + كارت الإجمالي فوق الجدول */
+.dash-root .paid-stats {
+  margin-bottom: 18px;
+}
+.dash-root .paid-stats .stat b small {
+  font-size: 14px;
+  color: var(--muted);
+}
+.dash-root .inv-table .paid-input {
+  width: 92px;
+  padding: 6px 9px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+.dash-root .inv-table .paid-input:hover {
+  border-color: var(--muted);
+}
+.dash-root .inv-table .paid-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: var(--surface);
+}
+.dash-root .inv-table .paid-input:disabled {
+  opacity: 0.55;
+}
+
 @media (min-width: 921px) and (max-width: 1180px) {
   .dash-root .table-cards--lg {
     background: none;

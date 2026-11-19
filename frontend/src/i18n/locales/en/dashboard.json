@@ -127,6 +127,9 @@
     "allStatuses": "All statuses",
     "allTemplates": "All templates",
     "search": "Search",
+    "totalPaid": "Total paid · {{n}} invitations",
+    "currency": "EGP",
+    "paidSaved": "Saved the paid amount for “{{title}}”.",
     "cols": {
       "invitation": "Invitation",
       "customer": "Customer",
@@ -135,6 +138,7 @@
       "guests": "Guests",
       "rsvps": "Replies",
       "views": "Views",
+      "paid": "Paid",
       "created": "Created",
       "actions": "Actions"
     },

@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { Link, useSearchParams } from 'react-router-dom'
 import { appPath } from '@/lib/appPath'
 
-import { useDeleteInvitation, useDuplicateInvitation, useInvitations } from '../api'
+import { useDeleteInvitation, useDuplicateInvitation, useInvitations, useSetInvitationPaid } from '../api'
 import type { InvitationFilters, InvitationRow } from '../types'
 import { useConfirm } from '../ui/ConfirmDialog'
 import { useLabels } from '../ui/labels'
@@ -106,6 +106,18 @@ export function InvitationsPage() {
 
       <QueryState loading={isPending} error={isError} />
       {data && (
+        <div className="stats paid-stats">
+          <div className="stat">
+            <b>
+              {formatMoney(data.totalPaid)} <small>{t('dashboard.invitations.currency')}</small>
+            </b>
+            <span>
+              {t('dashboard.invitations.totalPaid', { n: data.results.length })}
+            </span>
+          </div>
+        </div>
+      )}
+      {data && (
         <Table
           cards="lg"
           className="inv-table"
@@ -117,6 +129,7 @@ export function InvitationsPage() {
             t('dashboard.invitations.cols.guests'),
             t('dashboard.invitations.cols.rsvps'),
             t('dashboard.invitations.cols.views'),
+            t('dashboard.invitations.cols.paid'),
             t('dashboard.invitations.cols.created'),
             t('dashboard.invitations.cols.actions'),
           ]}
@@ -141,6 +154,9 @@ export function InvitationsPage() {
               <td data-label={t('dashboard.invitations.cols.guests')}>{invitation.guests}</td>
               <td data-label={t('dashboard.invitations.cols.rsvps')}>{invitation.rsvps}</td>
               <td data-label={t('dashboard.invitations.cols.views')}>{invitation.views}</td>
+              <td data-label={t('dashboard.invitations.cols.paid')}>
+                <PaidInput invitation={invitation} />
+              </td>
               <td data-label={t('dashboard.invitations.cols.created')}>
                 <time dateTime={invitation.createdAt ?? undefined} title={invitation.createdTitle}>
                   {invitation.createdLabel}
@@ -182,5 +198,58 @@ export function InvitationsPage() {
         </Table>
       )}
     </>
+  )
+}
+
+function formatMoney(value: string) {
+  const n = Number(value)
+  return Number.isFinite(n) ? n.toLocaleString('en-US') : value
+}
+
+/** خانة «المدفوع»: بتتحفظ لما تسيبها أو تدوس Enter؛ Esc بيرجّع القيمة القديمة. */
+function PaidInput({ invitation }: { invitation: InvitationRow }) {
+  const { t } = useTranslation()
+  const toast = useToast()
+  const save = useSetInvitationPaid()
+  const initial = invitation.paidAmount === '0' ? '' : invitation.paidAmount
+
+  function commit(input: HTMLInputElement) {
+    const value = input.value.trim()
+    if (value === initial) return
+    save.mutate(
+      { id: invitation.id, paidAmount: value },
+      {
+        onSuccess: (res) => {
+          input.value = res.paidAmount === '0' ? '' : res.paidAmount
+          toast.success(t('dashboard.invitations.paidSaved', { title: invitation.title }))
+        },
+        onError: (error) => {
+          input.value = initial
+          toast.fail(error)
+        },
+      },
+    )
+  }
+
+  return (
+    <input
+      key={initial}
+      className="paid-input"
+      type="text"
+      inputMode="decimal"
+      dir="ltr"
+      defaultValue={initial}
+      placeholder="0"
+      aria-label={t('dashboard.invitations.cols.paid')}
+      disabled={save.isPending}
+      onBlur={(event) => commit(event.currentTarget)}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter') event.currentTarget.blur()
+        if (event.key === 'Escape') {
+          event.currentTarget.value = initial
+          event.currentTarget.blur()
+        }
+      }}
+    />
   )
 }

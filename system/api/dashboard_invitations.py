@@ -7,8 +7,10 @@
 
 from __future__ import annotations
 
+from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
+
 from django.db import transaction
-from django.db.models import F, Q
+from django.db.models import F, Q, Sum
 from django.http import Http404
 from django.urls import path
 
@@ -39,6 +41,7 @@ def _invitation_row(inv) -> dict:
         "guests": inv.guest_total,
         "rsvps": inv.rsvp_total,
         "views": inv.public_views,
+        "paidAmount": money(inv.paid_amount),
         "createdAt": iso(inv.created_at),
         "createdLabel": fmt_dt(inv.created_at, "j M Y"),
         "createdTitle": fmt_dt(inv.created_at, "j F Y — g:i A"),
@@ -85,16 +88,35 @@ def invitations(request):
         "statusChoices": [{"value": value, "label": label}
                           for value, label in Invitation.STATUS_CHOICES],
         "templateChoices": [{"id": pk, "name": name} for pk, name in template_choices],
+        "totalPaid": money(qs.aggregate(t=Sum("paid_amount"))["t"] or 0),
         "results": [_invitation_row(inv) for inv in qs],
     }
 
 
-@staff_api("DELETE")
+@staff_api("PATCH", "DELETE")
 def invitation_detail(request, pk):
     inv = _get_or_404(pk)
+    if request.method == "PATCH":
+        return _update_paid_amount(inv, json_body(request))
     title = inv.title
     _delete_invitation(inv)
     return {"deleted": True, "title": title}
+
+
+def _update_paid_amount(inv, data) -> dict:
+    """تعديل «المدفوع» يدوي من الجدول — فاضي = صفر."""
+    raw = str(data.get("paidAmount") or "").strip().replace(",", "")
+    raw = raw.translate(str.maketrans("٠١٢٣٤٥٦٧٨٩", "0123456789"))
+    try:
+        amount = Decimal(raw or "0")
+    except InvalidOperation:
+        amount = None
+    if amount is None or not amount.is_finite() or amount < 0 or amount >= Decimal("1e8"):
+        message = "اكتب مبلغ صحيح."
+        raise ApiError(400, "validation_error", message, fields={"paidAmount": message})
+    inv.paid_amount = amount.quantize(Decimal("1"), rounding=ROUND_HALF_UP)  # جنيه صحيح زي العرض
+    inv.save(update_fields=["paid_amount", "updated_at"])
+    return {"id": inv.pk, "paidAmount": money(inv.paid_amount)}
 
 
 @staff_api("POST")

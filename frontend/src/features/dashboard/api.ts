@@ -142,6 +142,16 @@ export function useDeleteInvitation() {
   )
 }
 
+/** «المدفوع» اليدوي في جدول الدعوات — بيعيد تحميل القايمة عشان الإجمالي يتحدّث. */
+export function useSetInvitationPaid() {
+  return useInvalidatingMutation(({ id, paidAmount }: { id: number; paidAmount: string }) =>
+    api<{ id: number; paidAmount: string }>(`/dashboard/invitations/${id}/`, {
+      method: 'PATCH',
+      body: { paidAmount },
+    }),
+  )
+}
+
 export function useCreateInvitation() {
   return useInvalidatingMutation((body: InvitationCreateBody) =>
     api<{ id: number; editorUrl: string }>('/dashboard/invitations/', { method: 'POST', body }),

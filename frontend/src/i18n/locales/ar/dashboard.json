@@ -127,6 +127,9 @@
     "allStatuses": "كل الحالات",
     "allTemplates": "كل القوالب",
     "search": "بحث",
+    "totalPaid": "إجمالي المدفوع · {{n}} دعوة",
+    "currency": "ج.م",
+    "paidSaved": "اتحفظ المدفوع لـ«{{title}}».",
     "cols": {
       "invitation": "الدعوة",
       "customer": "العميل",
@@ -135,6 +138,7 @@
       "guests": "ضيوف",
       "rsvps": "ردود",
       "views": "مشاهدات",
+      "paid": "دفع",
       "created": "اتعملت",
       "actions": "إجراءات"
     },

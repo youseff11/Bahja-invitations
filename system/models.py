@@ -463,6 +463,10 @@ class Invitation(TimeStampedModel):
     public_views = models.PositiveIntegerField("عدد المشاهدات", default=0)
     published_at = models.DateTimeField(null=True, blank=True)
 
+    # اللي العميل دفعه فعلاً (بالجنيه) — بيتكتب يدوي من جدول الدعوات في اللوحة،
+    # ومالوش علاقة بسعر الباقة. إجماليه بيظهر فوق الجدول.
+    paid_amount = models.DecimalField("المدفوع", max_digits=10, decimal_places=2, default=0)
+
     class Meta:
         ordering = ["-created_at"]
         verbose_name = "دعوة"
