@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type DragEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import type { TemplatesLayout } from '@/api/types'
@@ -16,16 +16,78 @@ export function ComposeCard() {
   const save = useSaveComposeSettings()
   const [picked, setPicked] = useState<number[]>([])
   const [layout, setLayout] = useState<TemplatesLayout>('showcase')
+  // ترتيب كل القوالب (= ترتيب المعرض والرئيسية) — بيتغيّر بالسحب والإفلات
+  const [order, setOrder] = useState<number[]>([])
+  const [dirtyOrder, setDirtyOrder] = useState(false)
+  const [drag, setDrag] = useState<{ list: 'grid' | 'picked'; id: number } | null>(null)
+  const [over, setOver] = useState<number | null>(null)
 
   useEffect(() => {
     if (!data) return
     setPicked(data.selected)
     setLayout(data.layout)
+    setOrder(data.templates.map((row) => row.id))
+    setDirtyOrder(false)
   }, [data])
 
   if (!data) return null
   const byId = new Map(data.templates.map((row) => [row.id, row]))
   const full = picked.length >= data.max
+  const rows = order.map((id) => byId.get(id)).filter((row): row is NonNullable<typeof row> => Boolean(row))
+
+  /** بيشيل ‎id‎ من مكانه ويحطّه مكان ‎target‎ */
+  const reorder = (list: number[], id: number, target: number) => {
+    const from = list.indexOf(id)
+    const to = list.indexOf(target)
+    if (from < 0 || to < 0 || from === to) return list
+    const next = [...list]
+    next.splice(from, 1)
+    next.splice(to, 0, id)
+    return next
+  }
+
+  function onDrop(list: 'grid' | 'picked', target: number) {
+    const source = drag
+    setDrag(null)
+    setOver(null)
+    if (!source || source.list !== list || source.id === target) return
+    if (list === 'picked') {
+      setPicked((current) => reorder(current, source.id, target))
+      return
+    }
+    const next = reorder(order, source.id, target)
+    setOrder(next)
+    setDirtyOrder(true)
+    // القوالب المختارة بتظهر الأول في الرئيسية: تمشي على نفس ترتيب الشبكة
+    setPicked((current) => [...current].sort((a, b) => next.indexOf(a) - next.indexOf(b)))
+  }
+
+  const dragProps = (list: 'grid' | 'picked', id: number) => ({
+    draggable: true,
+    onDragStart: (event: DragEvent) => {
+      event.dataTransfer.effectAllowed = 'move'
+      event.dataTransfer.setData('text/plain', String(id))
+      setDrag({ list, id })
+    },
+    onDragOver: (event: DragEvent) => {
+      if (!drag || drag.list !== list) return
+      event.preventDefault()
+      event.dataTransfer.dropEffect = 'move'
+      if (over !== id) setOver(id)
+    },
+    onDragLeave: () => setOver((current) => (current === id ? null : current)),
+    onDrop: (event: DragEvent) => {
+      event.preventDefault()
+      onDrop(list, id)
+    },
+    onDragEnd: () => {
+      setDrag(null)
+      setOver(null)
+    },
+  })
+  const dragClass = (list: 'grid' | 'picked', id: number) =>
+    (drag?.list === list && drag.id === id ? ' is-dragging' : '') +
+    (drag?.list === list && over === id && drag.id !== id ? ' is-over' : '')
 
   const toggle = (id: number) =>
     setPicked((list) => (list.includes(id) ? list.filter((x) => x !== id) : full ? list : [...list, id]))
@@ -39,7 +101,7 @@ export function ComposeCard() {
     })
 
   function onSave() {
-    save.mutate({ templateIds: picked, layout }, {
+    save.mutate({ templateIds: picked, layout, ...(dirtyOrder ? { order } : {}) }, {
       onSuccess: () => toast.success(t('dashboard.site.compose.saved')),
       onError: (error) => toast.fail(error),
     })
@@ -73,7 +135,8 @@ export function ComposeCard() {
           {picked.map((id, index) => {
             const row = byId.get(id)
             return (
-              <li key={id}>
+              <li key={id} {...dragProps('picked', id)} className={'compose-admin-draggable' + dragClass('picked', id)}>
+                <span className="compose-admin-grip" aria-hidden="true">⋮⋮</span>
                 <span className="compose-admin-n">{index + 1}</span>
                 <strong>{row?.name ?? `#${id}`}</strong>
                 {row && !row.isActive && <em className="muted">{t('dashboard.site.compose.hidden')}</em>}
@@ -100,18 +163,22 @@ export function ComposeCard() {
       )}
 
       <h3 className="compose-admin-sub">{t('dashboard.site.compose.available')}</h3>
+      <p className="muted" style={{ fontSize: 12.5, marginTop: -4 }}>{t('dashboard.site.compose.dragHint')}</p>
       <div className="compose-admin-grid">
-        {data.templates.map((row) => {
+        {rows.map((row, index) => {
           const on = picked.includes(row.id)
           const disabled = !on && full
           return (
             <button
               key={row.id}
               type="button"
-              className={'compose-admin-tile' + (on ? ' is-on' : '')}
-              onClick={() => toggle(row.id)}
-              disabled={disabled}
+              className={'compose-admin-tile compose-admin-draggable' + (on ? ' is-on' : '') + (disabled ? ' is-full' : '') + dragClass('grid', row.id)}
+              onClick={() => !disabled && toggle(row.id)}
+              aria-disabled={disabled}
+              {...dragProps('grid', row.id)}
             >
+              <span className="compose-admin-rank">{index + 1}</span>
+              {on && <span className="compose-admin-pick">★ {picked.indexOf(row.id) + 1}</span>}
               {row.cover || row.intro ? <img src={row.cover || row.intro} alt="" loading="lazy" /> : <span className="compose-admin-ph" />}
               <span className="compose-admin-name">{row.name}</span>
               {!row.isActive && <small>{t('dashboard.site.compose.hidden')}</small>}

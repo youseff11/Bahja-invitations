@@ -331,9 +331,9 @@ export function useComposeSettings() {
 
 export function useSaveComposeSettings() {
   return useInvalidatingMutation(
-    (body: { templateIds: number[]; layout: TemplatesLayout }) =>
+    (body: { templateIds: number[]; layout: TemplatesLayout; order?: number[] }) =>
       api<ComposeSettings>('/dashboard/site/compose/', { method: 'PUT', body }),
     // شكل العرض بيتقرا من إعدادات الموقع ‎['site']‎ والقوالب من الرئيسية
-    [['public', 'home'], ['site']],
+    [['public', 'home'], ['public'], ['site']],
   )
 }

@@ -189,7 +189,7 @@ COMPOSE_MAX = 12
 def _compose_state(cfg: SiteSetting) -> dict:
     rows = []
     for t in Template.objects.only("id", "name", "name_en", "is_active", "compose_pieces",
-                                   "cover_image", "cover_url").order_by("-created_at"):
+                                   "cover_image", "cover_url"):
         data = compose.read(t.compose_pieces)
         rows.append({"id": t.pk, "name": t.name, "isActive": t.is_active, "parts": compose.parts(t.compose_pieces),
                      "intro": (data.get("intro") or {}).get("src", ""), "cover": t.cover_src or ""})
@@ -201,7 +201,8 @@ def _compose_state(cfg: SiteSetting) -> dict:
 
 @staff_api("GET", "PUT")
 def site_compose(request):
-    """عرض القوالب في الرئيسية: ‎PUT {templateIds: [..], layout?: "showcase"|"grid"}‎."""
+    """عرض القوالب في الرئيسية: ‎PUT {templateIds: [..], layout?: "showcase"|"grid", order?: [..]}‎.
+    ‎order‎ = ترتيب كل القوالب (سحب وإفلات في الداشبورد) وبيتحفظ في ‎Template.sort_order‎."""
     cfg = SiteSetting.load()
     if request.method == "PUT":
         data = json_body(request)
@@ -223,6 +224,15 @@ def site_compose(request):
                 raise ApiError(400, "validation_error", f"شكل العرض لازم يكون واحد من: {allowed}")
             cfg.templates_layout = layout
             fields.append("templates_layout")
+        order = data.get("order")
+        if order is not None:
+            if not isinstance(order, list) or not all(isinstance(i, int) and not isinstance(i, bool) for i in order):
+                raise ApiError(400, "validation_error", "order لازم تكون قايمة أرقام.")
+            rank = {pk: n for n, pk in enumerate(dict.fromkeys(order), start=1)}
+            rows = list(Template.objects.filter(pk__in=rank).only("id", "sort_order"))
+            for t in rows:
+                t.sort_order = rank[t.pk]
+            Template.objects.bulk_update(rows, ["sort_order"])
         cfg.compose_template_ids = ids
         cfg.save(update_fields=fields)
     return _compose_state(cfg)

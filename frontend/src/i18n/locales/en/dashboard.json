@@ -620,6 +620,7 @@
       "auto": "Nothing chosen — every template shows in gallery order.",
       "available": "Templates",
       "hidden": "(hidden — won't show)",
+      "dragHint": "Drag any template onto another to reorder — the number is its gallery/home position, the star is its spot in \"Shown first\". Then press Save.",
       "remove": "Remove",
       "none": "No templates yet.",
       "save": "Save",

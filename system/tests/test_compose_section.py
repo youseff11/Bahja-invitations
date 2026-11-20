@@ -51,6 +51,17 @@ class ComposeSettingTests(DashboardApiCase):
         self.assertEqual(rows[other.pk]["parts"], ["intro", "ayah"])
         self.assertEqual(rows[self.template.pk]["parts"], [])
 
+    def test_put_order_sets_gallery_order(self):
+        a = Template.objects.create(name="أ", slug="ord-a", is_active=True)
+        b = Template.objects.create(name="ب", slug="ord-b", is_active=True)
+        order = [b.pk, self.template.pk, a.pk]
+        res = self.send("PUT", f"{BASE}/site/compose/", {"templateIds": [], "order": order})
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual([r["id"] for r in res.json()["templates"]][:3], order)
+        self.assertEqual([Template.objects.get(pk=i).sort_order for i in order], [1, 2, 3])
+        bad = self.send("PUT", f"{BASE}/site/compose/", {"templateIds": [], "order": "1,2"})
+        self.assertEqual(bad.status_code, 400)
+
     def test_put_rejects_unknown_ids_and_too_many(self):
         missing = self.send("PUT", f"{BASE}/site/compose/", {"templateIds": [999999]})
         bad = self.send("PUT", f"{BASE}/site/compose/", {"templateIds": "1,2"})

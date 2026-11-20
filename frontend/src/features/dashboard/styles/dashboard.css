@@ -2745,3 +2745,22 @@ html[lang='en'] .dash-root .tpl-meta {
 .dash-root .compose-admin-tile:disabled { cursor: not-allowed; opacity: .45; }
 .dash-root .compose-admin-name { font-size: 12.5px; font-weight: 600; }
 .dash-root .compose-admin-tile small { font-size: 11px; color: var(--muted); }
+.dash-root .compose-admin-tile { position: relative; }
+.dash-root .compose-admin-tile.is-full { opacity: .45; }
+.dash-root .compose-admin-tile.is-full img { cursor: grab; }
+.dash-root .compose-admin-draggable { cursor: grab; }
+.dash-root .compose-admin-draggable:active { cursor: grabbing; }
+.dash-root .compose-admin-draggable.is-dragging { opacity: .35; }
+.dash-root .compose-admin-draggable.is-over { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); transform: scale(1.03); }
+.dash-root .compose-admin-tile, .dash-root .compose-admin-order li { transition: border-color .2s ease, box-shadow .2s ease, transform .15s ease, opacity .15s ease; }
+.dash-root .compose-admin-rank {
+  position: absolute; top: 10px; inset-inline-start: 10px; z-index: 1; min-width: 24px; height: 24px; padding: 0 6px; box-sizing: border-box;
+  display: grid; place-items: center; border-radius: 12px; background: rgba(20, 14, 16, .78); color: #fff; font-size: 12px; font-weight: 700;
+  pointer-events: none;
+}
+.dash-root .compose-admin-pick {
+  position: absolute; top: 10px; inset-inline-end: 10px; z-index: 1; height: 22px; padding: 0 7px; display: grid; place-items: center;
+  border-radius: 11px; background: var(--accent); color: #fff; font-size: 11px; font-weight: 700; pointer-events: none;
+}
+.dash-root .compose-admin-tile img { pointer-events: none; }
+.dash-root .compose-admin-grip { color: var(--muted); letter-spacing: -3px; user-select: none; }
