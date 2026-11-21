@@ -608,7 +608,7 @@
     "reviewData": "Check the data — a field is missing or wrong.",
     "compose": {
       "title": "Templates on the home page",
-      "body": "Choose how the templates section after the hero looks, and which templates come first, in order (up to {{max}}). Every active template always shows; the rest follow your picks.",
+      "body": "Choose how the templates section after the hero looks, and the order of the templates. Every active template shows on the home page and in the gallery in this order; hidden ones don't show.",
       "layout": "Layout",
       "layouts": {
         "showcase": "Live phone showcase",
@@ -616,11 +616,11 @@
         "grid": "Card grid (the old look)",
         "gridHint": "Template cards with categories and a preview button on each."
       },
-      "order": "Shown first, in order",
+      "order": "Templates order",
       "auto": "Nothing chosen — every template shows in gallery order.",
       "available": "Templates",
       "hidden": "(hidden — won't show)",
-      "dragHint": "Drag any template onto another to reorder — the number is its gallery/home position, the star is its spot in \"Shown first\". Then press Save.",
+      "dragHint": "Drag any card up or down (or use the arrows) — the number is its position on the home page and in the gallery. Then press Save.",
       "remove": "Remove",
       "none": "No templates yet.",
       "save": "Save",

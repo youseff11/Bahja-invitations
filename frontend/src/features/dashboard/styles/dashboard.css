@@ -2764,3 +2764,23 @@ html[lang='en'] .dash-root .tpl-meta {
 }
 .dash-root .compose-admin-tile img { pointer-events: none; }
 .dash-root .compose-admin-grip { color: var(--muted); letter-spacing: -3px; user-select: none; }
+.dash-root .compose-admin-stack { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.dash-root .compose-admin-card {
+  display: flex; align-items: center; gap: 14px; padding: 10px 14px;
+  border: 1px solid var(--line); border-radius: 14px; background: var(--surface-2, var(--surface));
+  transition: border-color .2s ease, box-shadow .2s ease, transform .15s ease, opacity .15s ease;
+}
+.dash-root .compose-admin-card.is-over { transform: scale(1.01); }
+.dash-root .compose-admin-card.is-hidden .compose-admin-thumb { opacity: .45; filter: grayscale(.5); }
+.dash-root .compose-admin-thumb {
+  flex: none; width: 150px; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 10px; background: var(--line);
+  pointer-events: none; user-select: none; box-shadow: 0 2px 10px rgba(0, 0, 0, .12);
+}
+.dash-root .compose-admin-info { display: grid; gap: 4px; min-width: 0; }
+.dash-root .compose-admin-info strong { font-size: 15.5px; }
+.dash-root .compose-admin-info em { font-size: 12px; font-style: normal; }
+@media (max-width: 560px) {
+  .dash-root .compose-admin-card { gap: 10px; padding: 8px 10px; }
+  .dash-root .compose-admin-thumb { width: 96px; }
+  .dash-root .compose-admin-actions { flex-direction: column; gap: 4px; }
+}
