@@ -1807,7 +1807,9 @@ html[lang='en'] .dash-root .tpl-meta {
   background: color-mix(in srgb, var(--ok) 9%, transparent);
 }
 .dash-root .account-toggle.is-paid i {
-  background: currentColor;
+  /* مش ‎currentColor‎: الـcolor هنا أبيض فالخلفية كانت بتبقى بيضا والصح مختفية */
+  background: var(--ok);
+  border-color: var(--ok);
   color: #fff;
 }
 .dash-root .account-toggle:disabled {
@@ -2036,6 +2038,45 @@ html[lang='en'] .dash-root .tpl-meta {
     content: none;
   }
 }
+/* جدول الدعوات على الشاشة الكبيرة: ١١ عمود (بعد «الحساب») لازم يدخلوا في ~1180px من غير
+   ما يطلعوا برّه الكارت — حشوة أصغر، المدفوع أضيق، والتاريخ يلف سطرين. اتقاس: بيكفي لحد 1080px. */
+@media (min-width: 1181px) {
+  .dash-root .inv-table th,
+  .dash-root .inv-table td {
+    padding-inline: 7px;
+  }
+  .dash-root .inv-table .cell--text {
+    min-width: 70px;
+    max-width: 130px;
+  }
+  .dash-root .inv-table .cell--title {
+    min-width: 140px;
+  }
+  .dash-root .inv-table .paid-field {
+    width: 100px;
+    padding-inline: 9px;
+    gap: 4px;
+  }
+  .dash-root .inv-table td time {
+    display: inline-block;
+    min-width: 60px;
+    white-space: normal;
+    line-height: 1.35;
+  }
+  .dash-root .inv-table .row-actions {
+    gap: 5px;
+  }
+  .dash-root .inv-table .row-actions .btn--sm {
+    padding: 7px 11px;
+  }
+  .dash-root .inv-table .status-pick {
+    padding-inline: 10px;
+  }
+  .dash-root .inv-table .account-toggle {
+    padding-inline: 8px 10px;
+  }
+}
+
 /* الكروت على الموبايل/التابلت بتاخد قواعد ‎.table-cards‎ العامة؛ بس نلغي حدود العرض */
 @media (max-width: 920px) {
   .dash-root .inv-table .cell--text,
