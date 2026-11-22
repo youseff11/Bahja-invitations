@@ -2489,6 +2489,22 @@ a.tpl-cover { text-decoration: none; cursor: pointer; }
 }
 .sc-card.is-active { border-color: var(--sc-wine); box-shadow: 0 0 0 2px var(--sc-wine), 0 18px 30px -20px rgba(60, 10, 25, .7); }
 .sc-card.is-active .sc-card-name { color: var(--accent); font-weight: 600; }
+/* ضغطة مطوّلة = نسخ لينك القالب: من غير قايمة الصورة بتاعة الآيفون/أندرويد ولا تحديد نص */
+.sc-card { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+.sc-card img { -webkit-user-drag: none; pointer-events: none; }
+.sc-card.is-armed { transform: scale(.95); border-color: var(--sc-gold); box-shadow: 0 0 0 2px var(--sc-gold), 0 18px 30px -20px rgba(60, 10, 25, .7); }
+.sc-hold-hint {
+  display: flex; align-items: center; justify-content: center; gap: 7px; margin: 0;
+  font-size: 12.5px; color: color-mix(in srgb, var(--sc-gold) 55%, var(--muted)); text-align: center;
+}
+.sc-hold-hint::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--sc-gold); flex: none; }
+.sc-copied {
+  position: fixed; z-index: 60; inset-inline: 0; bottom: max(24px, env(safe-area-inset-bottom)); width: fit-content;
+  margin: 0 auto; padding: 10px 18px; border-radius: 99px; background: var(--sc-wine); color: #fff;
+  font-size: 13.5px; box-shadow: 0 16px 34px -14px rgba(60, 10, 25, .7); animation: sc-copied-in .25s ease-out;
+}
+.sc-copied.is-fail { background: #6b6b6b; }
+@keyframes sc-copied-in { from { opacity: 0; transform: translateY(10px); } }
 .sc-all { justify-self: start; color: var(--accent); font-weight: 600; text-decoration: none; border-bottom: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); padding-bottom: 2px; }
 .sc-all:hover { border-bottom-color: var(--accent); }
 [dir="ltr"] .sc-all span { display: inline-block; transform: scaleX(-1); }

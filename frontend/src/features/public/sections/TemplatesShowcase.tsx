@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 
 import { ApiError } from '@/api/client'
 import type { SiteInfo } from '@/api/types'
+import { copyText } from '@/features/editor/panels/slug'
 import { warmPreview } from '@/features/invite/previewPrefetch'
 import { useHistoryState } from '@/lib/useHistoryState'
 import { pick, useLang } from '../text'
@@ -152,6 +153,46 @@ export function TemplatesShowcase({ site, templates, chosen, error }: Props) {
     }
   }, [near, list.length])
 
+  // ضغطة مطوّلة على كارت = نسخ لينك القالب. النسخ بيحصل لحظة رفع الصباع (سفاري على الآيفون
+  // بيرفض الكتابة في الحافظة برّه حدث لمس، فمايتعملش من جوّه التايمر)؛ التايمر بيجهّز بس.
+  const press = useRef<{ slug: string; x: number; y: number; timer: number; armed: boolean } | null>(null)
+  const swallowClick = useRef(false)
+  const [armed, setArmed] = useState('')
+  const [copied, setCopied] = useState<'' | 'ok' | 'fail'>('')
+  useEffect(() => {
+    if (!copied) return
+    const id = window.setTimeout(() => setCopied(''), 2200)
+    return () => window.clearTimeout(id)
+  }, [copied])
+
+  function endPress() {
+    if (press.current) window.clearTimeout(press.current.timer)
+    press.current = null
+    setArmed('')
+  }
+  function startPress(event: ReactPointerEvent, slug: string) {
+    if (event.button !== 0) return
+    endPress()
+    const timer = window.setTimeout(() => {
+      if (!press.current) return
+      press.current.armed = true
+      setArmed(slug)
+      navigator.vibrate?.(18)
+    }, 480)
+    press.current = { slug, x: event.clientX, y: event.clientY, timer, armed: false }
+  }
+  function movePress(event: ReactPointerEvent) {
+    const p = press.current
+    if (p && Math.hypot(event.clientX - p.x, event.clientY - p.y) > 10) endPress()
+  }
+  function releasePress() {
+    const p = press.current
+    endPress()
+    if (!p?.armed) return
+    swallowClick.current = true // الضغطة المطوّلة مش اختيار للقالب
+    void copyText(window.location.origin + previewPath(p.slug)).then((ok) => setCopied(ok ? 'ok' : 'fail'))
+  }
+
   const slide = (dir: -1 | 1) => {
     const box = rail.current
     if (box) box.scrollBy({ left: dir * box.clientWidth * 0.75, behavior: 'smooth' })
@@ -285,6 +326,7 @@ export function TemplatesShowcase({ site, templates, chosen, error }: Props) {
                 </Link>
               </div>
 
+              <p className="sc-hold-hint">{t('public.showcase.holdHint')}</p>
               <div className={'sc-rail-wrap' + (edges.left ? ' is-left' : '') + (edges.right ? ' is-right' : '')}>
                 <div className="sc-rail" ref={rail} role="listbox" aria-label={t('public.showcase.pick')}>
                   {list.map((tpl) => {
@@ -295,9 +337,21 @@ export function TemplatesShowcase({ site, templates, chosen, error }: Props) {
                         type="button"
                         role="option"
                         aria-selected={on}
-                        className={'sc-card' + (on ? ' is-active' : '')}
-                        onClick={() => choose(tpl.slug)}
+                        className={'sc-card' + (on ? ' is-active' : '') + (armed === tpl.slug ? ' is-armed' : '')}
+                        onClick={() => {
+                          if (swallowClick.current) {
+                            swallowClick.current = false
+                            return
+                          }
+                          choose(tpl.slug)
+                        }}
                         onPointerEnter={() => warmPreview(tpl.slug)}
+                        onPointerDown={(event) => startPress(event, tpl.slug)}
+                        onPointerMove={movePress}
+                        onPointerUp={releasePress}
+                        onPointerCancel={endPress}
+                        onPointerLeave={endPress}
+                        onContextMenu={(event) => press.current && event.preventDefault()}
                       >
                         <span className="sc-card-img">
                           {tpl.cover ? (
@@ -349,6 +403,11 @@ export function TemplatesShowcase({ site, templates, chosen, error }: Props) {
                 )}
               </div>
 
+              {copied && (
+                <p className={'sc-copied' + (copied === 'fail' ? ' is-fail' : '')} role="status">
+                  {t(copied === 'ok' ? 'public.showcase.linkCopied' : 'public.showcase.linkCopyFailed')}
+                </p>
+              )}
               <p className="sc-tip sc-tip--below">{t('public.showcase.tip')}</p>
               <Link className="sc-all" to="/templates">
                 {t('public.showcase.all')} <span aria-hidden="true">←</span>

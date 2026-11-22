@@ -79,7 +79,10 @@
     "order": "Order on WhatsApp",
     "orderMessage": "Hello, I love the {{name}} template and would like to order it",
     "open": "Open full size",
-    "all": "See all templates"
+    "all": "See all templates",
+    "holdHint": "Long-press a template to copy its link",
+    "linkCopied": "Template link copied ✓",
+    "linkCopyFailed": "Couldn't copy the link — try again"
   },
   "plans": {
     "eyebrow": "Pricing",
