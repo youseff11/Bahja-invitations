@@ -252,7 +252,7 @@ export function TemplatesPage() {
   return (
     <>
       <PageHead title={t('dashboard.templates.title')}>
-        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center' }}>
           <Link className="btn btn--gold" to="/dashboard/templates/new">
             {t('dashboard.templates.create')}
           </Link>
@@ -280,7 +280,7 @@ export function TemplatesPage() {
         >
           <Trans i18nKey="dashboard.templates.importLimits" components={{ strong: <strong /> }} />
         </p>
-        <form className="toolbar" onSubmit={onImport}>
+        <form className="toolbar tpl-import" onSubmit={onImport}>
           <input type="file" name="file" required accept=".html,.htm,.zip,text/html,application/zip" />
           <input
             type="text"

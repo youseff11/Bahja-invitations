@@ -839,8 +839,55 @@
 @media (max-width: 700px) {
   .dash-root .grid--gallery.grid--admin-5 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
 }
+/* الموبايل: كارتين في الصف بدل كارت واحد طوله ~٧٢٠px (الصفحة كانت ١٠٫٥ ألف بكسل) —
+   صورة + اسم + أرقام + تصنيف وقايمة، والوصف بيستخبّى */
 @media (max-width: 440px) {
-  .dash-root .grid--gallery.grid--admin-5 { grid-template-columns: 1fr; }
+  .dash-root .grid--gallery.grid--admin-5 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .dash-root .grid--admin-5 .tpl-card { padding: 6px; border-radius: 15px; }
+  .dash-root .grid--admin-5 .tpl-cover { border-radius: 10px; }
+  .dash-root .grid--admin-5 .tpl-body { padding: 9px 3px 2px; gap: 3px; }
+  .dash-root .grid--admin-5 .tpl-body h3 { font-size: 14px; }
+  .dash-root .grid--admin-5 .inline-edit.tpl-desc { display: none; }
+  .dash-root .grid--admin-5 .tpl-meta { font-size: 10.5px; padding-inline: 3px; }
+  .dash-root .grid--admin-5 .tpl-foot { gap: 5px; padding-top: 8px; }
+  .dash-root .grid--admin-5 .tpl-foot .tpl-category { padding: 5px 6px; font-size: 12px; }
+  .dash-root .grid--admin-5 .tpl-foot .tpl-action-trigger { width: 30px; height: 30px; }
+  .dash-root .grid--admin-5 .tpl-badges { top: 6px; inset-inline-start: 6px; }
+  .dash-root .grid--admin-5 .tpl-badges > * { font-size: 10px; padding: 1px 7px; }
+}
+/* الأسامي والأوصاف الإنجليزي جوّه صفحة عربي: الاتجاه من النص نفسه (النقطة كانت بتطلع أوّل السطر) */
+.dash-root .tpl-body h3 .inline-edit,
+.dash-root .inline-edit.tpl-desc {
+  unicode-bidi: plaintext;
+}
+/* استيراد قالب: خانة الملف كانت أعرض من الموبايل وبتعمل تمرير أفقي */
+.dash-root .tpl-import input[type='file'] {
+  min-width: 0;
+  max-width: 100%;
+}
+@media (max-width: 620px) {
+  .dash-root .tpl-import {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+  }
+  .dash-root .tpl-import input[type='file'],
+  .dash-root .tpl-import input[type='text'] {
+    grid-column: 1 / -1;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .dash-root .tpl-import input[type='file'] {
+    padding: 8px;
+    font-size: 13px;
+  }
+  .dash-root .tpl-import select {
+    width: 100%;
+    min-width: 0;
+  }
+  .dash-root .tpl-import .btn {
+    padding-inline: 20px;
+  }
 }
 /* كارت الإدارة المضغوط: اسم + وصف سطرين + سطر صغير للأرقام + صف واحد للتصنيف والإجراءات */
 .dash-root .grid--admin-5 .tpl-card { padding: 8px; border-radius: 18px; }
