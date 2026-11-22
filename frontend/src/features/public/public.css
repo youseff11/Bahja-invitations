@@ -2489,6 +2489,8 @@ a.tpl-cover { text-decoration: none; cursor: pointer; }
 }
 .sc-card.is-active { border-color: var(--sc-wine); box-shadow: 0 0 0 2px var(--sc-wine), 0 18px 30px -20px rgba(60, 10, 25, .7); }
 .sc-card.is-active .sc-card-name { color: var(--accent); font-weight: 600; }
+/* عرض القوالب من غير وميض اللمس الأزرق بتاع أندرويد (التلفون والكروت والأسهم) */
+.section--showcase { -webkit-tap-highlight-color: transparent; }
 /* ضغطة مطوّلة = نسخ لينك القالب: من غير قايمة الصورة بتاعة الآيفون/أندرويد ولا تحديد نص */
 .sc-card { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
 .sc-card img { -webkit-user-drag: none; pointer-events: none; }

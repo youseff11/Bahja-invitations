@@ -25,7 +25,7 @@ const PHONE_H = 720
 const HIDE_IN_PHONE =
   '.lb-back,.lb-share-fab,.lb-cta,.lb-autoscroll,.lb-music{display:none!important}' +
   // زرار المزيكا مستخبي: المشغّل بقى في الـ Dynamic Island (DynamicIsland.tsx)
-  'html{scrollbar-width:none}html::-webkit-scrollbar{display:none}' +
+  'html{scrollbar-width:none;-webkit-tap-highlight-color:transparent}html::-webkit-scrollbar{display:none}' +
   // المسافة اللي المعاينة بتسيبها تحت عشان شريط التواصل — الشريط مستخبي هنا، فآخر حاجة تبقى «صُممت بواسطة بهجة»
   '.lb-doc .lb-stage{margin-block-end:0!important}' +
   '.lb-doc .lb-music,.lb-doc .lb-autoscroll{inset-block-end:18px!important}.lb-doc .lb-intro-play{translate:none!important}'
