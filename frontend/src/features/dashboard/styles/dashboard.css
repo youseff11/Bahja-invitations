@@ -2086,6 +2086,118 @@ html[lang='en'] .dash-root .tpl-meta {
   }
 }
 
+/* جدول الدعوات كروت: الحشوة الفخمة (‎16px‎ لكل خانة) كانت بتفرد الكارت */
+@media (max-width: 1180px) {
+  .dash-root .table-cards.inv-lux td {
+    padding: 0;
+  }
+}
+/* الموبايل: كارت مضغوط — العنوان والحالة جنب بعض، سطر بيانات، تلات أرقام في مربعات،
+   المدفوع والحساب جنب بعض، والأزرار في صف واحد */
+@media (max-width: 620px) {
+  .dash-root .table-cards.inv-table tr {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 12px 8px;
+    padding: 16px 15px 14px;
+  }
+  .dash-root .table-cards.inv-table .cell--title {
+    grid-column: span 4;
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+  .dash-root .table-cards.inv-table .cell--title strong {
+    font-size: 16px;
+    line-height: 1.45;
+  }
+  .dash-root .table-cards.inv-table .cell--title small {
+    margin-top: 2px;
+    text-align: end;
+  }
+  .dash-root .table-cards.inv-table .cell--status {
+    grid-column: span 2;
+    order: -1;
+    align-items: flex-end;
+  }
+  .dash-root .table-cards.inv-table .cell--status::before {
+    content: none;
+  }
+  .dash-root .table-cards.inv-table .cell--customer,
+  .dash-root .table-cards.inv-table .cell--template,
+  .dash-root .table-cards.inv-table .cell--created {
+    grid-column: span 2;
+    font-size: 13px;
+  }
+  .dash-root .table-cards.inv-table .cell--customer {
+    order: 1;
+  }
+  .dash-root .table-cards.inv-table .cell--template {
+    order: 2;
+  }
+  .dash-root .table-cards.inv-table .cell--created {
+    order: 3;
+  }
+  .dash-root .table-cards.inv-table .cell--created time {
+    font-size: 12.5px;
+  }
+  .dash-root .table-cards.inv-table .cell--stat {
+    grid-column: span 2;
+    align-items: center;
+    gap: 1px;
+    order: 4;
+    padding: 6px 4px;
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--lux-gold) 7%, var(--surface-2));
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 600;
+  }
+  .dash-root .table-cards.inv-table .cell--stat::before {
+    font-family: var(--font-body, inherit);
+    font-size: 10.5px;
+    font-weight: 400;
+    letter-spacing: 0;
+  }
+  .dash-root .table-cards.inv-table .cell--paid,
+  .dash-root .table-cards.inv-table .cell--account {
+    grid-column: span 3;
+    order: 5;
+  }
+  .dash-root .table-cards.inv-table .paid-field {
+    width: 100%;
+    height: 38px;
+  }
+  .dash-root .table-cards.inv-table .account-cell {
+    align-items: stretch;
+    width: 100%;
+  }
+  .dash-root .table-cards.inv-table .account-toggle {
+    justify-content: center;
+    height: 38px;
+    border-radius: 12px;
+    font-size: 12.5px;
+  }
+  .dash-root .table-cards.inv-table .account-left {
+    text-align: center;
+  }
+  .dash-root .table-cards.inv-table .cell--actions {
+    grid-column: 1 / -1;
+    padding-top: 12px;
+  }
+  .dash-root .table-cards.inv-table .row-actions {
+    flex-wrap: nowrap;
+    gap: 6px;
+  }
+  .dash-root .table-cards.inv-table .row-actions > * {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+  .dash-root .table-cards.inv-table .row-actions .btn--sm,
+  .dash-root .table-cards.inv-table .rowmenu-btn {
+    justify-content: center;
+    padding-inline: 8px;
+  }
+}
+
 @media (max-width: 860px) {
   .dash-root .dash-main {
     padding: 22px 0 60px;

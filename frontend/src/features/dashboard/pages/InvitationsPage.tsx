@@ -183,25 +183,25 @@ export function InvitationsPage() {
                 <strong>{invitation.title}</strong>
                 <small className="muted">/i/{invitation.slug}/</small>
               </td>
-              <td className="cell--text" data-label={t('dashboard.invitations.cols.customer')}>
+              <td className="cell--text cell--customer" data-label={t('dashboard.invitations.cols.customer')}>
                 {invitation.customerName}
               </td>
-              <td className="cell--text" data-label={t('dashboard.invitations.cols.template')}>
+              <td className="cell--text cell--template" data-label={t('dashboard.invitations.cols.template')}>
                 {invitation.templateName}
               </td>
-              <td data-label={t('dashboard.invitations.cols.status')}>
+              <td className="cell--status" data-label={t('dashboard.invitations.cols.status')}>
                 <StatusSelect invitation={invitation} choices={data.statusChoices.map((choice) => choice.value)} />
               </td>
-              <td data-label={t('dashboard.invitations.cols.guests')}>{invitation.guests}</td>
-              <td data-label={t('dashboard.invitations.cols.rsvps')}>{invitation.rsvps}</td>
-              <td data-label={t('dashboard.invitations.cols.views')}>{invitation.views}</td>
-              <td data-label={t('dashboard.invitations.cols.paid')}>
+              <td className="cell--stat" data-label={t('dashboard.invitations.cols.guests')}>{invitation.guests}</td>
+              <td className="cell--stat" data-label={t('dashboard.invitations.cols.rsvps')}>{invitation.rsvps}</td>
+              <td className="cell--stat" data-label={t('dashboard.invitations.cols.views')}>{invitation.views}</td>
+              <td className="cell--paid" data-label={t('dashboard.invitations.cols.paid')}>
                 <PaidInput invitation={invitation} />
               </td>
-              <td data-label={t('dashboard.invitations.cols.account')}>
+              <td className="cell--account" data-label={t('dashboard.invitations.cols.account')}>
                 <AccountToggle invitation={invitation} />
               </td>
-              <td data-label={t('dashboard.invitations.cols.created')}>
+              <td className="cell--created" data-label={t('dashboard.invitations.cols.created')}>
                 <time dateTime={invitation.createdAt ?? undefined} title={invitation.createdTitle}>
                   {invitation.createdLabel}
                 </time>
