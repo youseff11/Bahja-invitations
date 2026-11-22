@@ -162,6 +162,16 @@ export function useSetInvitationStatus() {
   )
 }
 
+/** «الحساب»: دفع بالكامل ولا لأ — من غيرها الدعوة المنشورة بترجع مسودة بعد ساعة. */
+export function useSetInvitationPaidInFull() {
+  return useInvalidatingMutation(({ id, paidInFull }: { id: number; paidInFull: boolean }) =>
+    api<{ id: number; paidInFull: boolean; unpaidDeadline: string | null }>(`/dashboard/invitations/${id}/`, {
+      method: 'PATCH',
+      body: { paidInFull },
+    }),
+  )
+}
+
 export function useCreateInvitation() {
   return useInvalidatingMutation((body: InvitationCreateBody) =>
     api<{ id: number; editorUrl: string }>('/dashboard/invitations/', { method: 'POST', body }),

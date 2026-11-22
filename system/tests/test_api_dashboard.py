@@ -8,12 +8,14 @@ import json
 import shutil
 import tempfile
 import zipfile
+from datetime import timedelta
 from decimal import Decimal
 
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
+from django.utils import timezone
 from PIL import Image
 
 from system import blocks as blocks_engine
@@ -290,7 +292,7 @@ class InvitationTests(DashboardApiCase):
     def test_change_status(self):
         url = f"{BASE}/invitations/{self.invitation.pk}/"
         response = self.send("PATCH", url, {"status": "draft"})
-        self.assertEqual(response.json(), {"id": self.invitation.pk, "status": "draft"})
+        self.assertEqual(response.json()["status"], "draft")
         self.invitation.refresh_from_db()
         self.assertEqual(self.invitation.status, "draft")
         Invitation.objects.filter(pk=self.invitation.pk).update(published_at=None)
@@ -299,6 +301,46 @@ class InvitationTests(DashboardApiCase):
         self.assertEqual(self.invitation.status, "published")
         self.assertIsNotNone(self.invitation.published_at)
         self.assertEqual(self.send("PATCH", url, {"status": "bogus"}).status_code, 400)
+
+    def test_unpaid_published_turns_draft_after_one_hour(self):
+        inv = self.invitation
+        self.assertIsNotNone(inv.live_since)
+        row = self.get(f"{BASE}/invitations/").json()["results"][0]
+        self.assertFalse(row["paidInFull"])
+        self.assertIsNotNone(row["unpaidDeadline"])
+        # لسه جوّه الساعة: منشورة وشغّالة
+        Invitation.objects.filter(pk=inv.pk).update(
+            live_since=timezone.now() - timedelta(minutes=59))
+        inv.refresh_from_db()
+        self.assertTrue(inv.is_live)
+        # عدّت الساعة: مش شغّالة، والقايمة بتحوّلها مسودة
+        Invitation.objects.filter(pk=inv.pk).update(
+            live_since=timezone.now() - timedelta(hours=1, seconds=1))
+        inv.refresh_from_db()
+        self.assertFalse(inv.is_live)
+        self.assertEqual(self.get(f"{BASE}/invitations/").json()["results"][0]["status"], "draft")
+        # النشر تاني بيدّي ساعة جديدة
+        self.send("PATCH", f"{BASE}/invitations/{inv.pk}/", {"status": "published"})
+        inv.refresh_from_db()
+        self.assertEqual(inv.status, "published")
+        self.assertTrue(inv.is_live)
+        self.assertLess(timezone.now() - inv.live_since, timedelta(seconds=30))
+
+    def test_paid_in_full_stops_the_clock(self):
+        url = f"{BASE}/invitations/{self.invitation.pk}/"
+        response = self.send("PATCH", url, {"paidInFull": True})
+        self.assertEqual(response.json()["paidInFull"], True)
+        self.assertIsNone(response.json()["unpaidDeadline"])
+        Invitation.objects.filter(pk=self.invitation.pk).update(
+            live_since=timezone.now() - timedelta(days=3))
+        self.assertEqual(Invitation.draft_unpaid_overdue(), 0)
+        self.invitation.refresh_from_db()
+        self.assertTrue(self.invitation.is_live)
+        # شيل العلامة = ساعة جديدة من دلوقتي، مش رجوع فوري لمسودة
+        self.send("PATCH", url, {"paidInFull": False})
+        self.invitation.refresh_from_db()
+        self.assertTrue(self.invitation.is_live)
+        self.assertFalse(self.invitation.paid_in_full)
 
     def test_delete(self):
         response = self.send("DELETE", f"{BASE}/invitations/{self.invitation.pk}/")

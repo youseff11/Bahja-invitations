@@ -38,6 +38,7 @@ from .dashboard_common import (
 # ---------------------------------------------------------------- النظرة العامة
 @staff_api("GET")
 def overview(request):
+    Invitation.draft_unpaid_overdue()
     invitations = Invitation.objects.all()
     stats = {
         "invitations": invitations.count(),

@@ -132,6 +132,15 @@
     "paidSaved": "اتحفظ المدفوع لـ«{{title}}».",
     "statusSaved": "«{{title}}» بقت {{status}}.",
     "changeStatus": "غيّر الحالة",
+    "account": {
+      "paid": "دفع بالكامل",
+      "unpaid": "لسه",
+      "draftIn": "مسودة بعد {{time}}",
+      "drafting": "بترجع مسودة…",
+      "draftHint": "لو ماتعلّمتش «دفع بالكامل» الدعوة بترجع مسودة بعد ساعة من نشرها",
+      "markedPaid": "«{{title}}» دفع بالكامل.",
+      "markedUnpaid": "«{{title}}» لسه مادفعش بالكامل — لو منشورة هترجع مسودة بعد ساعة."
+    },
     "cols": {
       "invitation": "الدعوة",
       "customer": "العميل",
@@ -141,6 +150,7 @@
       "rsvps": "ردود",
       "views": "مشاهدات",
       "paid": "دفع",
+      "account": "الحساب",
       "created": "اتعملت",
       "actions": "إجراءات"
     },

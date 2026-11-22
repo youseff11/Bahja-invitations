@@ -73,6 +73,9 @@ export interface InvitationRow {
   rsvps: number
   views: number
   paidAmount: string
+  /** «الحساب»: العميل دفع بالكامل — من غيرها الدعوة المنشورة بترجع مسودة عند ‎unpaidDeadline‎. */
+  paidInFull: boolean
+  unpaidDeadline: string | null
   createdAt: string | null
   createdLabel: string
   createdTitle: string

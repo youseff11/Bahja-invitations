@@ -13,6 +13,7 @@ from django.db import transaction
 from django.db.models import F, Q, Sum
 from django.http import Http404
 from django.urls import path
+from django.utils import timezone
 
 from ..models import Customer, Invitation, Plan, Template
 from ..services import _delete_invitation, _duplicate_invitation
@@ -42,6 +43,8 @@ def _invitation_row(inv) -> dict:
         "rsvps": inv.rsvp_total,
         "views": inv.public_views,
         "paidAmount": money(inv.paid_amount),
+        "paidInFull": inv.paid_in_full,
+        "unpaidDeadline": iso(inv.unpaid_deadline),
         "createdAt": iso(inv.created_at),
         "createdLabel": fmt_dt(inv.created_at, "j M Y"),
         "createdTitle": fmt_dt(inv.created_at, "j F Y — g:i A"),
@@ -57,6 +60,7 @@ def invitations(request):
     if request.method == "POST":
         return _create_invitation(request)
 
+    Invitation.draft_unpaid_overdue()  # اللي عدّت ساعتها من غير «دفع بالكامل» تظهر مسودة
     q = (request.GET.get("q") or "").strip()
     status = request.GET.get("status", "")
     template_id = (request.GET.get("template") or "").strip()
@@ -100,6 +104,8 @@ def invitation_detail(request, pk):
         data = json_body(request)
         if "status" in data:
             return _update_status(inv, data)
+        if "paidInFull" in data:
+            return _update_paid_in_full(inv, data)
         return _update_paid_amount(inv, data)
     title = inv.title
     _delete_invitation(inv)
@@ -131,8 +137,22 @@ def _update_status(inv, data) -> dict:
         raise ApiError(400, "validation_error", message, fields={"status": message})
     if status != inv.status:
         inv.status = status
-        inv.save(update_fields=["status", "published_at", "updated_at"])
-    return {"id": inv.pk, "status": inv.status}
+        inv.save(update_fields=["status", "updated_at"])  # ‎save()‎ بيزوّد ‎published_at/live_since‎
+    return {"id": inv.pk, "status": inv.status, "unpaidDeadline": iso(inv.unpaid_deadline)}
+
+
+def _update_paid_in_full(inv, data) -> dict:
+    """«الحساب»: دفع بالكامل ولا لأ. شيل العلامة عن دعوة منشورة = ساعة جديدة من دلوقتي."""
+    paid = data.get("paidInFull") is True
+    if paid != inv.paid_in_full:
+        inv.paid_in_full = paid
+        fields = ["paid_in_full", "updated_at"]
+        if not paid and inv.status == "published":
+            inv.live_since = timezone.now()
+            fields.append("live_since")
+        inv.save(update_fields=fields)
+    return {"id": inv.pk, "paidInFull": inv.paid_in_full,
+            "unpaidDeadline": iso(inv.unpaid_deadline)}
 
 
 @staff_api("POST")

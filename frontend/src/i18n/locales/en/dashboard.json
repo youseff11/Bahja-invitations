@@ -132,6 +132,15 @@
     "paidSaved": "Saved the paid amount for “{{title}}”.",
     "statusSaved": "“{{title}}” is now {{status}}.",
     "changeStatus": "Change status",
+    "account": {
+      "paid": "Paid in full",
+      "unpaid": "Not yet",
+      "draftIn": "Draft in {{time}}",
+      "drafting": "Turning into a draft…",
+      "draftHint": "Unless marked paid in full, a published invitation turns back into a draft one hour after it was published",
+      "markedPaid": "“{{title}}” is paid in full.",
+      "markedUnpaid": "“{{title}}” is not paid in full — if published, it turns into a draft in one hour."
+    },
     "cols": {
       "invitation": "Invitation",
       "customer": "Customer",
@@ -141,6 +150,7 @@
       "rsvps": "Replies",
       "views": "Views",
       "paid": "Paid",
+      "account": "Account",
       "created": "Created",
       "actions": "Actions"
     },

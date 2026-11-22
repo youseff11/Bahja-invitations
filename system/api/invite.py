@@ -43,6 +43,8 @@ def get_live_invitation(slug: str) -> Invitation:
     invitation = get_object_or_404(
         Invitation.objects.select_related("template", "plan", "customer"), slug=slug)
     if not invitation.is_live:
+        if invitation.unpaid_overdue:  # عدّت ساعتها من غير «دفع بالكامل» — ترجع مسودة فعلاً
+            Invitation.draft_unpaid_overdue()
         raise Http404("الدعوة غير متاحة.")
     return invitation
 

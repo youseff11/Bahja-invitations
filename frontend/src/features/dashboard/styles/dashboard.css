@@ -1739,8 +1739,9 @@ html[lang='en'] .dash-root .tpl-meta {
   content: '';
   width: 5px;
   height: 5px;
-  border-inline-end: 1.5px solid currentColor;
-  border-block-end: 1.5px solid currentColor;
+  /* اتجاهات فعلية مش منطقية: في RTL ‎inline-end‎ كانت بتقلب السهم لـ«<» */
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
   transform: translateY(-2px) rotate(45deg);
   opacity: 0.7;
 }
@@ -1760,6 +1761,64 @@ html[lang='en'] .dash-root .tpl-meta {
 .dash-root .status-pick option {
   color: var(--ink, #222);
   background: var(--card, #fff);
+}
+
+/* «الحساب»: زرار دفع بالكامل/لسه + عدّاد الرجوع لمسودة */
+.dash-root .account-cell {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.dash-root .account-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px 4px 10px;
+  border-radius: 999px;
+  border: 1px dashed color-mix(in srgb, var(--danger) 55%, var(--line));
+  background: color-mix(in srgb, var(--danger) 6%, transparent);
+  color: var(--danger);
+  font: inherit;
+  font-size: 11.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: box-shadow 0.15s, background 0.15s;
+}
+.dash-root .account-toggle i {
+  display: inline-grid;
+  place-items: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  border: 1.5px solid currentColor;
+  font-style: normal;
+  font-size: 10px;
+  line-height: 1;
+}
+.dash-root .account-toggle:hover {
+  box-shadow: 0 0 0 3px color-mix(in srgb, currentColor 14%, transparent);
+}
+.dash-root .account-toggle.is-paid {
+  border-style: solid;
+  border-color: currentColor;
+  color: var(--ok);
+  background: color-mix(in srgb, var(--ok) 9%, transparent);
+}
+.dash-root .account-toggle.is-paid i {
+  background: currentColor;
+  color: #fff;
+}
+.dash-root .account-toggle:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+.dash-root .account-left {
+  font-size: 10.5px;
+  color: var(--danger);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 /* خانة «المدفوع»: رقم + «ج.م» في كبسولة، ودهبي لما يبقى فيها مبلغ */

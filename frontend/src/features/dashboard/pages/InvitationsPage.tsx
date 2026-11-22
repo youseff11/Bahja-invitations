@@ -1,3 +1,5 @@
+import { useQueryClient } from '@tanstack/react-query'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useSearchParams } from 'react-router-dom'
 import { appPath } from '@/lib/appPath'
@@ -7,6 +9,7 @@ import {
   useDuplicateInvitation,
   useInvitations,
   useSetInvitationPaid,
+  useSetInvitationPaidInFull,
   useSetInvitationStatus,
 } from '../api'
 import type { InvitationFilters, InvitationRow } from '../types'
@@ -167,6 +170,7 @@ export function InvitationsPage() {
             t('dashboard.invitations.cols.rsvps'),
             t('dashboard.invitations.cols.views'),
             t('dashboard.invitations.cols.paid'),
+            t('dashboard.invitations.cols.account'),
             t('dashboard.invitations.cols.created'),
             t('dashboard.invitations.cols.actions'),
           ]}
@@ -193,6 +197,9 @@ export function InvitationsPage() {
               <td data-label={t('dashboard.invitations.cols.views')}>{invitation.views}</td>
               <td data-label={t('dashboard.invitations.cols.paid')}>
                 <PaidInput invitation={invitation} />
+              </td>
+              <td data-label={t('dashboard.invitations.cols.account')}>
+                <AccountToggle invitation={invitation} />
               </td>
               <td data-label={t('dashboard.invitations.cols.created')}>
                 <time dateTime={invitation.createdAt ?? undefined} title={invitation.createdTitle}>
@@ -241,6 +248,74 @@ export function InvitationsPage() {
 function formatMoney(value: string) {
   const n = Number(value)
   return Number.isFinite(n) ? n.toLocaleString('en-US') : value
+}
+
+/** «الحساب»: زرار دفع بالكامل / لسه. لو لسه والدعوة منشورة بيعدّ الوقت الباقي قبل ما ترجع مسودة. */
+function AccountToggle({ invitation }: { invitation: InvitationRow }) {
+  const { t } = useTranslation()
+  const toast = useToast()
+  const save = useSetInvitationPaidInFull()
+  const paid = save.isPending && save.variables ? save.variables.paidInFull : invitation.paidInFull
+  const left = useCountdown(paid ? null : invitation.unpaidDeadline)
+  const qc = useQueryClient()
+  const expired = left === 0
+  useEffect(() => {
+    // الساعة خلصت: نعيد تحميل القايمة عشان السيرفر يحوّلها مسودة وتظهر كده (ثانيتين هامش)
+    if (!expired) return
+    const id = window.setTimeout(() => void qc.invalidateQueries({ queryKey: ['dashboard'] }), 2000)
+    return () => window.clearTimeout(id)
+  }, [expired, qc])
+
+  return (
+    <div className="account-cell">
+      <button
+        type="button"
+        className={paid ? 'account-toggle is-paid' : 'account-toggle'}
+        aria-pressed={paid}
+        disabled={save.isPending}
+        onClick={() =>
+          save.mutate(
+            { id: invitation.id, paidInFull: !paid },
+            {
+              onSuccess: (res) =>
+                toast.success(
+                  t(res.paidInFull ? 'dashboard.invitations.account.markedPaid' : 'dashboard.invitations.account.markedUnpaid', {
+                    title: invitation.title,
+                  }),
+                ),
+              onError: toast.fail,
+            },
+          )
+        }
+      >
+        <i aria-hidden="true">{paid ? '✓' : ''}</i>
+        {t(paid ? 'dashboard.invitations.account.paid' : 'dashboard.invitations.account.unpaid')}
+      </button>
+      {left !== null && (
+        <small className="account-left" title={t('dashboard.invitations.account.draftHint')}>
+          {left > 0 ? t('dashboard.invitations.account.draftIn', { time: formatLeft(left) }) : t('dashboard.invitations.account.drafting')}
+        </small>
+      )}
+    </div>
+  )
+}
+
+/** ثواني باقية لحد موعد (بتتحدّث كل ثانية)، ‎null‎ لو مفيش موعد. */
+function useCountdown(deadline: string | null) {
+  const target = deadline ? Date.parse(deadline) : null
+  const [now, setNow] = useState(() => Date.now())
+  useEffect(() => {
+    if (target === null) return
+    const id = window.setInterval(() => setNow(Date.now()), 1000)
+    return () => window.clearInterval(id)
+  }, [target])
+  return target === null ? null : Math.max(0, Math.round((target - now) / 1000))
+}
+
+function formatLeft(seconds: number) {
+  const m = Math.floor(seconds / 60)
+  const s = seconds % 60
+  return `${m}:${String(s).padStart(2, '0')}`
 }
 
 /** حبّة الحالة كقايمة: اختيار مسودة/منشورة/… بيتحفظ على طول من غير فتح المحرر. */

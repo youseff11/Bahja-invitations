@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import secrets
 import uuid
+from datetime import timedelta
 from decimal import Decimal
 from urllib.parse import quote
 
@@ -466,6 +467,12 @@ class Invitation(TimeStampedModel):
     # اللي العميل دفعه فعلاً (بالجنيه) — بيتكتب يدوي من جدول الدعوات في اللوحة،
     # ومالوش علاقة بسعر الباقة. إجماليه بيظهر فوق الجدول.
     paid_amount = models.DecimalField("المدفوع", max_digits=10, decimal_places=2, default=0)
+    # «الحساب»: الأدمن بيعلّم إن العميل دفع بالكامل. الدعوة المنشورة اللي مش متعلّمة
+    # بترجع مسودة بعد ‎UNPAID_GRACE‎ بالظبط من آخر مرة اتنشرت (‎live_since‎).
+    paid_in_full = models.BooleanField("دفع بالكامل", default=False)
+    live_since = models.DateTimeField("منشورة من", null=True, blank=True)
+
+    UNPAID_GRACE = timedelta(hours=1)
 
     class Meta:
         ordering = ["-created_at"]
@@ -486,9 +493,45 @@ class Invitation(TimeStampedModel):
         if not self.title:
             names = " و ".join(n for n in [self.name_one, self.name_two] if n)
             self.title = names or f"دعوة {self.slug}"
+        touched = []
         if self.status == "published" and not self.published_at:
             self.published_at = timezone.now()
+            touched.append("published_at")
+        # كل مرة الدعوة تتحوّل لمنشورة تاخد ساعة جديدة لحد ما الحساب يتعلّم «دفع بالكامل»
+        if self.status == "published" and (
+                self.live_since is None or getattr(self, "_db_status", None) != "published"):
+            self.live_since = timezone.now()
+            touched.append("live_since")
+        if touched and kwargs.get("update_fields") is not None:
+            kwargs["update_fields"] = {*kwargs["update_fields"], *touched}
         super().save(*args, **kwargs)
+        self._db_status = self.status
+
+    @classmethod
+    def from_db(cls, db, field_names, values):
+        instance = super().from_db(db, field_names, values)
+        instance._db_status = instance.__dict__.get("status")
+        return instance
+
+    @property
+    def unpaid_deadline(self):
+        """امتى الدعوة المنشورة هترجع مسودة لو الحساب ماتعلّمش — ‎None‎ لو مفيش عدّاد."""
+        if self.status != "published" or self.paid_in_full or not self.live_since:
+            return None
+        return self.live_since + self.UNPAID_GRACE
+
+    @property
+    def unpaid_overdue(self) -> bool:
+        deadline = self.unpaid_deadline
+        return deadline is not None and deadline <= timezone.now()
+
+    @classmethod
+    def draft_unpaid_overdue(cls) -> int:
+        """يرجّع كل دعوة منشورة عدّت ساعتها من غير «دفع بالكامل» لمسودة (‎UPDATE‎ واحد)."""
+        return cls.objects.filter(
+            status="published", paid_in_full=False,
+            live_since__lte=timezone.now() - cls.UNPAID_GRACE,
+        ).update(status="draft", updated_at=timezone.now())
 
     def get_absolute_url(self) -> str:
         return reverse("invitation_public", kwargs={"slug": self.slug})
@@ -531,6 +574,8 @@ class Invitation(TimeStampedModel):
     @property
     def is_live(self) -> bool:
         if self.status != "published":
+            return False
+        if self.unpaid_overdue:
             return False
         if self.expires_at and self.expires_at < timezone.now():
             return False
