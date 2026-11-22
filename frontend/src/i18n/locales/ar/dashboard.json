@@ -130,6 +130,8 @@
     "totalPaid": "إجمالي المدفوع",
     "currency": "ج.م",
     "paidSaved": "اتحفظ المدفوع لـ«{{title}}».",
+    "statusSaved": "«{{title}}» بقت {{status}}.",
+    "changeStatus": "غيّر الحالة",
     "cols": {
       "invitation": "الدعوة",
       "customer": "العميل",

@@ -1722,6 +1722,46 @@ html[lang='en'] .dash-root .tpl-meta {
   background: color-mix(in srgb, var(--muted) 8%, transparent);
 }
 
+/* حبّة الحالة كقايمة: نفس شكل الحبّة + سهم صغير، والقايمة الأصلية شفافة فوقها */
+.dash-root .status-pick {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: box-shadow 0.15s;
+}
+.dash-root .status-pick:hover,
+.dash-root .status-pick:focus-within {
+  box-shadow: 0 0 0 3px color-mix(in srgb, currentColor 14%, transparent);
+}
+.dash-root .status-pick::after {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-inline-end: 1.5px solid currentColor;
+  border-block-end: 1.5px solid currentColor;
+  transform: translateY(-2px) rotate(45deg);
+  opacity: 0.7;
+}
+.dash-root .status-pick select {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  padding: 0;
+  cursor: pointer;
+  outline: none;
+}
+.dash-root .status-pick select:disabled {
+  opacity: 0.6;
+}
+.dash-root .status-pick option {
+  color: var(--ink, #222);
+  background: var(--card, #fff);
+}
+
 /* خانة «المدفوع»: رقم + «ج.م» في كبسولة، ودهبي لما يبقى فيها مبلغ */
 .dash-root .paid-field {
   display: inline-flex;

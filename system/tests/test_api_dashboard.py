@@ -287,6 +287,19 @@ class InvitationTests(DashboardApiCase):
         self.assertEqual(response.json()["sourceTitle"], self.invitation.title)
         self.assertTrue(dup.title.endswith("(نسخة)"))
 
+    def test_change_status(self):
+        url = f"{BASE}/invitations/{self.invitation.pk}/"
+        response = self.send("PATCH", url, {"status": "draft"})
+        self.assertEqual(response.json(), {"id": self.invitation.pk, "status": "draft"})
+        self.invitation.refresh_from_db()
+        self.assertEqual(self.invitation.status, "draft")
+        Invitation.objects.filter(pk=self.invitation.pk).update(published_at=None)
+        self.send("PATCH", url, {"status": "published"})
+        self.invitation.refresh_from_db()
+        self.assertEqual(self.invitation.status, "published")
+        self.assertIsNotNone(self.invitation.published_at)
+        self.assertEqual(self.send("PATCH", url, {"status": "bogus"}).status_code, 400)
+
     def test_delete(self):
         response = self.send("DELETE", f"{BASE}/invitations/{self.invitation.pk}/")
         self.assertEqual(response.status_code, 200)

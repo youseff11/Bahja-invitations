@@ -97,7 +97,10 @@ def invitations(request):
 def invitation_detail(request, pk):
     inv = _get_or_404(pk)
     if request.method == "PATCH":
-        return _update_paid_amount(inv, json_body(request))
+        data = json_body(request)
+        if "status" in data:
+            return _update_status(inv, data)
+        return _update_paid_amount(inv, data)
     title = inv.title
     _delete_invitation(inv)
     return {"deleted": True, "title": title}
@@ -117,6 +120,19 @@ def _update_paid_amount(inv, data) -> dict:
     inv.paid_amount = amount.quantize(Decimal("1"), rounding=ROUND_HALF_UP)  # جنيه صحيح زي العرض
     inv.save(update_fields=["paid_amount", "updated_at"])
     return {"id": inv.pk, "paidAmount": money(inv.paid_amount)}
+
+
+def _update_status(inv, data) -> dict:
+    """تغيير الحالة (مسودة/منشورة/…) من الجدول من غير فتح المحرر.
+    ‎save()‎ بيحط ‎published_at‎ أول مرة تتنشر."""
+    status = str(data.get("status") or "").strip()
+    if status not in dict(Invitation.STATUS_CHOICES):
+        message = "حالة غير معروفة."
+        raise ApiError(400, "validation_error", message, fields={"status": message})
+    if status != inv.status:
+        inv.status = status
+        inv.save(update_fields=["status", "published_at", "updated_at"])
+    return {"id": inv.pk, "status": inv.status}
 
 
 @staff_api("POST")

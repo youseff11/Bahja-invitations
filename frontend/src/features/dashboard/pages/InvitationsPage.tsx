@@ -2,11 +2,17 @@ import { useTranslation } from 'react-i18next'
 import { Link, useSearchParams } from 'react-router-dom'
 import { appPath } from '@/lib/appPath'
 
-import { useDeleteInvitation, useDuplicateInvitation, useInvitations, useSetInvitationPaid } from '../api'
+import {
+  useDeleteInvitation,
+  useDuplicateInvitation,
+  useInvitations,
+  useSetInvitationPaid,
+  useSetInvitationStatus,
+} from '../api'
 import type { InvitationFilters, InvitationRow } from '../types'
 import { useConfirm } from '../ui/ConfirmDialog'
 import { useLabels } from '../ui/labels'
-import { Pill, usePageTitle } from '../ui/page'
+import { usePageTitle } from '../ui/page'
 import { RowMenu, RowMenuButton, RowMenuCopy, RowMenuLink, RowMenuTitle } from '../ui/RowMenu'
 import { QueryState, Table } from '../ui/table'
 import { useToast } from '../ui/Toast'
@@ -180,7 +186,7 @@ export function InvitationsPage() {
                 {invitation.templateName}
               </td>
               <td data-label={t('dashboard.invitations.cols.status')}>
-                <Pill kind={invitation.status}>{labels.status(invitation.status)}</Pill>
+                <StatusSelect invitation={invitation} choices={data.statusChoices.map((choice) => choice.value)} />
               </td>
               <td data-label={t('dashboard.invitations.cols.guests')}>{invitation.guests}</td>
               <td data-label={t('dashboard.invitations.cols.rsvps')}>{invitation.rsvps}</td>
@@ -235,6 +241,42 @@ export function InvitationsPage() {
 function formatMoney(value: string) {
   const n = Number(value)
   return Number.isFinite(n) ? n.toLocaleString('en-US') : value
+}
+
+/** حبّة الحالة كقايمة: اختيار مسودة/منشورة/… بيتحفظ على طول من غير فتح المحرر. */
+function StatusSelect({ invitation, choices }: { invitation: InvitationRow; choices: string[] }) {
+  const { t } = useTranslation()
+  const labels = useLabels()
+  const toast = useToast()
+  const save = useSetInvitationStatus()
+  const status = save.isPending && save.variables ? save.variables.status : invitation.status
+
+  return (
+    <label className={`pill pill--${status} status-pick`} title={t('dashboard.invitations.changeStatus')}>
+      <select
+        value={status}
+        disabled={save.isPending}
+        aria-label={t('dashboard.invitations.changeStatus')}
+        onChange={(event) => {
+          const next = event.currentTarget.value
+          save.mutate(
+            { id: invitation.id, status: next },
+            {
+              onSuccess: () =>
+                toast.success(t('dashboard.invitations.statusSaved', { title: invitation.title, status: labels.status(next) })),
+              onError: toast.fail,
+            },
+          )
+        }}
+      >
+        {choices.map((value) => (
+          <option key={value} value={value}>
+            {labels.status(value)}
+          </option>
+        ))}
+      </select>
+    </label>
+  )
 }
 
 /** خانة «المدفوع»: بتتحفظ لما تسيبها أو تدوس Enter؛ Esc بيرجّع القيمة القديمة. */

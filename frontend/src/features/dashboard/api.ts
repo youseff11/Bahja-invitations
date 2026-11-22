@@ -152,6 +152,16 @@ export function useSetInvitationPaid() {
   )
 }
 
+/** تغيير حالة الدعوة (مسودة/منشورة/…) من الجدول — بيعيد تحميل القايمة عشان العدادات تتحدّث. */
+export function useSetInvitationStatus() {
+  return useInvalidatingMutation(({ id, status }: { id: number; status: string }) =>
+    api<{ id: number; status: string }>(`/dashboard/invitations/${id}/`, {
+      method: 'PATCH',
+      body: { status },
+    }),
+  )
+}
+
 export function useCreateInvitation() {
   return useInvalidatingMutation((body: InvitationCreateBody) =>
     api<{ id: number; editorUrl: string }>('/dashboard/invitations/', { method: 'POST', body }),

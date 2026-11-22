@@ -130,6 +130,8 @@
     "totalPaid": "Total paid",
     "currency": "EGP",
     "paidSaved": "Saved the paid amount for “{{title}}”.",
+    "statusSaved": "“{{title}}” is now {{status}}.",
+    "changeStatus": "Change status",
     "cols": {
       "invitation": "Invitation",
       "customer": "Customer",
