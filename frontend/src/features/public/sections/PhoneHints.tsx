@@ -96,9 +96,13 @@ export function PhoneHints({ frame, loaded, slug }: Props) {
         afterOpen()
       }
 
-      // أي لمسة جوه المعاينة = الزائر فهم؛ التمرير بإيده (عجلة/سحب) = اتعلّم التمرير
+      // أي لمسة جوه المعاينة = الزائر فهم، فالإرشاد بيختفي على طول — حتى لو الافتتاحية
+      // لسه بتشتغل (فيديو بيكمّل قبل ما تتفتح)؛ التمرير بإيده (عجلة/سحب) = اتعلّم التمرير
+      let touched = false
       const onTouch = () => {
-        if (modeRef.current === 'scroll') setMode('')
+        touched = true
+        if (modeRef.current === 'tap') learned.tap = true
+        if (modeRef.current) setMode('')
       }
       const onScrollIntent = () => {
         learned.scroll = true
@@ -107,21 +111,27 @@ export function PhoneHints({ frame, loaded, slug }: Props) {
       const onScroll = () => measure()
 
       d.addEventListener('lb:intro-open', onOpen)
-      d.addEventListener('pointerdown', onTouch, { passive: true })
+      d.addEventListener('pointerdown', onTouch, { passive: true, capture: true })
       d.addEventListener('wheel', onScrollIntent, { passive: true })
       d.addEventListener('touchmove', onScrollIntent, { passive: true })
       w.addEventListener('scroll', onScroll, { passive: true })
       detach = () => {
         d.removeEventListener('lb:intro-open', onOpen)
-        d.removeEventListener('pointerdown', onTouch)
+        d.removeEventListener('pointerdown', onTouch, true)
         d.removeEventListener('wheel', onScrollIntent)
         d.removeEventListener('touchmove', onScrollIntent)
         w.removeEventListener('scroll', onScroll)
       }
 
-      if (d.querySelector('.lb-intro:not(.is-open)')) {
-        if (!learned.tap) later(() => setMode((m) => m || 'tap'), 900)
-      } else afterOpen()
+      // الدعوة (‎.lb-doc‎) بتترسم قبل الافتتاحية بلحظة، فمانحكمش إن مفيش افتتاحية من أول نظرة
+      let looks = 0
+      const decide = () => {
+        if (d.querySelector('.lb-intro:not(.is-open)')) {
+          if (!learned.tap) later(() => !touched && setMode((m) => m || 'tap'), 700)
+        } else if (!d.querySelector('.lb-intro') && ++looks < 4) later(decide, 300)
+        else afterOpen()
+      }
+      decide()
     }
     attach()
     return () => {
