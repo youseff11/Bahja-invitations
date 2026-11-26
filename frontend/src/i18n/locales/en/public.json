@@ -81,6 +81,9 @@
     "open": "Open full size",
     "all": "See all templates",
     "holdHint": "Long-press a template to copy its link",
+    "hintTap": "Tap to open the invitation",
+    "hintSwipe": "Swipe inside the phone",
+    "hintWheel": "Scroll over the phone",
     "linkCopied": "Template link copied ✓",
     "linkCopyFailed": "Couldn't copy the link — try again"
   },

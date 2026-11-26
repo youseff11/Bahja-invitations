@@ -2584,6 +2584,98 @@ a.tpl-cover { text-decoration: none; cursor: pointer; }
   .sc-spin { animation-duration: 2s; }
 }
 
+/* ---- إرشادات فوق شاشة التلفون (PhoneHints.tsx): «اضغطوا لفتح الدعوة» ثم «اسحبوا جوه التلفون»،
+   ومؤشر تمرير رفيع على جنب الشاشة. الطبقة مابتمسكش ضغطات، وكل الحركة transform/opacity بس. */
+.sc-hints { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.sc-hints::before {
+  content: ''; position: absolute; inset: 0; opacity: 0; transition: opacity .5s ease;
+  background: radial-gradient(circle at 50% 56%, rgba(25, 6, 12, .42), rgba(25, 6, 12, .12) 34%, transparent 58%);
+}
+.sc-hints.is-tap::before, .sc-hints.is-scroll::before { opacity: 1; }
+
+.sc-hint {
+  position: absolute; left: 50%; top: 56%; width: 21cqi; height: 21cqi; margin: -10.5cqi 0 0 -10.5cqi;
+  opacity: 0; transform: scale(.8); transition: opacity .4s ease, transform .5s cubic-bezier(.32, 1.42, .52, 1);
+}
+.sc-hints.is-tap .sc-hint--tap, .sc-hints.is-scroll .sc-hint--scroll { opacity: 1; transform: none; }
+.sc-hint-hand {
+  position: absolute; inset: 0; width: 100%; height: 100%; fill: #fff; transform-origin: 48% 20%;
+  filter: drop-shadow(0 3px 6px rgba(20, 5, 10, .55));
+}
+
+/* اضغطوا: الإيد بتدوس، ودايرتين بيتمدّوا من طرف الصباع */
+.sc-hint-ring {
+  position: absolute; left: 47.5%; top: 19%; width: 15cqi; height: 15cqi; margin: -7.5cqi 0 0 -7.5cqi;
+  border-radius: 50%; border: 2px solid rgba(255, 255, 255, .95); opacity: 0;
+  box-shadow: 0 0 12px rgba(255, 255, 255, .5);
+}
+.sc-hints.is-tap .sc-hint--tap .sc-hint-hand { animation: sc-press 1.9s ease-in-out infinite; }
+.sc-hints.is-tap .sc-hint-ring { animation: sc-ring 1.9s ease-out infinite; }
+.sc-hints.is-tap .sc-hint-ring--late { animation-delay: .22s; }
+@keyframes sc-press { 0%, 100% { transform: none; } 14% { transform: scale(.84) translateY(4%); } 28% { transform: none; } }
+@keyframes sc-ring { 0%, 12% { opacity: 0; transform: scale(.25); } 18% { opacity: 1; } 60%, 100% { opacity: 0; transform: scale(1.7); } }
+
+/* اسحبوا: الإيد بتطلع لفوق وورا صباعها خط بينوّر */
+.sc-hint-trail {
+  position: absolute; left: calc(47.5% - 1.5px); bottom: 80%; width: 3px; height: 20cqi; border-radius: 3px;
+  background: linear-gradient(to top, rgba(255, 255, 255, .95), transparent); transform-origin: 50% 100%; opacity: 0;
+}
+.sc-hints.is-scroll .sc-hint--scroll .sc-hint-hand { animation: sc-swipe 2.3s cubic-bezier(.45, 0, .25, 1) infinite; }
+.sc-hints.is-scroll .sc-hint-trail { animation: sc-trail 2.3s cubic-bezier(.45, 0, .25, 1) infinite; }
+@keyframes sc-swipe {
+  0% { opacity: 0; transform: translateY(42%); }
+  14% { opacity: 1; transform: translateY(42%) scale(.92); }
+  62% { opacity: 1; transform: translateY(-58%) scale(.92); }
+  78%, 100% { opacity: 0; transform: translateY(-58%); }
+}
+@keyframes sc-trail {
+  0%, 14% { opacity: 0; transform: translateY(42%) scaleY(0); }
+  30% { opacity: .9; }
+  62% { opacity: .7; transform: translateY(-58%) scaleY(1); }
+  78%, 100% { opacity: 0; transform: translateY(-58%) scaleY(1); }
+}
+
+/* على الكمبيوتر: ماوس عجلته بتلف بدل الإيد */
+.sc-hint-mouse {
+  display: none; position: absolute; left: 50%; top: 50%; width: 11cqi; height: 17cqi; margin: -8.5cqi 0 0 -5.5cqi;
+  border: 2px solid #fff; border-radius: 6cqi; box-shadow: 0 3px 10px rgba(20, 5, 10, .45);
+}
+.sc-hint-mouse i {
+  position: absolute; left: 50%; top: 18%; width: 2px; height: 3.4cqi; margin-left: -1px; border-radius: 2px; background: #fff;
+}
+.sc-hints.is-scroll .sc-hint-mouse i { animation: sc-wheel 1.5s ease-in-out infinite; }
+@keyframes sc-wheel { 0% { opacity: 0; transform: none; } 25% { opacity: 1; } 80%, 100% { opacity: 0; transform: translateY(3.6cqi); } }
+.sc-hint-wheel { display: none; }
+@media (hover: hover) and (pointer: fine) {
+  .sc-hint--scroll .sc-hint-hand, .sc-hint-trail { display: none; }
+  .sc-hint-mouse { display: block; }
+  .sc-hint-touch { display: none; }
+  .sc-hint-wheel { display: inline; }
+}
+
+.sc-hint-pill {
+  position: absolute; left: 50%; top: calc(56% + 15cqi); max-width: 84%; padding: 1.9cqi 4.4cqi; border-radius: 99px;
+  background: rgba(30, 8, 14, .78); color: #fff; font-size: 3.9cqi; line-height: 1.35; white-space: nowrap; text-align: center;
+  border: 1px solid color-mix(in srgb, var(--sc-gold) 55%, transparent); box-shadow: 0 8px 18px -8px rgba(20, 5, 10, .6);
+  opacity: 0; transform: translate(-50%, 6px); transition: opacity .4s ease, transform .4s ease;
+}
+.sc-hints.is-tap .sc-hint-pill, .sc-hints.is-scroll .sc-hint-pill { opacity: 1; transform: translate(-50%, 0); transition-delay: .15s; }
+
+/* مؤشر التمرير: خط رفيع على جنب الشاشة، المقبض الدهبي بيقول وصلت لفين في الدعوة */
+.sc-progress {
+  position: absolute; right: 2.2cqi; top: 26%; width: 3px; height: 48%; border-radius: 3px; overflow: hidden;
+  background: rgba(255, 255, 255, .35); box-shadow: 0 0 0 1px rgba(30, 8, 14, .12); opacity: 0; transition: opacity .5s ease;
+}
+.sc-progress span {
+  position: absolute; left: 0; top: 0; width: 100%; height: 20%; border-radius: inherit;
+  background: var(--sc-gold); transition: transform .12s linear;
+}
+.sc-hints.has-progress .sc-progress { opacity: .9; }
+@media (prefers-reduced-motion: reduce) {
+  .sc-hints *, .sc-hints *::before { animation: none !important; }
+  .sc-hint-ring, .sc-hint-trail { display: none; }
+}
+
 /* ---- الـ Dynamic Island: مشغّل مزيكا القالب (DynamicIsland.tsx). كل المقاسات بـ cqi
    (نسبة من عرض التلفون) فبتتصغّر مع التلفون، والحركة سوستة بتفوت شوية وترجع زي الآيفون. */
 .sc-phone { container-type: inline-size; }

@@ -9,6 +9,7 @@ import { warmPreview } from '@/features/invite/previewPrefetch'
 import { useHistoryState } from '@/lib/useHistoryState'
 import { pick, useLang } from '../text'
 import { DynamicIsland } from './DynamicIsland'
+import { PhoneHints } from './PhoneHints'
 import type { ComposeTemplate, PublicTemplate } from '../types'
 
 /**
@@ -276,6 +277,7 @@ export function TemplatesShowcase({ site, templates, chosen, error }: Props) {
                       }}
                     />
                   )}
+                  <PhoneHints frame={frame} loaded={loaded} slug={current.slug} />
                   <div className={'sc-loading' + (loading ? ' is-on' : '')} aria-hidden="true">
                     {/* الغلاف مربّع: بيظهر كامل في النص فوق نسخة منه مغبّشة مالية الشاشة */}
                     {current.cover && <img className="sc-loading-bg" src={current.cover} alt="" />}
